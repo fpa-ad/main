@@ -1,7 +1,7 @@
-#include "Particle.h"
+#include "particle.h"
 
 // constructor
-Particle::Particle(double in_ctm, double in_x, double in_y, double in_vx, double in_vy) {
+particle::particle(double in_ctm, double in_x, double in_y, double in_vx, double in_vy) {
     ctm = in_ctm;
     x = in_x;
     y = in_y;
@@ -11,7 +11,7 @@ Particle::Particle(double in_ctm, double in_x, double in_y, double in_vx, double
 
 // advance function - steps 1 and 2
 void Particle::advance_position(double dt, double Ex, double Ey, double Bx, double By) {
-    vx += + ctm/2 * dt * Ex;
+    vx += ctm/2 * dt * Ex;
     x += dt * vx;
 }
 

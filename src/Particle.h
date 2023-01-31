@@ -3,7 +3,7 @@
 
 using namespace std;
 
-class Particle{
+class particle{
     private:
         // charge to mass ratio
         double ctm;
@@ -14,7 +14,7 @@ class Particle{
 
     public:
         // constructor
-        Particle(double in_ctm, double in_x, double in_y, double in_vx, double in_vy);
+        particle(double in_ctm, double in_x, double in_y, double in_vx, double in_vy);
 
         // advance function - steps 1 and 2
         void advance_position(double dt, double Ex, double Ey, double Bx, double By);
