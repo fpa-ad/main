@@ -1,11 +1,13 @@
 1. Makefile
 2. Definir as classes
     - classe geral da simulação
-        - particle (tem as coordenadas no phase space, dá para avançar com o método)
+        - particles
+            - individual particles (tem as coordenadas no phase space, dá para avançar com o método)
+                q/m x y vx vy
         - fields (método para recalcular)
 3. Criar Python para testes
 
-
+particles.advance(dt, fields.update(particles.get_all()))
 
 Output:
 1 pasta por simulação
