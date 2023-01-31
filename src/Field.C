@@ -67,3 +67,7 @@ void Field::Update(double** rho){
     ///Boi, this part is hard
 }
 
+double** Density(Field.update(int n_types, int* n_particles, double* ctm, particle** particles)){
+    //Calculate rho
+}
+

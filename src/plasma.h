@@ -2,6 +2,7 @@
 #define __PLASMA__
 
 #include "particle.h"
+#include "Field.h"
 
 using namespace std;
 
@@ -13,12 +14,23 @@ class plasma{
         int* n_particles = nullptr;
         // particle matrix (first index por particle type, second index for particle itself)
         particle** particles = nullptr;
+        
+        // number of fields
+        int nFields=0;
+        // vector of field objects
+        Field* fields = nullptr;
 
-        // Field
+        //properties of grid
+        //Size of box
+        double Lx;
+        double Ly;
+        //Spatial Step
+        double hx;
+        double hy;
 
     public:
         // constructor
-        plasma(int in_n, int* in_n_particles, int* ctm, auto f);
+        plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, int* ctm, auto f, int in_nFields, double** const_fields);
 
         // destructor
         ~plasma();
