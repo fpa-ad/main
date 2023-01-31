@@ -36,6 +36,11 @@ class plasma{
         int get_n_particle(int i);
         particle** get_particles();
 
+        inline double get_Ex(double x, double y);
+        inline double get_Ey(double x, double y);
+        inline double get_Bx(double x, double y);
+        inline double get_By(double x, double y);
+
         // move
         void move(double dt);
 

@@ -27,25 +27,63 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
 
 inline int plasma::get_n() {
     return n;
-}
+};
 
 inline int plasma::get_n_particle(int i) {
     return n_particles[i];
-}
+};
 
 inline particle** plasma::get_particles() {
     return particles;
-}
+};
+
+inline double plasma::get_Ex(double x, double y) {
+    if (nFields == 0) {
+        return 0;
+    }
+    else {
+        return fields[0].get_X(x, y);
+    }
+};
+
+inline double plasma::get_Ey(double x, double y) {
+    if (nFields == 0) {
+        return 0;
+    }
+    else {
+        return fields[0].get_Y(x, y);
+    }
+};
+
+inline double plasma::get_Bx(double x, double y) {
+    if (nFields <= 1) {
+        return 0;
+    }
+    else {
+        return fields[1].get_X(x, y);
+    }
+};
+
+inline double plasma::get_By(double x, double y) {
+    if (nFields <= 1) {
+        return 0;
+    }
+    else {
+        return fields[1].get_Y(x, y);
+    }
+};
 
 // move
 void plasma::move(double dt) {
     // loop through the particles
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n_particles[i]; j++) {
-            // advance
+            double x = particles[i][j].get_x();
+            double y = particles[i][j].get_y();
+            particles[i][j].advance_position(dt, get_Ex(x, y), get_Ey(x, y), get_Bx(x, y), get_By(x, y));
         }
     }
-}
+};
 
 // destructor
 plasma::~plasma() {
