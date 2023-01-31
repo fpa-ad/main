@@ -1,0 +1,2 @@
+1. Makefile
+2. Definir as estruturas
