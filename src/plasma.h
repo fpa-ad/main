@@ -32,9 +32,9 @@ class plasma{
         // constructor
         plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, int* ctm, auto f, int in_nFields, double** const_fields);
 
-        int get_n();
-        int get_n_particle(int i);
-        particle** get_particles();
+        inline int get_n();
+        inline int get_n_particle(int i);
+        inline particle** get_particles();
 
         inline double get_Ex(double x, double y);
         inline double get_Ey(double x, double y);
