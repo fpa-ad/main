@@ -25,12 +25,21 @@ inline double particle::get_vy() {
 };
 
 // advance function - steps 1 and 2
-void particle::advance_position(double dt, double Ex, double Ey, double Bx, double By) {
+inline void particle::advance_position(double dt, double Ex, double Ey, double Bx, double By) {
     vx += ctm/2 * dt * Ex;
     x += dt * vx;
 };
 
 // advance function - step 3
-void particle::advance_velocity(double dt, double Ex, double Ey, double Bx, double By) {
+inline void particle::advance_velocity(double dt, double Ex, double Ey, double Bx, double By) {
     vx += ctm/2 * dt * Ex;
+};
+
+inline void particle::sanity_check(double X, double Y) {
+    if (x > X) {
+        x -= X;
+    }
+    if (y > Y) {
+        y -= Y;
+    }
 };

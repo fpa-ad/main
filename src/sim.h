@@ -5,13 +5,14 @@
 #include "plasma.h"
 #include <chrono>
 #include <string>
+#include "utils.h"
 
 using namespace std;
 
 class sim{
     private:
         // name
-        string timestamp = "";
+        string timestamp = current_time();
         string name = "";
         int snapcount = 0;
 
