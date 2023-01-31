@@ -12,7 +12,9 @@ using namespace std;
 class sim{
     private:
         // name
-        string name = format("{0:%F}T{0:%R%z}", chrono::system_clock::now());
+        string timestamp = format("{0:%F}T{0:%R%z}", chrono::system_clock::now());
+        string name = "";
+        int snapcount = 0;
 
         // box dimensions
         double X, Y;
@@ -20,6 +22,8 @@ class sim{
         double dx, dy;
         // time step
         double dt;
+        // current time
+        double t;
 
         // plasma
         plasma* sim_plasma = nullptr;
@@ -31,6 +35,12 @@ class sim{
         // simulation name
         void set_name(string new_name);
         string get_name();
+
+        // snapshot
+        void snapshot();
+
+        // run simulation
+        void run(double runtime, double sc_dt);
 
 };
 

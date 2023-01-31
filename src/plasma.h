@@ -12,7 +12,7 @@ class plasma{
         int n = 0;
         // how many of each particle
         int* n_particles = nullptr;
-        // particle matrix (first index por particle type, second index for particle itself)
+        // particle matrix (first index for particle type, second index for particle itself)
         particle** particles = nullptr;
         
         // number of fields
@@ -31,6 +31,10 @@ class plasma{
     public:
         // constructor
         plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, int* ctm, auto f, int in_nFields, double** const_fields);
+
+        int get_n();
+        int get_n_particle(int i);
+        int get_particles();
 
         // move
         move(double dt);

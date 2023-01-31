@@ -16,6 +16,12 @@ class particle{
         // constructor
         particle(double in_ctm, double in_x, double in_y, double in_vx, double in_vy);
 
+        double get_ctm();
+        double get_x();
+        double get_y();
+        double get_vx();
+        double get_vy();
+
         // advance function - steps 1 and 2
         void advance_position(double dt, double Ex, double Ey, double Bx, double By);
 
