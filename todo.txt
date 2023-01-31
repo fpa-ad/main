@@ -1,2 +1,31 @@
 1. Makefile
-2. Definir as estruturas
+2. Definir as classes
+    - classe geral da simulação
+        - particle (tem as coordenadas no phase space, dá para avançar com o método)
+        - fields (método para recalcular)
+3. Criar Python para testes
+
+
+
+Output:
+1 pasta por simulação
+
+README
+-- Ficheiro exemplo -- (legendas, não incluir)
+
+X Y (dimensões da caixa) dx (tamanho da grelha) dy (tamanho da grelha) dt (step temporal)
+N (quantos tipos de partículas)
+-1 (q/m) n (quantas partículas) rho (densidade)
+...
+E externo B externo
+
+1 ficheiro txt por snapshot
+-- Ficheiro exemplo -- (legendas, não incluir)
+
+0 (tempo) N (quantos tipos)
+-1 (q/m) n (quantas partículas)
+"x" "y" "vx" "vy"
+...
++1 (q/m) n (quantas partículas)
+"x" "y" "vx" "vy"
+...
