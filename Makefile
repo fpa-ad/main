@@ -5,9 +5,9 @@ LIBDIR := lib
 
 CCFLAGS := -pedantic
 
-CC := g++ -std=c++11
+CC := g++ -std=c++20
 
-# src/ (declarcaoes de funcoes, de calsses + codigo)
+# src/ (declarcaoes de funcoes, de classes + codigo)
 # main/ (programas principais)
 # bin/ (temporarios, .o, .exe)
 # lib/ (bibliotecas) biblioteca FC
@@ -21,6 +21,8 @@ VPATH = main:src
 SRC := $(wildcard src/*.C)
 OBJ := $(patsubst %.C, $(BINDIR)/%.o, $(notdir $(SRC)))
 INC := $(wildcard src/*.h)
+
+.PHONY: all clean lib
 
 lib: $(LIBDIR)/libFC.a
 
