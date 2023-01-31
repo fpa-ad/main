@@ -14,6 +14,8 @@ class plasma{
         // particle matrix (first index por particle type, second index for particle itself)
         particle** particles = nullptr;
 
+        // Field
+
     public:
         // constructor
         plasma(int in_n, int* in_n_particles, int* ctm, auto f);

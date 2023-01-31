@@ -17,12 +17,13 @@ class sim{
 
         // plasma
         plasma* sim_plasma = nullptr;
-        // field
-        // not yet but soon
 
     public:
-        // construtor - initializes simulation, plasma and fields
+        // construtor
         sim(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, int* n_particles, int* ctm, auto f);
+
+
+
 };
 
 #endif
