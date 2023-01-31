@@ -4,25 +4,25 @@
 particle::particle(double in_ctm, double in_x, double in_y, double in_vx, double in_vy) :
                     ctm(in_ctm), x(in_x), y(in_y), vx(in_vx), vy(in_vy) {};
 
-double particle::get_ctm() {
-    inline return ctm;
-}
+inline double particle::get_ctm() {
+    return ctm;
+};
 
-double particle::get_x() {
-    inline return x;
-}
+inline double particle::get_x() {
+    return x;
+};
 
-double particle::get_y() {
-    inline return y;
-}
+inline double particle::get_y() {
+    return y;
+};
 
-double particle::get_vx() {
-    inline return vx;
-}
+inline double particle::get_vx() {
+    return vx;
+};
 
-double particle::get_vy() {
-    inline return vy;
-}
+inline double particle::get_vy() {
+    return vy;
+};
 
 // advance function - steps 1 and 2
 void particle::advance_position(double dt, double Ex, double Ey, double Bx, double By) {
