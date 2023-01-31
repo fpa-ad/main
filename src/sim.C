@@ -57,7 +57,9 @@ void sim::run(double runtime, double sc_dt) {
         int n_part = sim_plasma->get_n_particle(i);
         f << part[i][0].get_ctm() << " [q/m] " << n_part << " particles\n";
     }
-    // TODO E externo B externo
+    double* fields = sim_plasma->get_background_fields();
+    f << "Ex= " << fields[0] << " Ey= " << fields[1] << " Bx= " << fields[2] << " By=" << fields[3] << endl;
+    free(fields);
     f.close();
 
     snapcount = 0;

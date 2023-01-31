@@ -37,6 +37,25 @@ inline particle** plasma::get_particles() {
     return particles;
 };
 
+inline double* plasma::get_background_fields() {
+    double* f = (double*) malloc(4*sizeof(double));
+    if (nFields <= 1) {
+        f[3] = f[2] = 0;
+        if (nFields == 1) {
+            f[0] = bkg_fields[0][0];
+            f[1] = bkg_fields[0][1];
+        }
+        else {
+            f[1] = f[0] = 0;
+        }
+    }
+    else {
+        f[2] = bkg_fields[1][0];
+        f[3] = bkg_fields[1][1];
+    }
+    return f;
+};
+
 inline double plasma::get_Ex(double x, double y) {
     if (nFields == 0) {
         return 0;
