@@ -1,11 +1,11 @@
 #ifndef __SIM__
 #define __SIM__
 
-#include "Particle.h"
+#include "particle.h"
 #include "plasma.h"
 #include <chrono>
 #include <string>
-#include "utils.h"
+#include "myutils.h"
 
 using namespace std;
 
@@ -30,7 +30,7 @@ class sim{
 
     public:
         // constructor
-        sim(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, int* n_particles, int* ctm, auto f);
+        sim(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, int* n_particles, double* ctm, func** f);
 
         // simulation name
         void set_name(string new_name);
