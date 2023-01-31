@@ -77,13 +77,13 @@ double Field::Y2deriv(int nx, int ny){
 
 double Field::get_X(double x, double y){
     int auxX = (int)(x/hx);
-    int auxy = (int)(y/hy);
+    int auxY = (int)(y/hy);
     return Fx[auxX][auxY]+ext_x;
 }
 
 double Field::get_Y(double x, double y){
     int auxX = (int)(x/hx);
-    int auxy = (int)(y/hy);
+    int auxY = (int)(y/hy);
     return Fy[auxX][auxY]+ext_y;
 }
 
