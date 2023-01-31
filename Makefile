@@ -5,7 +5,7 @@ LIBDIR := lib
 
 CCFLAGS := -pedantic
 
-CC := g++ -std=c++20
+CC := g++ -std=c++14
 
 # src/ (declarcaoes de funcoes, de classes + codigo)
 # main/ (programas principais)
