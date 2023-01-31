@@ -75,13 +75,13 @@ double Field::Y2deriv(int nx, int ny){
     return ((phi[nx][ny+1]-2*phi[nx][ny]+phi[nx][ny-1])/(hy*hy));
 }
 
-double get_X(double x, double y){
+double Field::get_X(double x, double y){
     int auxX = (int)(x/hx);
     int auxy = (int)(y/hy);
     return Fx[auxX][auxY]+ext_x;
 }
 
-double get_Y(double x, double y){
+double Field::get_Y(double x, double y){
     int auxX = (int)(x/hx);
     int auxy = (int)(y/hy);
     return Fy[auxX][auxY]+ext_y;
@@ -91,7 +91,8 @@ void Field::Update(double** rho){
     ///Boi, this part is hard
 }
 
-double** Density(Field.update(int n_types, int* n_particles, double* ctm, particle** particles)){
+double** Field::Density(int n_types, int* n_particles, double* ctm, particle** particles){
     //Calculate rho
+    return 0;
 }
 

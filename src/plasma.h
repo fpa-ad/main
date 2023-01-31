@@ -1,7 +1,7 @@
 #ifndef __PLASMA__
 #define __PLASMA__
 
-#include "particle.h"
+#include "Particle.h"
 #include "Field.h"
 
 using namespace std;

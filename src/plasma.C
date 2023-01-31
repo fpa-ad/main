@@ -18,7 +18,7 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
     }
 
     //initialize fields
-    fields = new Field[nFields];
+    fields = (Field*) malloc(sizeof(Field));
     //loop through fields
     for (int i = 0; i < nFields; i++){
         fields[i]=Field(Lx, Ly, hx, hy, const_fields[i][0], const_fields[i][1]);
