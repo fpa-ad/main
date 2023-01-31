@@ -1,6 +1,6 @@
 #include "Field.h"
 
-Field::Field(double fLx, double fLy, double fhx, double fhy){
+Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, double fext_y){
     Lx=fLx;
     Nx=(int)(fLx/fhx);
     hx=fLx/((double)(Nx));
@@ -11,17 +11,29 @@ Field::Field(double fLx, double fLy, double fhx, double fhy){
     phi=new double*[Nx];
     for(int i=0; i<Nx; ++i){
         phi[i]=new double[Ny];
+        for(int j=0; j<Ny; ++j){
+            phi[i][j]=0;
+        }
     }
 
     Fx=new double*[Nx];
     for(int i=0; i<Nx; ++i){
         Fx[i]=new double[Ny];
+        for(int j=0; j<Ny; ++j){
+            Fx[i][j]=0;
+        }
     }
 
     Fy=new double*[Nx];
     for(int i=0; i<Nx; ++i){
         Fy[i]=new double[Ny];
+        for(int j=0; j<Ny; ++j){
+            Fy[i][j]=0;
+        }
     }
+
+    ext_x=fext_x;
+    ext_y=fext_y;
 }
 
 

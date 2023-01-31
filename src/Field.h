@@ -7,7 +7,7 @@ class Field{
     public:
 
     //Constructor
-    Field(double fLx, double fLy, double fhx, double fhy);
+    Field(double fLx, double fLy, double fhx, double fhy, double fext_x, double fext_y);
     //Destructor
     ~Field();
 
@@ -31,5 +31,7 @@ class Field{
     double** phi;
     double** Fx;
     double** Fy;
+    double ext_x;
+    double ext_y;
 };
 #endif
