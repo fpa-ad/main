@@ -2,14 +2,18 @@
 #include <cstdlib>
 
 // constructor
-plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, int* ctm, auto f, int in_nFields, double** const_fields) : Lx(in_Lx),Ly(in_Ly),hx(in_hx),hy(in_hy),n(in_n), n_particles(in_n_particles) , nFields(in_nFields) {
+plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, auto f, int in_nFields, double** const_fields) : Lx(in_Lx),Ly(in_Ly),hx(in_hx),hy(in_hy),n(in_n), n_particles(in_n_particles) , nFields(in_nFields) {
 
-    //initialize particles
-    particles = (particle**) malloc(sizeof(particle*));
+    // initialize particles
+    particles = (particle**) malloc(n*sizeof(particle*));
+    // initialize ctm ratios
+    ctm = (double*) malloc(sizeof(n*sizeof(double)));
     // for each particle type
     for (int i = 0; i < n; i++) {
         // create the particle array
         particles[i] = (particle*) malloc(sizeof(particle));
+        // copy the ctm ratios to properly store them
+        ctm[i] = in_ctm[i];
         // loop through the particles
         for (int j = 0; j < n_particles[i]; j++) {
             // f[i] should be an array of four functions to initialize the x y vx and vy coordinates
@@ -102,6 +106,19 @@ void plasma::move(double dt) {
             particles[i][j].advance_position(dt, get_Ex(x, y), get_Ey(x, y), get_Bx(x, y), get_By(x, y));
         }
     }
+    // update the fields
+    for (int i = 0; i < nFields; i ++) {
+        fields[i].Update(fields[i].Density(n, n_particles, ctm, particles));
+    }
+    // loop through the particles
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n_particles[i]; j++) {
+            double x = particles[i][j].get_x();
+            double y = particles[i][j].get_y();
+            particles[i][j].advance_velocity(dt, get_Ex(x, y), get_Ey(x, y), get_Bx(x, y), get_By(x, y));
+            particles[i][j].sanity_check(Lx, Ly);
+        }
+    }
 };
 
 // destructor
@@ -110,4 +127,5 @@ plasma::~plasma() {
         free(particles[i]);
     }
     free(particles);
+    free(ctm);
 };

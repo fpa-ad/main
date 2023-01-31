@@ -12,6 +12,8 @@ class plasma{
         int n = 0;
         // how many of each particle
         int* n_particles = nullptr;
+        // charge to mass ratios
+        double* ctm = nullptr;
         // particle matrix (first index for particle type, second index for particle itself)
         particle** particles = nullptr;
         
@@ -32,7 +34,7 @@ class plasma{
 
     public:
         // constructor
-        plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, int* ctm, auto f, int in_nFields, double** const_fields);
+        plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, auto f, int in_nFields, double** const_fields);
 
         int get_n();
         int get_n_particle(int i);

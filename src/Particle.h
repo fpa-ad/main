@@ -27,6 +27,9 @@ class particle{
 
         // advance function - step 3
         void advance_velocity(double dt, double Ex, double Ey, double Bx, double By);
+
+        // thinking with portals: enabled (aka periodic border conditions)
+        void sanity_check(double X, double Y);
 };
 
 #endif
