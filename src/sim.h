@@ -22,8 +22,6 @@ class sim{
         // construtor
         sim(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, int* n_particles, int* ctm, auto f);
 
-
-
 };
 
 #endif
