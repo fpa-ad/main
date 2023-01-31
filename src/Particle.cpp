@@ -16,6 +16,6 @@ void Particle::advance_position(double dt, double Ex, double Ey, double Bx, doub
 }
 
 // advance function - step 3
-void Particle::advance_position(double dt, double Ex, double Ey, double Bx, double By) {
+void Particle::advance_velocity(double dt, double Ex, double Ey, double Bx, double By) {
     vx += ctm/2 * dt * Ex;
 }
