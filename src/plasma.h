@@ -34,10 +34,10 @@ class plasma{
 
         int get_n();
         int get_n_particle(int i);
-        int get_particles();
+        particle** get_particles();
 
         // move
-        move(double dt);
+        void move(double dt);
 
         // destructor
         ~plasma();

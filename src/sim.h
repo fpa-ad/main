@@ -3,7 +3,6 @@
 
 #include "particle.h"
 #include "plasma.h"
-#include <format>
 #include <chrono>
 #include <string>
 
@@ -12,7 +11,7 @@ using namespace std;
 class sim{
     private:
         // name
-        string timestamp = format("{0:%F}T{0:%R%z}", chrono::system_clock::now());
+        string timestamp = "";
         string name = "";
         int snapcount = 0;
 

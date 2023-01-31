@@ -25,20 +25,20 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
     }
 };
 
-int plasma::get_n() {
-    inline return n;
+inline int plasma::get_n() {
+    return n;
 }
 
-int plasma::get_n_particle(int i) {
-    inline return n_particles[i];
+inline int plasma::get_n_particle(int i) {
+    return n_particles[i];
 }
 
-int plasma::get_particles() {
-    inline return particles;
+inline particle** plasma::get_particles() {
+    return particles;
 }
 
 // move
-plasma::move(double dt) {
+void plasma::move(double dt) {
     // loop through the particles
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n_particles[i]; j++) {
