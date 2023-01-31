@@ -20,7 +20,7 @@ string sim::get_name() {
 void sim::snapshot() {
     ofstream f;
     stringstream ss;
-    ss << timestamp << "--" << name << "/" << snapcount << ".txt";
+    ss << "bin/" << timestamp << "--" << name << "/" << snapcount << ".txt";
     f.open (ss.str());
 
     int n = sim_plasma->get_n();
@@ -41,14 +41,14 @@ void sim::snapshot() {
 }
 
 void sim::run(double runtime, double sc_dt) {
-    string folder = timestamp + "--" + name;
+    string folder = "bin/" + timestamp + "--" + name;
     // this should not be a problem, but in case it is
     if (!filesystem::is_directory(folder) || !filesystem::exists(folder)) {
         filesystem::create_directory(folder);
     }
 
     ofstream f;
-    f.open (timestamp + "--" + name + "/README.txt");
+    f.open ("bin/" + timestamp + "--" + name + "/README.txt");
     f << X << " " << Y << " " << dx << " " << dy << " " << dt << endl;
     int n = sim_plasma->get_n();
     f << n << " part. types\n";
