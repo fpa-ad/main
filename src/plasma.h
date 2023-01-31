@@ -20,6 +20,9 @@ class plasma{
         // constructor
         plasma(int in_n, int* in_n_particles, int* ctm, auto f);
 
+        // move
+        move(double dt);
+
         // destructor
         ~plasma();
 };

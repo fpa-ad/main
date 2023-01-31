@@ -16,6 +16,16 @@ plasma::plasma(int in_n, int* in_n_particles, int* ctm, auto f) : n(in_n), n_par
     }
 };
 
+// move
+plasma::move(double dt) {
+    // loop through the particles
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n_particles[i]; j++) {
+            // advance
+        }
+    }
+}
+
 // destructor
 plasma::~plasma() {
     for (int i = 0; i < n; i++) {
