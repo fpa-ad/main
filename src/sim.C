@@ -4,10 +4,10 @@
 #include <fstream>
 #include <sstream>
 
-sim::sim(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, int* n_particles, int* ctm, auto f) :
+sim::sim(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, int* n_particles, double* ctm, func** f) :
         X(in_X), Y(in_Y), dx(in_dx), dy(in_dy), dt(in_dt) {
-    *sim_plasma = plasma(n, n_particles, ctm, f);
-};
+    *sim_plasma = plasma(X, Y, dx, dy, n, n_particles, ctm, f);
+}
 
 void sim::set_name(string new_name) {
     name = new_name;

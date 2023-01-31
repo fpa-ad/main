@@ -2,7 +2,7 @@
 #include <cstdlib>
 
 // constructor
-plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, auto f, int in_nFields, double** const_fields) : Lx(in_Lx),Ly(in_Ly),hx(in_hx),hy(in_hy),n(in_n), n_particles(in_n_particles) , nFields(in_nFields) {
+plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, func** f, int in_nFields, double** const_fields) : Lx(in_Lx),Ly(in_Ly),hx(in_hx),hy(in_hy),n(in_n), n_particles(in_n_particles) , nFields(in_nFields) {
 
     // initialize particles
     particles = (particle**) malloc(n*sizeof(particle*));
@@ -27,19 +27,19 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
     for (int i = 0; i < nFields; i++){
         fields[i]=Field(Lx, Ly, hx, hy, const_fields[i][0], const_fields[i][1]);
     }
-};
+}
 
 inline int plasma::get_n() {
     return n;
-};
+}
 
 inline int plasma::get_n_particle(int i) {
     return n_particles[i];
-};
+}
 
 inline particle** plasma::get_particles() {
     return particles;
-};
+}
 
 inline double* plasma::get_background_fields() {
     double* f = (double*) malloc(4*sizeof(double));
@@ -58,7 +58,7 @@ inline double* plasma::get_background_fields() {
         f[3] = bkg_fields[1][1];
     }
     return f;
-};
+}
 
 inline double plasma::get_Ex(double x, double y) {
     if (nFields == 0) {
@@ -67,7 +67,7 @@ inline double plasma::get_Ex(double x, double y) {
     else {
         return fields[0].get_X(x, y);
     }
-};
+}
 
 inline double plasma::get_Ey(double x, double y) {
     if (nFields == 0) {
@@ -76,7 +76,7 @@ inline double plasma::get_Ey(double x, double y) {
     else {
         return fields[0].get_Y(x, y);
     }
-};
+}
 
 inline double plasma::get_Bx(double x, double y) {
     if (nFields <= 1) {
@@ -85,7 +85,7 @@ inline double plasma::get_Bx(double x, double y) {
     else {
         return fields[1].get_X(x, y);
     }
-};
+}
 
 inline double plasma::get_By(double x, double y) {
     if (nFields <= 1) {
@@ -94,7 +94,7 @@ inline double plasma::get_By(double x, double y) {
     else {
         return fields[1].get_Y(x, y);
     }
-};
+}
 
 // move
 void plasma::move(double dt) {
@@ -119,7 +119,7 @@ void plasma::move(double dt) {
             particles[i][j].sanity_check(Lx, Ly);
         }
     }
-};
+}
 
 // destructor
 plasma::~plasma() {
@@ -128,4 +128,4 @@ plasma::~plasma() {
     }
     free(particles);
     free(ctm);
-};
+}

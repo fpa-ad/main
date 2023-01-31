@@ -32,12 +32,12 @@ $(LIBDIR)/libFC.a: $(OBJ)
 	ranlib $@
     
 %.exe: $(BINDIR)/%.o $(LIBDIR)/libFC.a
-	@echo compilink and linking...
-	$(CC) -I src $< -o $(BINDIR)/$@ -L lib -l FC
+	@echo compiling and linking...
+	$(CC) -I src -L lib $< -o $(BINDIR)/$@ -l FC
 
 bin/%.exe: $(BINDIR)/%.o $(LIBDIR)/libFC.a 
-	@echo compilink and linking... 
-	$(CC) -I src $< -o $@ -L lib -l FC
+	@echo compiling and linking... 
+	$(CC) -I src -L lib $< -o $@ -l FC
 
 $(BINDIR)/%.o: %.C | $(INC)
 	@echo compiling... $<
