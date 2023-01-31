@@ -17,6 +17,10 @@ class Field{
     double X2deriv(int nx, int ny);
     double Y2deriv(int nx, int ny);
 
+    //Get Fields
+    double get_X(double x, double y);
+    double get_Y(double x, double y);
+
     //Function to calculate the field, given the charge density
     void Update(double** rho);
     double** Density(Field.update(int n_types, int* n_particles, double* ctm, particle** particles));
