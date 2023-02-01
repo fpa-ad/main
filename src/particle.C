@@ -1,4 +1,5 @@
 #include "Particle.h"
+#include <iostream>
 
 // constructor
 particle::particle(double in_ctm, double in_x, double in_y, double in_vx, double in_vy) :

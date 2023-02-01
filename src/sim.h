@@ -12,7 +12,7 @@ class sim{
     private:
         // name
         string timestamp = current_time();
-        string name = "";
+        string name = "sim";
         int snapcount = 0;
 
         // box dimensions
@@ -22,14 +22,15 @@ class sim{
         // time step
         double dt;
         // current time
-        double t;
+        double t = 0;
 
         // plasma
-        plasma* sim_plasma = nullptr;
+        plasma sim_plasma;
 
     public:
         // constructor
-        sim(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, int* n_particles, double* ctm, func** f);
+        // TODO fix f
+        sim(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, int* n_particles, double* ctm, func** f, int in_nFields, double** const_fields);
 
         // simulation name
         void set_name(string new_name);
