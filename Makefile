@@ -3,7 +3,7 @@
 BINDIR := bin
 LIBDIR := lib
 
-CCFLAGS := -pedantic
+CCFLAGS := -pedantic 
 
 CC := g++ -std=c++20
 
@@ -26,7 +26,7 @@ INC := $(wildcard src/*.h)
 
 lib: $(LIBDIR)/libFC.a
 
-$(LIBDIR)/libFC.a: $(OBJ) 
+$(LIBDIR)/libFC.a: $(OBJ)
 	@echo make lib...
 	ar ruv $@ $^
 	ranlib $@
