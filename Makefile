@@ -53,6 +53,7 @@ obj := $(wildcard */*.o) $(wildcard *.o) $(wildcard */*.so) $(wildcard */*.pcm) 
 clean:
 	@echo cleaning dir...
 	rm -f $(exe) $(obj) $(tilde)
+	rm -r output/*
 
 #CC := g++
 #CCFLAGS:= -std=c++11 -Wall -g

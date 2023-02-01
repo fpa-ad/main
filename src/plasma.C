@@ -18,7 +18,7 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
         for (int j = 0; j < n_particles[i]; j++) {
             // f[i] should be an array of four functions to initialize the x y vx and vy coordinates
             // particles[i][j] = particle(ctm[i], f[i][0](), f[i][1](), f[i][2](), f[i][3]());
-            particles[i][j] = particle(ctm[i], 0.5, 0.5, 1, 0);
+            particles[i][j] = particle(ctm[i], 0.5, 0.5, 0, 0);
         }
     }
 

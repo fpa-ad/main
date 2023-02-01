@@ -68,7 +68,7 @@ void sim::run(double runtime, double sc_dt) {
     double snap = t;
     snapshot();
     while (t < runtime + dt) {
-        if (t - snap > sc_dt) {
+        if (t - snap >= sc_dt) {
             snap = t;
             snapshot();
         }
