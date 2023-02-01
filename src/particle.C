@@ -40,13 +40,13 @@ void particle::sanity_check(double X, double Y) {
     if (x > X) {
         x -= X;
     }
-    else if (x < X) {
+    else if (x < 0) {
         x += X;
     }
     if (y > Y) {
         y -= Y;
     }
-    else if (y > Y) {
+    else if (y < 0) {
         y += Y;
     }
 };

@@ -72,9 +72,7 @@ void sim::run(double runtime, double sc_dt) {
             snap = t;
             snapshot();
         }
-        cout << "going to move" << endl;
         sim_plasma.move(dt);
-        cout << "moved" << endl;
         t += dt;
     }
 }

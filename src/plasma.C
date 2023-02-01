@@ -102,11 +102,8 @@ void plasma::move(double dt) {
     // loop through the particles
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n_particles[i]; j++) {
-            cout << "getting x" << endl;
             double x = particles[i][j].get_x();
-            cout << "getting y" << endl;
             double y = particles[i][j].get_y();
-            cout << "advancing position" << endl;
             particles[i][j].advance_position(dt, get_Ex(x, y), get_Ey(x, y), get_Bx(x, y), get_By(x, y));
         }
     }

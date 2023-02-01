@@ -75,15 +75,17 @@ double Field::Y2deriv(int nx, int ny){
 }
 
 double Field::get_X(double x, double y){
-    int auxX = (int)(x/hx);
+    /*int auxX = (int)(x/hx);
     int auxY = (int)(y/hy);
-    return Fx[auxX][auxY]+ext_x;
+    return Fx[auxX][auxY]+ext_x;*/
+    return ext_x;
 }
 
 double Field::get_Y(double x, double y){
-    int auxX = (int)(x/hx);
+    /*int auxX = (int)(x/hx);
     int auxY = (int)(y/hy);
-    return Fy[auxX][auxY]+ext_y;
+    return Fy[auxX][auxY]+ext_y;*/
+    return ext_y;
 }
 
 void Field::Update(double** rho){
