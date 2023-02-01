@@ -1,6 +1,9 @@
 #include "plasma.h"
 #include <cstdlib>
 
+// TEMPORARY
+#include <random>
+
 // constructor
 plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, func** f, int in_nFields, double** const_fields) : Lx(in_Lx), Ly(in_Ly), hx(in_hx), hy(in_hy), n(in_n), n_particles(in_n_particles), nFields(in_nFields), bkg_fields(const_fields) {
 
@@ -15,10 +18,18 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
         // copy the ctm ratios to properly store them
         ctm[i] = in_ctm[i];
         // loop through the particles
+
+        // TEMPORARY
+        random_device rd;  // Will be used to obtain a seed for the random number engine
+        mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
+        uniform_real_distribution<> disx(0, Lx);
+        uniform_real_distribution<> disy(0, Ly);
+
         for (int j = 0; j < n_particles[i]; j++) {
             // f[i] should be an array of four functions to initialize the x y vx and vy coordinates
             // particles[i][j] = particle(ctm[i], f[i][0](), f[i][1](), f[i][2](), f[i][3]());
-            particles[i][j] = particle(ctm[i], 0.5, 0.5, 0, 0);
+            // TODO
+            particles[i][j] = particle(ctm[i], disx(gen), disy(gen), 0, 0);
         }
     }
 

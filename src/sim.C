@@ -23,7 +23,7 @@ void sim::snapshot() {
     f.open (ss.str());
 
     int n = sim_plasma.get_n();
-    f << t << " s " << n << " part. types\n";
+    f << t << " s " << n << " part. type(s)\n";
 
     particle** part = sim_plasma.get_particles();
     for (int i = 0; i < n; i++) {
@@ -53,7 +53,7 @@ void sim::run(double runtime, double sc_dt) {
     f.open ("output/" + timestamp + "__" + name + "/README.txt");
     f << "Lx= " << X << " Ly= " << Y << " dx= " << dx << " dy= " << dy << " dt= " << dt << endl;
     int n = sim_plasma.get_n();
-    f << n << " part. types\n";
+    f << n << " part. type(s)\n";
     particle** part = sim_plasma.get_particles();
     for (int i = 0; i < n; i++) {
         int n_part = sim_plasma.get_n_particle(i);
