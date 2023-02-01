@@ -29,7 +29,7 @@ class sim{
 
     public:
         // constructor
-        sim(double in_X = 0, double in_Y = 0, double in_dx = 0, double in_dy = 0, double in_dt = 0, int n = 0, int* n_particles = nullptr, double* ctm = nullptr, func** f = nullptr);
+        sim(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, int* n_particles, double* ctm, func** f);
 
         // simulation name
         void set_name(string new_name);
