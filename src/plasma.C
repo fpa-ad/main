@@ -29,19 +29,19 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
     }
 }
 
-inline int plasma::get_n() {
+int plasma::get_n() {
     return n;
 }
 
-inline int plasma::get_n_particle(int i) {
+int plasma::get_n_particle(int i) {
     return n_particles[i];
 }
 
-inline particle** plasma::get_particles() {
+particle** plasma::get_particles() {
     return particles;
 }
 
-inline double* plasma::get_background_fields() {
+double* plasma::get_background_fields() {
     double* f = (double*) malloc(4*sizeof(double));
     if (nFields <= 1) {
         f[3] = f[2] = 0;
@@ -60,7 +60,7 @@ inline double* plasma::get_background_fields() {
     return f;
 }
 
-inline double plasma::get_Ex(double x, double y) {
+double plasma::get_Ex(double x, double y) {
     if (nFields == 0) {
         return 0;
     }
@@ -69,7 +69,7 @@ inline double plasma::get_Ex(double x, double y) {
     }
 }
 
-inline double plasma::get_Ey(double x, double y) {
+double plasma::get_Ey(double x, double y) {
     if (nFields == 0) {
         return 0;
     }
@@ -78,7 +78,7 @@ inline double plasma::get_Ey(double x, double y) {
     }
 }
 
-inline double plasma::get_Bx(double x, double y) {
+double plasma::get_Bx(double x, double y) {
     if (nFields <= 1) {
         return 0;
     }
@@ -87,7 +87,7 @@ inline double plasma::get_Bx(double x, double y) {
     }
 }
 
-inline double plasma::get_By(double x, double y) {
+double plasma::get_By(double x, double y) {
     if (nFields <= 1) {
         return 0;
     }

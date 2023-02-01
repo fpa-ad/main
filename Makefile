@@ -33,7 +33,7 @@ $(LIBDIR)/libFC.a: $(OBJ)
     
 %.exe: $(BINDIR)/%.o $(LIBDIR)/libFC.a
 	@echo compiling and linking...
-	$(CC) -I src -L lib $< -o $(BINDIR)/$@ -l FC
+	$(CC) -I src $< -o $(BINDIR)/$@ -L lib -l FC
 
 bin/%.exe: $(BINDIR)/%.o $(LIBDIR)/libFC.a 
 	@echo compiling and linking... 

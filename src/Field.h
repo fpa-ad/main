@@ -1,7 +1,7 @@
 #ifndef __FIELD__
 #define __FIELD__
 
-#include "Particle.h"
+#include "particle.h"
 
 using namespace std;
 

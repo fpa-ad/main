@@ -36,7 +36,6 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
     ext_y=fext_y;
 }
 
-
 Field::~Field(){
     delete [] phi;
     delete [] Fx;

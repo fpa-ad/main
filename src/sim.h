@@ -1,7 +1,6 @@
 #ifndef __SIM__
 #define __SIM__
 
-#include "particle.h"
 #include "plasma.h"
 #include <chrono>
 #include <string>

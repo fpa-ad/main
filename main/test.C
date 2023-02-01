@@ -1,4 +1,5 @@
 #include "myutils.h"
+#include "particle.h"
 #include "sim.h"
 
 using namespace std;
@@ -6,5 +7,6 @@ using namespace std;
 int main()
 {
     cout << current_time() << endl;
-    sim my_sim;
+    particle par(1, 1, 1, 1, 1);
+    sim simm;
 }
