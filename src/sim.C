@@ -76,3 +76,7 @@ void sim::run(double runtime, double sc_dt) {
         t += dt;
     }
 }
+
+/*sim::~sim(){
+    free(&sim_plasma);
+}*/

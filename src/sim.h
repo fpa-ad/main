@@ -29,8 +29,8 @@ class sim{
 
     public:
         // constructor
-        // TODO fix f
         sim(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, int* n_particles, double* ctm, funcdouble** f, int in_nFields, double** const_fields);
+        //~sim();
 
         // simulation name
         void set_name(string new_name);
