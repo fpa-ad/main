@@ -1,6 +1,6 @@
 #include "Field.h"
 
-Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, double fext_y){
+Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, double fext_y, double fext_z){
     Lx=fLx;
     Nx=(int)(fLx/fhx);
     hx=fLx/((double)(Nx));
@@ -36,8 +36,17 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
         }
     }
 
+    Fz=new double*[Nx];
+    for(int i=0; i<Nx; ++i){
+        Fz[i]=new double[Ny];
+        for(int j=0; j<Ny; ++j){
+            Fz[i][j]=0;
+        }
+    }
+
     ext_x=fext_x;
     ext_y=fext_y;
+    ext_z=fext_z;
 }
 
 Field::~Field(){
@@ -81,31 +90,47 @@ double Field::Y2deriv(int nx, int ny){
 double Field::get_X(double x, double y){
     int auxX = (int)(x/hx);
     int auxY = (int)(y/hy);
-    return Fx[auxX][auxY]+ext_x;
+    cout<<"start field.get_X()"<<endl;
+    if(auxX<Nx&&auxY<Ny)
+        return Fx[auxX][auxY]+ext_x;
+    return ext_x;
 }
 
 double Field::get_Y(double x, double y){
     int auxX = (int)(x/hx);
     int auxY = (int)(y/hy);
-    return Fy[auxX][auxY]+ext_y;
+    cout<<"start field.get_Y()"<<endl;
+    if(auxX<Nx&&auxY<Ny)
+        return Fy[auxX][auxY]+ext_y;
+    return ext_y;
 }
 
 void Field::Update(int n_types, int* n_particles, double* ctm, particle** particles){
     
-    double** rho=(double**) malloc(Nx*sizeof(double*));
-    for (int i=0;i<Nx;++i){
+    /*double** rho=new double*[Nx];
+    for (int i=0;i<Nx;i++){
         //rho[i]=(double*) malloc(Ny*sizeof(double));
-        for(int j=0; j<Ny; ++j){
-            //rho[i][j]=0;
+        rho[i]=new double[Ny];
+        for(int j=0; j<Ny; j++){
+            rho[i][j]=0;
         }
     }
 
     //Density(n_types,n_particles,ctm,particles,rho);
     
-    for(int i=0;i<Nx;++i){
-        //free(rho[i]);
+    for(int i=0;i<Nx;i++){
+        free(rho[i]);
     }
-    free(rho);
+    free(rho);*/
+
+    double** testvec=new double*[Nx];
+    for (int i=0;i<Nx;i++){
+        testvec[i]=new double[Ny];
+    }
+    for(int i=0;i<Nx;i++){
+        delete [] testvec[i];
+    }
+    delete [] testvec;
 }
 
 void Field::Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho){

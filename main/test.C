@@ -24,9 +24,10 @@ int main(){
     ctm[0] = 1;
     ctm[1] = -1;
     double** fields = new double*[1];
-    fields[0] = new double[2];
+    fields[0] = new double[3];
     fields[0][0] = 1;
     fields[0][1] = 0;
+    fields[0][2] = 0;
     funcdouble** f=new funcdouble*[2];
     f[0]=new funcdouble[4];
     f[1]=new funcdouble[4];

@@ -29,7 +29,7 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
             double raux2=(double)(gen())/((double)(gen.max()));
             double raux3=(double)(gen())/((double)(gen.max()));
             double raux4=(double)(gen())/((double)(gen.max()));
-            particles[i][j] = particle(ctm[i], InverseCDF(f[i][0],raux1), InverseCDF(f[i][1],raux2), InverseCDF(f[i][0],raux3), InverseCDF(f[i][0],raux4));
+            particles[i][j] = particle(ctm[i], InverseCDF(f[i][0],raux1), InverseCDF(f[i][1],raux2), InverseCDF(f[i][2],raux3), InverseCDF(f[i][3],raux4));
             particles[i][j].sanity_check(Lx,Ly);
         }
     }
@@ -38,7 +38,7 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
     fields = (Field*) malloc(nFields * sizeof(Field));
     //loop through fields
     for (int i = 0; i < nFields; i++){
-        fields[i] = Field(Lx, Ly, hx, hy, const_fields[i][0], const_fields[i][1]);
+        fields[i] = Field(Lx, Ly, hx, hy, const_fields[i][0], const_fields[i][1], const_fields[i][2]);
     }
 }
 
@@ -124,12 +124,17 @@ void plasma::move(double dt) {
     for (int i = 0; i < nFields; i ++) {
         fields[i].Update(n, n_particles, ctm, particles);
     }
+    cout<<"out of fields"<<endl;
     // loop through the particles
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n_particles[i]; j++) {
             double x = particles[i][j].get_x();
             double y = particles[i][j].get_y();
+            cout<<"started advance of particles"<<endl;
+            get_Ex(x, y);
+            cout<<"ended one get_X()"<<endl;
             particles[i][j].advance_velocity(dt, get_Ex(x, y), get_Ey(x, y), get_Bx(x, y), get_By(x, y));
+            cout<<"finished iteration of particles"<<endl;
             particles[i][j].sanity_check(Lx, Ly);
         }
     }
