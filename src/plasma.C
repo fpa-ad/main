@@ -1,8 +1,11 @@
 #include "plasma.h"
 #include <cstdlib>
 
+// TEMPORARY
+#include <random>
+
 // constructor
-plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, func** f, int in_nFields, double** const_fields) : Lx(in_Lx),Ly(in_Ly),hx(in_hx),hy(in_hy),n(in_n), n_particles(in_n_particles) , nFields(in_nFields) {
+plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, func** f, int in_nFields, double** const_fields) : Lx(in_Lx), Ly(in_Ly), hx(in_hx), hy(in_hy), n(in_n), n_particles(in_n_particles), nFields(in_nFields), bkg_fields(const_fields) {
 
     // initialize particles
     particles = (particle**) malloc(n*sizeof(particle*));
@@ -11,37 +14,46 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
     // for each particle type
     for (int i = 0; i < n; i++) {
         // create the particle array
-        particles[i] = (particle*) malloc(sizeof(particle));
+        particles[i] = (particle*) malloc(n_particles[i] * sizeof(particle));
         // copy the ctm ratios to properly store them
         ctm[i] = in_ctm[i];
         // loop through the particles
+
+        // TEMPORARY
+        random_device rd;  // Will be used to obtain a seed for the random number engine
+        mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
+        uniform_real_distribution<> disx(0, Lx);
+        uniform_real_distribution<> disy(0, Ly);
+
         for (int j = 0; j < n_particles[i]; j++) {
             // f[i] should be an array of four functions to initialize the x y vx and vy coordinates
-            particles[i][j] = particle(ctm[i], f[i][0](), f[i][1](), f[i][2](), f[i][3]());
+            // particles[i][j] = particle(ctm[i], f[i][0](), f[i][1](), f[i][2](), f[i][3]());
+            // TODO
+            particles[i][j] = particle(ctm[i], disx(gen), disy(gen), 0, 0);
         }
     }
 
     //initialize fields
-    fields = (Field*) malloc(sizeof(Field));
+    fields = (Field*) malloc(nFields * sizeof(Field));
     //loop through fields
     for (int i = 0; i < nFields; i++){
-        fields[i]=Field(Lx, Ly, hx, hy, const_fields[i][0], const_fields[i][1]);
+        fields[i] = Field(Lx, Ly, hx, hy, const_fields[i][0], const_fields[i][1]);
     }
 }
 
-inline int plasma::get_n() {
+int plasma::get_n() {
     return n;
 }
 
-inline int plasma::get_n_particle(int i) {
+int plasma::get_n_particle(int i) {
     return n_particles[i];
 }
 
-inline particle** plasma::get_particles() {
+particle** plasma::get_particles() {
     return particles;
 }
 
-inline double* plasma::get_background_fields() {
+double* plasma::get_background_fields() {
     double* f = (double*) malloc(4*sizeof(double));
     if (nFields <= 1) {
         f[3] = f[2] = 0;
@@ -60,7 +72,7 @@ inline double* plasma::get_background_fields() {
     return f;
 }
 
-inline double plasma::get_Ex(double x, double y) {
+double plasma::get_Ex(double x, double y) {
     if (nFields == 0) {
         return 0;
     }
@@ -69,7 +81,7 @@ inline double plasma::get_Ex(double x, double y) {
     }
 }
 
-inline double plasma::get_Ey(double x, double y) {
+double plasma::get_Ey(double x, double y) {
     if (nFields == 0) {
         return 0;
     }
@@ -78,7 +90,7 @@ inline double plasma::get_Ey(double x, double y) {
     }
 }
 
-inline double plasma::get_Bx(double x, double y) {
+double plasma::get_Bx(double x, double y) {
     if (nFields <= 1) {
         return 0;
     }
@@ -87,7 +99,7 @@ inline double plasma::get_Bx(double x, double y) {
     }
 }
 
-inline double plasma::get_By(double x, double y) {
+double plasma::get_By(double x, double y) {
     if (nFields <= 1) {
         return 0;
     }

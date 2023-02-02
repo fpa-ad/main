@@ -3,7 +3,7 @@
 BINDIR := bin
 LIBDIR := lib
 
-CCFLAGS := -pedantic
+CCFLAGS := -pedantic 
 
 CC := g++ -std=c++20
 
@@ -26,14 +26,14 @@ INC := $(wildcard src/*.h)
 
 lib: $(LIBDIR)/libFC.a
 
-$(LIBDIR)/libFC.a: $(OBJ) 
+$(LIBDIR)/libFC.a: $(OBJ)
 	@echo make lib...
 	ar ruv $@ $^
 	ranlib $@
     
 %.exe: $(BINDIR)/%.o $(LIBDIR)/libFC.a
 	@echo compiling and linking...
-	$(CC) -I src -L lib $< -o $(BINDIR)/$@ -l FC
+	$(CC) -I src $< -o $(BINDIR)/$@ -L lib -l FC
 
 bin/%.exe: $(BINDIR)/%.o $(LIBDIR)/libFC.a 
 	@echo compiling and linking... 
@@ -53,6 +53,7 @@ obj := $(wildcard */*.o) $(wildcard *.o) $(wildcard */*.so) $(wildcard */*.pcm) 
 clean:
 	@echo cleaning dir...
 	rm -f $(exe) $(obj) $(tilde)
+	rm -r output/*
 
 #CC := g++
 #CCFLAGS:= -std=c++11 -Wall -g
