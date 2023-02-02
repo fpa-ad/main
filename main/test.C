@@ -17,6 +17,6 @@ int main()
     cout << "starting simulation" << endl;
     sim simulation(1, 1, 0.1, 0.1, 1e-3, 2, n_particles, ctm, nullptr, 1, fields);
     cout << "running simulation" << endl;
-    simulation.run(0.1, 0.02);
+    simulation.run(1, 0.05);
     cout << "simulation complete" << endl;
 }
