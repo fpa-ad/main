@@ -50,6 +50,11 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
 }
 
 Field::~Field(){
+    for(int i=0; i<Nx;++i){
+        delete [] phi[i];
+        delete [] Fx[i];
+        delete [] Fy[i];
+    }
     delete [] phi;
     delete [] Fx;
     delete [] Fy;
@@ -90,7 +95,6 @@ double Field::Y2deriv(int nx, int ny){
 double Field::get_X(double x, double y){
     int auxX = (int)(x/hx);
     int auxY = (int)(y/hy);
-    cout<<"start field.get_X()"<<endl;
     if(auxX<Nx&&auxY<Ny)
         return Fx[auxX][auxY]+ext_x;
     return ext_x;
@@ -99,7 +103,6 @@ double Field::get_X(double x, double y){
 double Field::get_Y(double x, double y){
     int auxX = (int)(x/hx);
     int auxY = (int)(y/hy);
-    cout<<"start field.get_Y()"<<endl;
     if(auxX<Nx&&auxY<Ny)
         return Fy[auxX][auxY]+ext_y;
     return ext_y;
@@ -123,14 +126,15 @@ void Field::Update(int n_types, int* n_particles, double* ctm, particle** partic
     }
     free(rho);*/
 
-    double** testvec=new double*[Nx];
+    /*double** testvec = new double*[Nx];
     for (int i=0;i<Nx;i++){
-        testvec[i]=new double[Ny];
+        testvec[i] = new double[Ny];
     }
     for(int i=0;i<Nx;i++){
         delete [] testvec[i];
     }
-    delete [] testvec;
+    delete [] testvec;*/
+
 }
 
 void Field::Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho){

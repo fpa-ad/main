@@ -124,17 +124,13 @@ void plasma::move(double dt) {
     for (int i = 0; i < nFields; i ++) {
         fields[i].Update(n, n_particles, ctm, particles);
     }
-    cout<<"out of fields"<<endl;
     // loop through the particles
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n_particles[i]; j++) {
             double x = particles[i][j].get_x();
             double y = particles[i][j].get_y();
-            cout<<"started advance of particles"<<endl;
             get_Ex(x, y);
-            cout<<"ended one get_X()"<<endl;
             particles[i][j].advance_velocity(dt, get_Ex(x, y), get_Ey(x, y), get_Bx(x, y), get_By(x, y));
-            cout<<"finished iteration of particles"<<endl;
             particles[i][j].sanity_check(Lx, Ly);
         }
     }
@@ -145,6 +141,11 @@ plasma::~plasma() {
     for (int i = 0; i < n; i++) {
         free(particles[i]);
     }
+    for (int i = 0; i < nFields; i++) {
+        free(bkg_fields[i]);
+    }
+    free(bkg_fields);
     free(particles);
+    free(fields);
     free(ctm);
 }
