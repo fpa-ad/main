@@ -5,7 +5,7 @@
 #include <random>
 
 // constructor
-plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, func** f, int in_nFields, double** const_fields) : Lx(in_Lx), Ly(in_Ly), hx(in_hx), hy(in_hy), n(in_n), n_particles(in_n_particles), nFields(in_nFields), bkg_fields(const_fields) {
+plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, funcdouble** f, int in_nFields, double** const_fields) : Lx(in_Lx), Ly(in_Ly), hx(in_hx), hy(in_hy), n(in_n), n_particles(in_n_particles), nFields(in_nFields), bkg_fields(const_fields) {
 
     // initialize particles
     particles = (particle**) malloc(n*sizeof(particle*));
@@ -22,14 +22,10 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
         // TEMPORARY
         random_device rd;  // Will be used to obtain a seed for the random number engine
         mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
-        uniform_real_distribution<> disx(0, Lx);
-        uniform_real_distribution<> disy(0, Ly);
 
         for (int j = 0; j < n_particles[i]; j++) {
             // f[i] should be an array of four functions to initialize the x y vx and vy coordinates
-            // particles[i][j] = particle(ctm[i], f[i][0](), f[i][1](), f[i][2](), f[i][3]());
-            // TODO
-            particles[i][j] = particle(ctm[i], disx(gen), disy(gen), 0, 0);
+            particles[i][j] = particle(ctm[i], InverseCDF(f[i][0],gen()), InverseCDF(f[i][1],gen()), InverseCDF(f[i][0],gen()), InverseCDF(f[i][0],gen()));
         }
     }
 
@@ -116,21 +112,26 @@ void plasma::move(double dt) {
             double x = particles[i][j].get_x();
             double y = particles[i][j].get_y();
             particles[i][j].advance_position(dt, get_Ex(x, y), get_Ey(x, y), get_Bx(x, y), get_By(x, y));
+            particles[i][j].sanity_check(Lx,Ly);
         }
     }
     // update the fields
     for (int i = 0; i < nFields; i ++) {
-        fields[i].Update(fields[i].Density(n, n_particles, ctm, particles));
+        fields[i].Update(n, n_particles, ctm, particles);
+        cout<<"gets out of fields"<<endl;
     }
     // loop through the particles
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n_particles[i]; j++) {
+            cout<<"starts one iteration"<<endl;
             double x = particles[i][j].get_x();
             double y = particles[i][j].get_y();
             particles[i][j].advance_velocity(dt, get_Ex(x, y), get_Ey(x, y), get_Bx(x, y), get_By(x, y));
             particles[i][j].sanity_check(Lx, Ly);
+            cout<<"completes one iteration"<<endl;
         }
     }
+    cout<<"gets to the end of move"<<endl;
 }
 
 // destructor

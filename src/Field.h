@@ -2,6 +2,7 @@
 #define __FIELD__
 
 #include "particle.h"
+#include <iostream>
 
 using namespace std;
 
@@ -24,9 +25,9 @@ class Field{
     double get_Y(double x, double y);
 
     //Function to calculate the field, given the charge density
-    void Update(double** rho);
+    void Update(int n_types, int* n_particles, double* ctm, particle** particles);
     //Function to calculate density given the particle positions
-    double** Density(int n_types, int* n_particles, double* ctm, particle** particles);
+    void Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho);
     
     private:
     double Lx;

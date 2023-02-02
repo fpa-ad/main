@@ -12,23 +12,7 @@ Já meti os limites a serem Lx e Ly, a grelha que aparece deve ser a mesma grelh
 
 Havendo mais do que uma simulação no output, ele vai processá-las todas pasta a pasta, portanto tem cuidado
 
-1. Situação nos campos:
 
-double Field::get_X(double x, double y){
-    /*int auxX = (int)(x/hx);
-    int auxY = (int)(y/hy);
-    return Fx[auxX][auxY]+ext_x;*/
-    return ext_x;
-}
-
-double Field::get_Y(double x, double y){
-    /*int auxX = (int)(x/hx);
-    int auxY = (int)(y/hy);
-    return Fy[auxX][auxY]+ext_y;*/
-    return ext_y;
-}
-
-O código comentado causa Segmentation Violation. Não logo, mas à segunda iteração.
 
 2. O campo magnético ainda não está nas contas para avançar posições e velocidades
 

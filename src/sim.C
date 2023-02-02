@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 
-sim::sim(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, int* n_particles, double* ctm, func** f, int in_nFields, double** const_fields) :
+sim::sim(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, int* n_particles, double* ctm, funcdouble** f, int in_nFields, double** const_fields) :
         X(in_X), Y(in_Y), dx(in_dx), dy(in_dy), dt(in_dt), sim_plasma(in_X, in_Y, in_dx, in_dy, n, n_particles, ctm, f, in_nFields, const_fields) {
 }
 

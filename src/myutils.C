@@ -26,3 +26,24 @@ double random_speed() {
     uniform_real_distribution<> dis(-1, 1);
     return dis(gen);
 }
+
+double Newton(funcdouble f, double a, double x0, int iterations, double h){
+    for (int i=0; i<iterations; ++i){
+        x0=x0-((Integral(f,-100,x0,0.01)-a)*2*h)/(Integral(f,-100,x0+h,0.01)-Integral(f,-100,x0-h,0.01));
+    }
+    return x0;
+}
+
+double Integral(funcdouble f, double a, double b, double h){
+    double res;
+    int iters=(int)((b-a)/h);
+    h=(b-a)/iters;
+    for (int i=0; i<iters; ++i){
+        res+=f(a+i*h)/h;
+    }
+    return res;
+}
+
+double InverseCDF(funcdouble f, double rand){
+    return (Newton(f,rand,0,10,0.01));
+}

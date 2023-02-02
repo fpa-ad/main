@@ -4,6 +4,7 @@
 #include "particle.h"
 #include "Field.h"
 #include "myutils.h"
+#include <iostream>
 
 using namespace std;
 
@@ -35,7 +36,7 @@ class plasma{
 
     public:
         // constructor
-        plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, func** f, int in_nFields, double** const_fields);
+        plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, funcdouble** f, int in_nFields, double** const_fields);
 
         int get_n();
         int get_n_particle(int i);
