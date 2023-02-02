@@ -21,7 +21,7 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
 
         // TEMPORARY
         random_device rd;  // Will be used to obtain a seed for the random number engine
-        mt19937 gen(time(NULL)); // Standard mersenne_twister_engine seeded with rd()
+        mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
 
         for (int j = 0; j < n_particles[i]; j++) {
             // f[i] should be an array of four functions to initialize the x y vx and vy coordinates

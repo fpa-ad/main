@@ -12,8 +12,9 @@ Já meti os limites a serem Lx e Ly, a grelha que aparece deve ser a mesma grelh
 
 Havendo mais do que uma simulação no output, ele vai processá-las todas pasta a pasta, portanto tem cuidado
 
+To do list:
 
-
-2. O campo magnético ainda não está nas contas para avançar posições e velocidades
-
-3. Funções de distribuição (estão completamente em falta, está tudo a zeros e com nullptrs)
+1. As partículas ainda não avançam em y
+2. Fazer o cálculo da densidade sem ele morrer
+3. Simular a equação de Poisson para o campo elétrico
+4. O campo magnético ainda não está nas contas para avançar posições e velocidades

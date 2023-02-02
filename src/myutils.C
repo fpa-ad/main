@@ -45,5 +45,5 @@ double Integral(funcdouble f, double a, double b, double h){
 }
 
 double InverseCDF(funcdouble f, double rand){
-    return (Newton(f,rand,0,20,0.01));
+    return (Newton(f,rand,0.1,20,0.01));
 }
