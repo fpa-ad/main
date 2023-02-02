@@ -4,7 +4,8 @@
 using namespace std;
  
 double maxwellian(double x){
-    return exp(-x*x);
+    double sigma=1;
+    return exp(-x*x/(2*sigma*sigma))/(sigma*sqrt(2*M_PI));
 }
 
 double uniform(double x){
@@ -13,6 +14,12 @@ double uniform(double x){
 
 int main()
 {
+    //Testing
+    cout<<maxwellian(-2)<<endl;
+    cout<<Integral(&maxwellian,-100,0,0.001)<<endl;
+    cout<<InverseCDF(&maxwellian,0.5)<<endl;
+    //EndTesting
+
     int n_particles[2];
     n_particles[0] = 10;
     n_particles[1] = 10;

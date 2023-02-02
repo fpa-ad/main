@@ -21,11 +21,16 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
 
         // TEMPORARY
         random_device rd;  // Will be used to obtain a seed for the random number engine
-        mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
+        mt19937 gen(time(NULL)); // Standard mersenne_twister_engine seeded with rd()
 
         for (int j = 0; j < n_particles[i]; j++) {
             // f[i] should be an array of four functions to initialize the x y vx and vy coordinates
-            particles[i][j] = particle(ctm[i], InverseCDF(f[i][0],gen()), InverseCDF(f[i][1],gen()), InverseCDF(f[i][0],gen()), InverseCDF(f[i][0],gen()));
+            double raux1=(double)(gen())/((double)(gen.max()));
+            double raux2=(double)(gen())/((double)(gen.max()));
+            double raux3=(double)(gen())/((double)(gen.max()));
+            double raux4=(double)(gen())/((double)(gen.max()));
+            particles[i][j] = particle(ctm[i], InverseCDF(f[i][0],raux1), InverseCDF(f[i][1],raux2), InverseCDF(f[i][0],raux3), InverseCDF(f[i][0],raux4));
+            particles[i][j].sanity_check(Lx,Ly);
         }
     }
 
@@ -118,20 +123,16 @@ void plasma::move(double dt) {
     // update the fields
     for (int i = 0; i < nFields; i ++) {
         fields[i].Update(n, n_particles, ctm, particles);
-        cout<<"gets out of fields"<<endl;
     }
     // loop through the particles
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n_particles[i]; j++) {
-            cout<<"starts one iteration"<<endl;
             double x = particles[i][j].get_x();
             double y = particles[i][j].get_y();
             particles[i][j].advance_velocity(dt, get_Ex(x, y), get_Ey(x, y), get_Bx(x, y), get_By(x, y));
             particles[i][j].sanity_check(Lx, Ly);
-            cout<<"completes one iteration"<<endl;
         }
     }
-    cout<<"gets to the end of move"<<endl;
 }
 
 // destructor

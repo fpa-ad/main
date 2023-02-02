@@ -35,15 +35,15 @@ double Newton(funcdouble f, double a, double x0, int iterations, double h){
 }
 
 double Integral(funcdouble f, double a, double b, double h){
-    double res;
+    double res=0;
     int iters=(int)((b-a)/h);
     h=(b-a)/iters;
     for (int i=0; i<iters; ++i){
-        res+=f(a+i*h)/h;
+        res+=f(a+i*h)*h;
     }
     return res;
 }
 
 double InverseCDF(funcdouble f, double rand){
-    return (Newton(f,rand,0,10,0.01));
+    return (Newton(f,rand,0,20,0.01));
 }
