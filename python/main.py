@@ -1,3 +1,3 @@
-import example
+import libFCpython as l
 
-print(example.current_time())
+print(l.current_time())
