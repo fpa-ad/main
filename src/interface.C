@@ -64,9 +64,9 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
                 case 0:
                     {
                     // it's maxwellian
-                    double T = specs[1].cast<double>();
-                    cout << "maxwellian with T " << T << endl;
-                    f[p][i] = (std::function<double(double)>) [T] (double v) {return 1/sqrt(M_PI) * exp(-v*v);};
+                    double vp = specs[1].cast<double>();
+                    cout << "maxwellian with vp " << vp << endl;
+                    f[p][i] = (std::function<double(double)>) [vp] (double v) {return 1/(vp*sqrt(M_PI)) * exp(-v*v/(vp*vp));};
                     break;
                     }
                 case 1:
