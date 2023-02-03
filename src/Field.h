@@ -12,6 +12,7 @@ class Field{
     //Constructor
     Field();
     Field(double fLx, double fLy, double fhx, double fhy, double fext_x, double fext_y, double fext_z);
+    Field(const Field& F1);
     //Destructor
     //~Field();
 
@@ -24,6 +25,7 @@ class Field{
     //Get Fields
     double get_X(double x, double y);
     double get_Y(double x, double y);
+    double get_Z(double x, double y);
 
     //Function to calculate the field, given the charge density
     void Update(int n_types, int* n_particles, double* ctm, particle** particles);

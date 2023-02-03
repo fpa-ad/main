@@ -6,7 +6,7 @@
 
 // constructor
 plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, funcdouble** f, int in_nFields, double** const_fields) : Lx(in_Lx), Ly(in_Ly), hx(in_hx), hy(in_hy), n(in_n), n_particles(in_n_particles), nFields(in_nFields), bkg_fields(const_fields) {
-    cout<<"Plasma constructor called"<<endl;
+
     // initialize particles
     particles = (particle**) malloc(n*sizeof(particle*));
     // initialize ctm ratios
@@ -37,11 +37,9 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
     fields = (Field*) malloc(nFields*sizeof(fields[0]));
     //loop through fields
     for (int i = 0; i < nFields; i++){
-        cout<<"Pos1"<<endl;
-        fields[i] = Field(Lx, Ly, hx, hy, const_fields[i][0], const_fields[i][1], const_fields[i][2]);
-        cout<<fields[i].get_X(0,0)<<endl;
-    }
-    cout<<"Plasma constructor ended"<<endl;
+        Field auxField(Lx, Ly, hx, hy, const_fields[i][0], const_fields[i][1], const_fields[i][2]);
+        fields[i] = auxField;
+        }
 }
 
 int plasma::get_n() {
