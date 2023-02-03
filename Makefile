@@ -3,9 +3,9 @@
 BINDIR := bin
 LIBDIR := lib
 
-CCFLAGS := -pedantic 
+CCFLAGS := -pedantic
 
-CC := g++ -std=c++20
+CC := g++ -std=c++20 -fPIC
 
 # src/ (declarcaoes de funcoes, de classes + codigo)
 # main/ (programas principais)
@@ -33,15 +33,15 @@ $(LIBDIR)/libFC.a: $(OBJ)
     
 %.exe: $(BINDIR)/%.o $(LIBDIR)/libFC.a
 	@echo compiling and linking...
-	$(CC) -I src $< -o $(BINDIR)/$@ -L lib -l FC
+	$(CC) -I src -I /usr/include/python3.10/ $< -o $(BINDIR)/$@ -L lib -l FC
 
 bin/%.exe: $(BINDIR)/%.o $(LIBDIR)/libFC.a 
 	@echo compiling and linking... 
-	$(CC) -I src -L lib $< -o $@ -l FC
+	$(CC) -I src -I /usr/include/python3.10/ -L lib $< -o $@ -l FC
 
 $(BINDIR)/%.o: %.C | $(INC)
 	@echo compiling... $<
-	$(CC) -I src -c $< -o $@
+	$(CC) -I src -I /usr/include/python3.10/ -c $< -o $@
 
 
 ######### clean

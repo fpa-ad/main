@@ -1,3 +1,4 @@
 import libFCpython as l
 
-print(l.current_time())
+i = l.interface()
+i.create_simulation(1.0, 1.0, 0.1, 0.1, 0.01, 1, [10], [1], [], 1, [[1, 0, 0]])
