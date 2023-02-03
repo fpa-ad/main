@@ -37,6 +37,8 @@ class plasma{
     public:
         // constructor
         plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, funcdouble** f, int in_nFields, double** const_fields);
+        // destructor
+        ~plasma();
 
         int get_n();
         int get_n_particle(int i);
@@ -50,9 +52,6 @@ class plasma{
 
         // move
         void move(double dt);
-
-        // destructor
-        ~plasma();
 };
 
 #endif

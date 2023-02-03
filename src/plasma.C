@@ -5,12 +5,10 @@
 #include <random>
 
 // constructor
-plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, funcdouble** f, int in_nFields, double** const_fields) : Lx(in_Lx), Ly(in_Ly), hx(in_hx), hy(in_hy), n(in_n), n_particles(in_n_particles), nFields(in_nFields), bkg_fields(const_fields) {
+plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, funcdouble** f, int in_nFields, double** const_fields) : Lx(in_Lx), Ly(in_Ly), hx(in_hx), hy(in_hy), n(in_n), n_particles(in_n_particles), ctm(in_ctm), nFields(in_nFields), bkg_fields(const_fields) {
 
     // initialize particles
     particles = (particle**) malloc(n*sizeof(particle*));
-    // initialize ctm ratios
-    ctm = (double*) malloc(n*sizeof(double));
     // for each particle type
     for (int i = 0; i < n; i++) {
         // create the particle array
@@ -36,10 +34,20 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
     //initialize fields
     fields = (Field*) malloc(nFields*sizeof(fields[0]));
     //loop through fields
-    for (int i = 0; i < nFields; i++){
+    for (int i = 0; i < nFields; i++) {
         Field auxField(Lx, Ly, hx, hy, const_fields[i][0], const_fields[i][1], const_fields[i][2]);
         fields[i] = auxField;
-        }
+    }
+}
+
+// destructor
+plasma::~plasma() {
+    for (int i = 0; i < n; i++) {
+        free(particles[i]);
+    }
+    free(particles);
+    free(fields);
+    free(ctm);
 }
 
 int plasma::get_n() {
@@ -134,14 +142,4 @@ void plasma::move(double dt) {
             particles[i][j].sanity_check(Lx, Ly);
         }
     }
-}
-
-// destructor
-plasma::~plasma() {
-    for (int i = 0; i < n; i++) {
-        free(particles[i]);
-    }
-    free(particles);
-    free(fields);
-    free(ctm);
 }
