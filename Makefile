@@ -37,18 +37,18 @@ $(LIBDIR)/libFC.a: $(OBJ)
     
 %.exe: $(BINDIR)/%.o $(LIBDIR)/libFC.a
 	@echo compiling and linking...
-	$(CC) -I src -I /usr/include/python3.8 -I /usr/include/python3.10 -I PYBINDDIR $< -o $(BINDIR)/$@ -L lib -l FC
+	$(CC) -I src -I /usr/include/python3.8 -I extern/pybind11/include -I /usr/include/python3.10 -I PYBINDDIR $< -o $(BINDIR)/$@ -L lib -l FC
 
 bin/%.exe: $(BINDIR)/%.o $(LIBDIR)/libFC.a 
 	@echo compiling and linking... 
-	$(CC) -I src -I /usr/include/python3.8 -I /usr/include/python3.10 -I PYBINDDIR -L lib $< -o $@ -l FC
+	$(CC) -I src -I extern/pybind11/include -I /usr/include/python3.8 -I /usr/include/python3.10 -I PYBINDDIR -L lib $< -o $@ -l FC
 
 $(BINDIR)/%.o: %.C | $(INC)
 	@echo compiling... $<
-	$(CC) -I src -I /usr/include/python3.8 -I /usr/include/python3.10 -I PYBINDDIR -c $< -o $@
+	$(CC) -I src -I extern/pybind11/include -I /usr/include/python3.8 -I /usr/include/python3.10 -I PYBINDDIR -c $< -o $@
 
 test: lib
-	g++ -O3 -Wall -shared -std=c++20 -fPIC -I /usr/include/python3.8 -I /usr/include/python3.10 -I PYBINDDIR -I src python/wrapper.cpp -o python/libFCpython$(P) -L lib -l FC -Wl,-rpath,.
+	g++ -O3 -Wall -shared -std=c++20 -fPIC -I extern/pybind11/include -I /usr/include/python3.8 -I /usr/include/python3.10 -I PYBINDDIR -I src python/wrapper.cpp -o python/libFCpython$(P) -L lib -l FC -Wl,-rpath,.
 	python3 python/main.py
 
 ######### clean
