@@ -13,5 +13,6 @@ PYBIND11_MODULE(libFCpython, m) {
     py::class_<interface>(m, "interface")
         .def(py::init<>())
         .def("create_simulation", &interface::create_simulation)
-        .def("run_simulation", &interface::run_simulation);
+        .def("run_simulation", &interface::run_simulation)
+        .def("end_simulation", &interface::end_simulation);
 }
