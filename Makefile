@@ -30,7 +30,6 @@ $(LIBDIR)/libFC.a: $(OBJ)
 	@echo make lib...
 	ar ruv $@ $^
 	ranlib $@
-	g++ -O3 -Wall -shared -std=c++20 -fPIC -I /usr/include/python3.10/ -I src python/wrapper.cpp -o python/libFCpython.cpython-310-x86_64-linux-gnu.so -L lib -l FC -Wl,-rpath,.
     
 %.exe: $(BINDIR)/%.o $(LIBDIR)/libFC.a
 	@echo compiling and linking...
@@ -45,6 +44,7 @@ $(BINDIR)/%.o: %.C | $(INC)
 	$(CC) -I src -I /usr/include/python3.10/ -c $< -o $@
 
 test: lib
+	g++ -O3 -Wall -shared -std=c++20 -fPIC -I /usr/include/python3.10/ -I src python/wrapper.cpp -o python/libFCpython.cpython-310-x86_64-linux-gnu.so -L lib -l FC -Wl,-rpath,.
 	python3 python/main.py
 
 ######### clean

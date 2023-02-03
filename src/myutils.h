@@ -5,9 +5,11 @@
 #include <iomanip>
 #include <ctime>
 #include <string>
+#include <functional>
 
 typedef double (*func)(void); // type for conciseness
-typedef double (*funcdouble)(double); // type for conciseness
+//typedef double (*funcdouble)(double); // type for conciseness
+typedef std::function<double(double)> funcdouble;
 
 std::string current_time();
 

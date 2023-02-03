@@ -1,4 +1,6 @@
 #include "interface.h"
+#include <math.h>
+#include <functional>
 
 void interface::create_simulation(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, py::list in_n_particles, py::list in_ctm, py::list in_f, int in_nFields, py::list in_const_fields) {
     int* n_particles = (int*) malloc(n*sizeof(int));
@@ -19,14 +21,20 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
         }
     }
 
+    funcdouble* f = new funcdouble[4];
+
     // go through the functions for the positions
     for (int i = 0; i < 2; i++) {
         py::list specs = in_f[i].cast<py::list>();
         switch (specs[0].cast<int>()) {
             case 0:
+                {
                 // it's uniform
                 cout << "uniform" << endl;
+                double L = (i == 0 ? in_X : in_Y);
+                f[i] = (std::function<double(double)>) [L] (double x) {return 1/L;};
                 break;
+                }
             case 1:
                 // it's step
                 cout << "step starting at " << specs[1].cast<double>() << endl;
@@ -43,14 +51,18 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
         py::list specs = in_f[i].cast<py::list>();
         switch (specs[0].cast<int>()) {
             case 0:
+                {
                 // it's maxwellian
-                cout << "maxwellian with T " << specs[1].cast<double>() << endl;
+                double T = specs[1].cast<double>();
+                cout << "maxwellian with T " << T << endl;
+                f[i] = (std::function<double(double)>) [T] (double v) {return 1/sqrt(M_PI) * exp(-v*v);};
                 break;
+                }
             case 1:
                 // it's a bump-on-tail
                 cout << "bump-on-tail at " << specs[1].cast<double>() << " with a= " << specs[2].cast<double>() << endl;
         }
     }
 
-    my_sim = new sim(in_X, in_Y, in_dx, in_dy, in_dt, n, n_particles, ctm, nullptr, in_nFields, const_fields);
+    my_sim = new sim(in_X, in_Y, in_dx, in_dy, in_dt, n, n_particles, ctm, &f, in_nFields, const_fields);
 }
