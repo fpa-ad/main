@@ -310,9 +310,7 @@ void Field::Poisson(double** rho){
         }
     }
 
-    //Now solve system Mat.vecphi = R;
-    
-    ///////////////////////////////
+    GaussElim(Mat,vecphi,R,Nx*Ny);
 
     for(int i = 0; i<Nx; ++i){
         for(int j = 0; j<Ny; ++j){
@@ -365,4 +363,8 @@ void Field::Kronecker(int p, int q, int m, int n, double** A, double** B, double
             R[i][j]=A[i/m][j/n]*B[i%m][j%n];
         }
     }
+}
+
+void Field::GaussElim(double** A, double* x, double* b, int N){
+    
 }

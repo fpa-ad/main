@@ -34,6 +34,7 @@ class Field{
     void Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho);
 
     void Kronecker(int p, int q, int m, int n, double** A, double** B, double** R);
+    void GaussElim(double** A, double* x, double* b, int N);
     
     private:
     double Lx=0;
