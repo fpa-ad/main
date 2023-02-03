@@ -66,3 +66,7 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
 
     my_sim = new sim(in_X, in_Y, in_dx, in_dy, in_dt, n, n_particles, ctm, &f, in_nFields, const_fields);
 }
+
+void interface::run_simulation(double runtime, double sc_dt) {
+    my_sim->run(runtime, sc_dt);
+}

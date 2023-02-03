@@ -12,5 +12,6 @@ namespace py = pybind11;
 PYBIND11_MODULE(libFCpython, m) {
     py::class_<interface>(m, "interface")
         .def(py::init<>())
-        .def("create_simulation", &interface::create_simulation);
+        .def("create_simulation", &interface::create_simulation)
+        .def("run_simulation", &interface::run_simulation);
 }
