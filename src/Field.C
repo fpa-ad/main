@@ -123,8 +123,10 @@ Field::Field(const Field& F1){
 }*/
 
 double Field::Xderiv(int nx, int ny){
-    if(nx==0 || nx==Nx-1)
-        return ((phi[1][ny]-phi[Nx-2][ny])/(2*hx));
+    if(nx==0)
+        return ((phi[1][ny]-phi[Nx-1][ny])/(2*hx));
+    if(nx==Nx-1)
+        return ((phi[0][ny]-phi[Nx-2][ny])/(2*hx));
     return ((phi[nx+1][ny]-phi[nx-1][ny])/(2*hx));
 }
     
@@ -138,17 +140,17 @@ double Field::Yderiv(int nx, int ny){
     
 double Field::X2deriv(int nx, int ny){
     if(nx==0)
-        return ((phi[nx+1][ny]-2*phi[nx][ny])/(hx*hx));
+        return ((phi[1][ny]-2*phi[0][ny]+phi[Nx-1][ny])/(hx*hx));
     if(nx==Nx-1)
-        return ((-2*phi[nx][ny]+phi[nx-1][ny])/(hx*hx));
+        return ((phi[0][ny]-2*phi[Nx-1][ny]+phi[Nx-2][ny])/(hx*hx));
     return ((phi[nx+1][ny]-2*phi[nx][ny]+phi[nx-1][ny])/(hx*hx));
 }
 
 double Field::Y2deriv(int nx, int ny){
     if(ny==0)
-        return ((phi[nx][ny+1]-2*phi[nx][ny])/(hy*hy));
+        return ((phi[nx][1]-2*phi[nx][0]+phi[nx][Ny-1])/(hy*hy));
     if(ny==Ny-1)
-        return ((-2*phi[nx][ny]+phi[nx][ny-1])/(hy*hy));
+        return ((phi[nx][0]-2*phi[nx][Ny-1]+phi[nx][Ny-2])/(hy*hy));
     return ((phi[nx][ny+1]-2*phi[nx][ny]+phi[nx][ny-1])/(hy*hy));
 }
 
@@ -203,9 +205,7 @@ void Field::Update(int n_types, int* n_particles, double* ctm, particle** partic
 
     Density(n_types,n_particles,ctm,particles,rho);
 
-    /////////////
-
-    /////////////
+    Poisson(rho);
     
     for(int i=0;i<Nx;i++){
         delete [] rho[i];
@@ -226,4 +226,143 @@ void Field::Density(int n_types, int* n_particles, double* ctm, particle** parti
         }
     }
     
+}
+
+void Field::Poisson(double** rho){
+    double** Ax=new double*[Ny];
+    for(int i=0; i<Ny; ++i){
+        Ax[i]=new double[Ny];
+        for(int j=0; j<Ny; ++j){
+            Ax[i][j]=0;
+            if(j==i) Ax[i][j]=-2;
+            if(j==i+1||j==i-1||(j==0&&i==Ny-1)||(j==Ny-1&&i==0)) Ax[i][j]=1;
+        }
+    }
+
+    double** Ay=new double*[Nx];
+    for(int i=0; i<Nx; ++i){
+        Ay[i]=new double[Nx];
+        for(int j=0; j<Nx; ++j){
+            Ay[i][j]=0;
+            if(j==i) Ay[i][j]=-2;
+            if(j==i+1||j==i-1||(j==0&&i==Nx-1)||(j==Nx-1&&i==0)) Ay[i][j]=1;
+        }
+    }
+
+    double** Iy=new double*[Ny];
+    for(int i=0; i<Ny; ++i){
+        Iy[i]=new double[Ny];
+        for(int j=0; j<Ny; ++j){
+            Iy[i][j]=0;
+            if(j==i) Iy[i][j]=1;
+        }
+    }
+
+    double** Ix=new double*[Nx];
+    for(int i=0; i<Nx; ++i){
+        Ix[i]=new double[Nx];
+        for(int j=0; j<Nx; ++j){
+            Ix[i][j]=0;
+            if(j==i) Ix[i][j]=1;
+        }
+    }
+
+    double** Matx=new double*[Nx*Ny];
+    for(int i=0; i<Nx*Ny; ++i){
+        Matx[i]=new double[Nx*Ny];
+        for(int j=0; j<Nx*Ny; ++j){
+            Matx[i][j]=0;
+        }
+    }
+    double** Maty=new double*[Nx*Ny];
+    for(int i=0; i<Nx*Ny; ++i){
+        Maty[i]=new double[Nx*Ny];
+        for(int j=0; j<Nx*Ny; ++j){
+            Maty[i][j]=0;
+        }
+    }
+
+    Kronecker(Ny,Ny,Nx,Nx,Ax,Ix,Matx);
+    Kronecker(Ny,Ny,Nx,Nx,Iy,Ay,Maty);
+
+    double** Mat=new double*[Nx*Ny];
+    for(int i=0; i<Nx*Ny; ++i){
+        Mat[i]=new double[Nx*Ny];
+        for(int j=0; j<Nx*Ny; ++j){
+            Mat[i][j]=Matx[i][j]+Maty[i][j];
+            //cout<<Mat[i][j]<<" ";
+        }
+        //cout<<endl;
+    }
+    //cout<<endl<<endl<<endl;
+
+    double* R = new double[Nx*Ny];
+    for(int i = 0; i<Nx; ++i){
+        for(int j = 0; j<Ny; ++j){
+            R[i*Ny+j]=-rho[i][j];
+        }
+    }
+
+    double* vecphi = new double[Nx*Ny];
+    for(int i = 0; i<Nx; ++i){
+        for(int j = 0; j<Ny; ++j){
+            vecphi[i*Ny+j]=0;
+        }
+    }
+
+    //Now solve system Mat.vecphi = R;
+    
+    ///////////////////////////////
+
+    for(int i = 0; i<Nx; ++i){
+        for(int j = 0; j<Ny; ++j){
+            phi[i][j]=vecphi[i*Ny+j];
+        }
+    }
+
+    for(int i = 0; i<Nx; ++i){
+        for(int j = 0; j<Ny; ++j){
+            Fx[i][j]=-Xderiv(i,j);
+        }
+    }
+
+    for(int i = 0; i<Nx; ++i){
+        for(int j = 0; j<Ny; ++j){
+            Fy[i][j]=-Yderiv(i,j);
+        }
+    }
+
+    //Free all the memory
+
+    for(int i = 0; i<Nx; ++i){
+        delete [] Ay[i];
+        delete [] Ix[i];
+    }
+    for(int i = 0; i<Ny; ++i){
+        delete [] Ax[i];
+        delete [] Iy[i];
+    }
+    for(int i = 0; i<Nx*Ny; ++i){
+        delete [] Matx[i];
+        delete [] Maty[i];
+        delete [] Mat[i];
+    }
+    delete [] Ax;
+    delete [] Ay;
+    delete [] Ix;
+    delete [] Iy;
+    delete [] Matx;
+    delete [] Maty;
+    delete [] Mat;
+    delete [] R;
+    delete [] vecphi;
+
+}
+
+void Field::Kronecker(int p, int q, int m, int n, double** A, double** B, double** R){
+    for(int i=0; i<p*m; ++i){
+        for(int j=0; j<q*n; ++j){
+            R[i][j]=A[i/m][j/n]*B[i%m][j%n];
+        }
+    }
 }
