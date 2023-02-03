@@ -116,6 +116,25 @@ double plasma::get_By(double x, double y) {
     }
 }
 
+double plasma::get_Ez(double x, double y) {
+    if (nFields == 0) {
+        return 0;
+    }
+    else {
+        return fields[0].get_Z(x, y);
+    }
+}
+
+double plasma::get_Bz(double x, double y) {
+    if (nFields <= 1) {
+        return 0;
+    }
+    else {
+        return fields[1].get_Z(x, y);
+    }
+}
+
+
 // move
 void plasma::move(double dt) {
     // loop through the particles
@@ -123,7 +142,7 @@ void plasma::move(double dt) {
         for (int j = 0; j < n_particles[i]; j++) {
             double x = particles[i][j].get_x();
             double y = particles[i][j].get_y();
-            particles[i][j].advance_position(dt, get_Ex(x, y), get_Ey(x, y), get_Bx(x, y), get_By(x, y));
+            particles[i][j].advance_position(dt, get_Ex(x, y), get_Ey(x, y), get_Ez(x, y), get_Bx(x, y), get_By(x, y), get_Bz(x, y));
             particles[i][j].sanity_check(Lx,Ly);
         }
     }
@@ -137,7 +156,7 @@ void plasma::move(double dt) {
             double x = particles[i][j].get_x();
             double y = particles[i][j].get_y();
             get_Ex(x, y);
-            particles[i][j].advance_velocity(dt, get_Ex(x, y), get_Ey(x, y), get_Bx(x, y), get_By(x, y));
+            particles[i][j].advance_velocity(dt, get_Ex(x, y), get_Ey(x, y), get_Ez(x, y), get_Bx(x, y), get_By(x, y), get_Bz(x, y));
             particles[i][j].sanity_check(Lx, Ly);
         }
     }

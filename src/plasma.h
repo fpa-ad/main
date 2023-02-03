@@ -49,6 +49,8 @@ class plasma{
         double get_Ey(double x, double y);
         double get_Bx(double x, double y);
         double get_By(double x, double y);
+        double get_Ez(double x, double y);
+        double get_Bz(double x, double y);
 
         // move
         void move(double dt);

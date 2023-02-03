@@ -23,11 +23,15 @@ int main(){
     double ctm[2];
     ctm[0] = 1;
     ctm[1] = -1;
-    double** fields = new double*[1];
+    double** fields = new double*[2];
     fields[0] = new double[3];
-    fields[0][0] = 1;
+    fields[1] = new double[3];
+    fields[0][0] = 0;
     fields[0][1] = 0;
     fields[0][2] = 0;
+    fields[1][0] = 0;
+    fields[1][1] = 0;
+    fields[1][2] = 10;
     funcdouble** f=new funcdouble*[2];
     f[0]=new funcdouble[4];
     f[1]=new funcdouble[4];
@@ -40,7 +44,7 @@ int main(){
     f[1][2]=&maxwellian;
     f[1][3]=&maxwellian;
     cout << "starting simulation" << endl;
-    sim simulation(1, 1, 0.1, 0.1, 1e-3, 2, n_particles, ctm, f, 1, fields);
+    sim simulation(1, 1, 0.1, 0.1, 1e-3, 2, n_particles, ctm, f, 2, fields);
     cout << "running simulation" << endl;
     simulation.run(3, 0.05);
     cout << "simulation complete" << endl;

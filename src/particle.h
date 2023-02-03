@@ -23,10 +23,10 @@ class particle{
         double get_vy();
 
         // advance function - steps 1 and 2
-        void advance_position(double dt, double Ex, double Ey, double Bx, double By);
+        void advance_position(double dt, double Ex, double Ey, double Ez, double Bx, double By, double Bz);
 
         // advance function - step 3
-        void advance_velocity(double dt, double Ex, double Ey, double Bx, double By);
+        void advance_velocity(double dt, double Ex, double Ey, double Ez, double Bx, double By, double Bz);
 
         // thinking with portals: enabled (aka periodic border conditions)
         void sanity_check(double X, double Y);
