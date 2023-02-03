@@ -10,9 +10,10 @@ class Field{
     public:
 
     //Constructor
+    Field();
     Field(double fLx, double fLy, double fhx, double fhy, double fext_x, double fext_y, double fext_z);
     //Destructor
-    ~Field();
+    //~Field();
 
     //Functions that calculate derivatives
     double Xderiv(int nx, int ny);
@@ -30,18 +31,18 @@ class Field{
     void Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho);
     
     private:
-    double Lx;
-    double hx;
-    int Nx;
-    double Ly;
-    double hy;
-    int Ny;
-    double** phi;
-    double** Fx;
-    double** Fy;
-    double** Fz;
-    double ext_x;
-    double ext_y;
-    double ext_z;
+    double Lx=0;
+    double hx=0;
+    int Nx=0;
+    double Ly=0;
+    double hy=0;
+    int Ny=0;
+    double** phi=nullptr;
+    double** Fx=nullptr;
+    double** Fy=nullptr;
+    double** Fz=nullptr;
+    double ext_x=0;
+    double ext_y=0;
+    double ext_z=0;
 };
 #endif

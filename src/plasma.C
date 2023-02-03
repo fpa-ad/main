@@ -6,11 +6,11 @@
 
 // constructor
 plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, funcdouble** f, int in_nFields, double** const_fields) : Lx(in_Lx), Ly(in_Ly), hx(in_hx), hy(in_hy), n(in_n), n_particles(in_n_particles), nFields(in_nFields), bkg_fields(const_fields) {
-
+    cout<<"Plasma constructor called"<<endl;
     // initialize particles
     particles = (particle**) malloc(n*sizeof(particle*));
     // initialize ctm ratios
-    ctm = (double*) malloc(sizeof(n*sizeof(double)));
+    ctm = (double*) malloc(n*sizeof(double));
     // for each particle type
     for (int i = 0; i < n; i++) {
         // create the particle array
@@ -19,7 +19,6 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
         ctm[i] = in_ctm[i];
         // loop through the particles
 
-        // TEMPORARY
         random_device rd;  // Will be used to obtain a seed for the random number engine
         mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
 
@@ -35,11 +34,14 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
     }
 
     //initialize fields
-    fields = (Field*) malloc(nFields * sizeof(Field));
+    fields = (Field*) malloc(nFields*sizeof(fields[0]));
     //loop through fields
     for (int i = 0; i < nFields; i++){
+        cout<<"Pos1"<<endl;
         fields[i] = Field(Lx, Ly, hx, hy, const_fields[i][0], const_fields[i][1], const_fields[i][2]);
+        cout<<fields[i].get_X(0,0)<<endl;
     }
+    cout<<"Plasma constructor ended"<<endl;
 }
 
 int plasma::get_n() {
@@ -141,10 +143,6 @@ plasma::~plasma() {
     for (int i = 0; i < n; i++) {
         free(particles[i]);
     }
-    for (int i = 0; i < nFields; i++) {
-        free(bkg_fields[i]);
-    }
-    free(bkg_fields);
     free(particles);
     free(fields);
     free(ctm);
