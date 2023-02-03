@@ -24,6 +24,8 @@ SRC := $(wildcard src/*.C)
 OBJ := $(patsubst %.C, $(BINDIR)/%.o, $(notdir $(SRC)))
 INC := $(wildcard src/*.h)
 
+P := $(shell echo `python3-config --extension-suffix`)
+
 .PHONY: all clean lib
 
 lib: $(LIBDIR)/libFC.a
@@ -46,7 +48,7 @@ $(BINDIR)/%.o: %.C | $(INC)
 	$(CC) -I src -I /usr/include/python3.8 -I /usr/include/python3.10 -I PYBINDDIR -c $< -o $@
 
 test: lib
-	g++ -O3 -Wall -shared -std=c++20 -fPIC -I /usr/include/python3.8 -I /usr/include/python3.10 -I PYBINDDIR -I src python/wrapper.cpp -o python/libFCpython.cpython-38-x86_64-linux-gnu.so -L lib -l FC -Wl,-rpath,.
+	g++ -O3 -Wall -shared -std=c++20 -fPIC -I /usr/include/python3.8 -I /usr/include/python3.10 -I PYBINDDIR -I src python/wrapper.cpp -o python/libFCpython$(P) -L lib -l FC -Wl,-rpath,.
 	python3 python/main.py
 
 ######### clean
