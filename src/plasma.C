@@ -47,7 +47,6 @@ plasma::~plasma() {
     }
     free(particles);
     free(fields);
-    free(ctm);
 }
 
 int plasma::get_n() {
