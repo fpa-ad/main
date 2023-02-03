@@ -10,7 +10,7 @@ class Window(QMainWindow):
  
         self.setWindowIcon(QtGui.QIcon('python/pic-logo.png'))
         # set the title
-        self.setWindowTitle("Icon")
+        self.setWindowTitle("PIC")
  
         # setting  the geometry of window
         self.setGeometry(0, 0, 400, 300)
