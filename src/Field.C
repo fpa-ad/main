@@ -1,5 +1,21 @@
 #include "Field.h"
 
+Field::Field(){
+    Lx=0;
+    Ly=0;
+    Nx=0;
+    Ny=0;
+    hx=0;
+    hy=0;
+    ext_x=0;
+    ext_y=0;
+    ext_z=0;
+    phi=nullptr;
+    Fx=nullptr;
+    Fy=nullptr;
+    Fz=nullptr;
+}
+
 Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, double fext_y, double fext_z){
     Lx=fLx;
     Nx=(int)(fLx/fhx);
@@ -12,6 +28,8 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
     Nx++;
     Ny++;
 
+    cout<<"Pos3"<<endl;
+
     phi=new double*[Nx];
     for(int i=0; i<Nx; ++i){
         phi[i]=new double[Ny];
@@ -19,6 +37,8 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
             phi[i][j]=0;
         }
     }
+
+    cout<<"Pos4"<<endl;
 
     Fx=new double*[Nx];
     for(int i=0; i<Nx; ++i){
@@ -28,6 +48,8 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
         }
     }
 
+    cout<<"Pos5"<<endl;
+
     Fy=new double*[Nx];
     for(int i=0; i<Nx; ++i){
         Fy[i]=new double[Ny];
@@ -35,6 +57,8 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
             Fy[i][j]=0;
         }
     }
+
+    cout<<"Pos6"<<endl;
 
     Fz=new double*[Nx];
     for(int i=0; i<Nx; ++i){
@@ -44,12 +68,17 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
         }
     }
 
+    cout<<"Pos7"<<endl;
+
     ext_x=fext_x;
     ext_y=fext_y;
     ext_z=fext_z;
+
+    cout<<"Pos8"<<endl;
 }
 
-Field::~Field(){
+/*Field::~Field(){
+    cout<<"Field destructor called"<<endl;
     for(int i=0; i<Nx;++i){
         delete [] phi[i];
         delete [] Fx[i];
@@ -58,7 +87,7 @@ Field::~Field(){
     delete [] phi;
     delete [] Fx;
     delete [] Fy;
-}
+}*/
 
 double Field::Xderiv(int nx, int ny){
     if(nx==0)
@@ -103,38 +132,27 @@ double Field::get_X(double x, double y){
 double Field::get_Y(double x, double y){
     int auxX = (int)(x/hx);
     int auxY = (int)(y/hy);
-    if(auxX<Nx&&auxY<Ny)
+    if(auxX>=0 && auxX<Nx && auxY>=0 && auxY<Ny)
         return Fy[auxX][auxY]+ext_y;
     return ext_y;
 }
 
 void Field::Update(int n_types, int* n_particles, double* ctm, particle** particles){
     
-    /*double** rho=new double*[Nx];
+    double** rho=new double*[Nx];
     for (int i=0;i<Nx;i++){
-        //rho[i]=(double*) malloc(Ny*sizeof(double));
         rho[i]=new double[Ny];
         for(int j=0; j<Ny; j++){
             rho[i][j]=0;
         }
     }
 
-    //Density(n_types,n_particles,ctm,particles,rho);
+    Density(n_types,n_particles,ctm,particles,rho);
     
     for(int i=0;i<Nx;i++){
-        free(rho[i]);
+        delete [] rho[i];
     }
-    free(rho);*/
-
-    /*double** testvec = new double*[Nx];
-    for (int i=0;i<Nx;i++){
-        testvec[i] = new double[Ny];
-    }
-    for(int i=0;i<Nx;i++){
-        delete [] testvec[i];
-    }
-    delete [] testvec;*/
-
+    delete [] rho;
 }
 
 void Field::Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho){
