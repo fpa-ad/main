@@ -71,7 +71,7 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
                     }
                 case 1:
                     // it's a bump-on-tail
-                    cout << "bump-on-tail at " << specs[1].cast<double>() << " with a= " << specs[2].cast<double>() << endl;
+                    cout << "bump-on-tail with vp " << specs[1].cast<double>() << " at " << specs[2].cast<double>() << " with a= " << specs[3].cast<double>() << endl;
             }
         }
     }
