@@ -47,7 +47,7 @@ if os.path.exists("output") and os.path.isdir("output"):
                         y.append(float(line[1]))
                         vx.append(float(line[2]))
                         vy.append(float(line[3]))
-                    plt.scatter(x, y, label="q/m="+header[0])
+                    plt.scatter(x, y, label="q/m="+header[0],s=5)
             plt.xlim(0, Lx)
             plt.ylim(0, Ly)
             plt.xticks(np.arange(0, Ly+dy, dy))

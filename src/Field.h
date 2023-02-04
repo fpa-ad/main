@@ -34,7 +34,9 @@ class Field{
     void Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho);
 
     void Kronecker(int p, int q, int m, int n, double** A, double** B, double** R);
-    void GaussElim(double** A, double* x, double* b, int N);
+    void LUdecomp(double** A, double** L, double** U, int N);
+    void LUinverse(double** A, double** L, double** U, int N);
+    void InitializeMatFD();
     
     private:
     double Lx=0;
@@ -50,5 +52,7 @@ class Field{
     double ext_x=0;
     double ext_y=0;
     double ext_z=0;
+    //Matrices for solving
+    double** Mat;
 };
 #endif

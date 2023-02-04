@@ -14,6 +14,15 @@ Field::Field(){
     Fx=nullptr;
     Fy=nullptr;
     Fz=nullptr;
+
+    Mat=new double*[Nx*Ny];
+    for(int i=0; i<Nx*Ny; ++i){
+        Mat[i]=new double[Nx*Ny];
+        for(int j=0; j<Nx*Ny; ++j){
+            Mat[i][j]=0;
+        }
+    }
+    InitializeMatFD();
 }
 
 Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, double fext_y, double fext_z){
@@ -63,6 +72,15 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
     ext_x=fext_x;
     ext_y=fext_y;
     ext_z=fext_z;
+
+    Mat=new double*[Nx*Ny];
+    for(int i=0; i<Nx*Ny; ++i){
+        Mat[i]=new double[Nx*Ny];
+        for(int j=0; j<Nx*Ny; ++j){
+            Mat[i][j]=0;
+        }
+    }
+    InitializeMatFD();
 }
 
 Field::Field(const Field& F1){
@@ -108,6 +126,15 @@ Field::Field(const Field& F1){
     ext_x=F1.ext_x;
     ext_y=F1.ext_y;
     ext_z=F1.ext_z;
+
+    Mat=new double*[Nx*Ny];
+    for(int i=0; i<Nx*Ny; ++i){
+        Mat[i]=new double[Nx*Ny];
+        for(int j=0; j<Nx*Ny; ++j){
+            Mat[i][j]=0;
+        }
+    }
+    InitializeMatFD();
 }
 
 /*Field::~Field(){
@@ -229,6 +256,56 @@ void Field::Density(int n_types, int* n_particles, double* ctm, particle** parti
 }
 
 void Field::Poisson(double** rho){
+    
+    double* R = new double[Nx*Ny];
+    for(int i = 0; i<Nx; ++i){
+        for(int j = 0; j<Ny; ++j){
+            R[i*Ny+j]=-rho[i][j];
+        }
+    }
+
+    double* vecphi = new double[Nx*Ny];
+    for(int i = 0; i<Nx; ++i){
+        for(int j = 0; j<Ny; ++j){
+            vecphi[i*Ny+j]=0;
+        }
+    }
+
+    ////vecphi=Mat.R
+    for(int i=0; i<Nx*Ny; ++i){
+        for(int j=0; j<Nx*Ny; ++j){
+            vecphi[i]+=R[j]*Mat[i][j];
+        }    
+    }
+
+    ///Put it all in phi Fx Fy
+    for(int i = 0; i<Nx; ++i){
+        for(int j = 0; j<Ny; ++j){
+            phi[i][j]=vecphi[i*Ny+j];
+        }
+    }
+
+    for(int i = 0; i<Nx; ++i){
+        for(int j = 0; j<Ny; ++j){
+            Fx[i][j]=-Xderiv(i,j);
+        }
+    }
+
+    for(int i = 0; i<Nx; ++i){
+        for(int j = 0; j<Ny; ++j){
+            Fy[i][j]=-Yderiv(i,j);
+        }
+    }
+
+    //Free all the memory
+
+    delete [] R;
+    delete [] vecphi;
+
+}
+
+void Field::InitializeMatFD(){
+
     double** Ax=new double*[Ny];
     for(int i=0; i<Ny; ++i){
         Ax[i]=new double[Ny];
@@ -285,50 +362,29 @@ void Field::Poisson(double** rho){
     Kronecker(Ny,Ny,Nx,Nx,Ax,Ix,Matx);
     Kronecker(Ny,Ny,Nx,Nx,Iy,Ay,Maty);
 
-    double** Mat=new double*[Nx*Ny];
     for(int i=0; i<Nx*Ny; ++i){
-        Mat[i]=new double[Nx*Ny];
         for(int j=0; j<Nx*Ny; ++j){
             Mat[i][j]=Matx[i][j]+Maty[i][j];
-            //cout<<Mat[i][j]<<" ";
-        }
-        //cout<<endl;
-    }
-    //cout<<endl<<endl<<endl;
-
-    double* R = new double[Nx*Ny];
-    for(int i = 0; i<Nx; ++i){
-        for(int j = 0; j<Ny; ++j){
-            R[i*Ny+j]=-rho[i][j];
         }
     }
 
-    double* vecphi = new double[Nx*Ny];
-    for(int i = 0; i<Nx; ++i){
-        for(int j = 0; j<Ny; ++j){
-            vecphi[i*Ny+j]=0;
+    double** LMat=new double*[Nx*Ny];
+    for(int i=0; i<Nx*Ny; ++i){
+        LMat[i]=new double[Nx*Ny];
+        for(int j=0; j<Nx*Ny; ++j){
+            LMat[i][j]=0;
+        }
+    }
+    double** UMat=new double*[Nx*Ny];
+    for(int i=0; i<Nx*Ny; ++i){
+        UMat[i]=new double[Nx*Ny];
+        for(int j=0; j<Nx*Ny; ++j){
+            UMat[i][j]=0;
         }
     }
 
-    GaussElim(Mat,vecphi,R,Nx*Ny);
-
-    for(int i = 0; i<Nx; ++i){
-        for(int j = 0; j<Ny; ++j){
-            phi[i][j]=vecphi[i*Ny+j];
-        }
-    }
-
-    for(int i = 0; i<Nx; ++i){
-        for(int j = 0; j<Ny; ++j){
-            Fx[i][j]=-Xderiv(i,j);
-        }
-    }
-
-    for(int i = 0; i<Nx; ++i){
-        for(int j = 0; j<Ny; ++j){
-            Fy[i][j]=-Yderiv(i,j);
-        }
-    }
+    LUdecomp(Mat,LMat,UMat,Nx*Ny);
+    LUinverse(Mat,LMat,UMat,Nx*Ny);
 
     //Free all the memory
 
@@ -343,7 +399,8 @@ void Field::Poisson(double** rho){
     for(int i = 0; i<Nx*Ny; ++i){
         delete [] Matx[i];
         delete [] Maty[i];
-        delete [] Mat[i];
+        delete [] LMat[i];
+        delete [] UMat[i];
     }
     delete [] Ax;
     delete [] Ay;
@@ -351,10 +408,8 @@ void Field::Poisson(double** rho){
     delete [] Iy;
     delete [] Matx;
     delete [] Maty;
-    delete [] Mat;
-    delete [] R;
-    delete [] vecphi;
-
+    delete [] LMat;
+    delete [] UMat;
 }
 
 void Field::Kronecker(int p, int q, int m, int n, double** A, double** B, double** R){
@@ -365,6 +420,67 @@ void Field::Kronecker(int p, int q, int m, int n, double** A, double** B, double
     }
 }
 
-void Field::GaussElim(double** A, double* x, double* b, int N){
+void Field::LUdecomp(double** A, double** L, double** U, int N){
+
+    for (int i = 0; i<N; ++i){
+        for (int j=0; j<N; ++j){
+            L[i][j]=0;
+            U[i][j]=0;
+            if (i==j) L[i][j]=1;
+        }
+    }
+
+    //setup of L and U matrices ^^^^^^^
+
+    for (int i = 0; i<N;++i){
+        for(int j = i; j<N; ++j){
+            U[i][j]=A[i][j];
+            for(int k = 0; k<i; ++k){
+                U[i][j]=U[i][j]-L[i][k]*U[k][j];
+            }
+        }
+        for(int j = i+1; j<N; ++j){
+            L[j][i]=A[j][i];
+            for(int k = 0; k<i; ++k){
+                L[j][i]=L[j][i]-L[j][k]*U[k][i];
+            }
+            L[j][i]=L[j][i]/U[i][i];
+        }
+    }
+}
+
+void Field::LUinverse(double** A, double** L, double** U, int N){
     
+    for(int i=0; i<N; ++i){ //loop for each collumn of the inverse matrix (Bcol)
+        double* Bcol=new double[N];
+        double* Icol=new double[N];
+        double* Zcol=new double[N];
+        for(int j=0; j<N; ++j){ //loop to fill Icol
+            Icol[j]=0;
+            Bcol[j]=0;
+            Zcol[j]=0;
+            if(j==i) Icol[j]=1;
+        }
+        //Solve single Linear system
+        //Solve L.Zcol=Icol
+        for(int j=0; j<N; ++j){
+            double aux=0;
+            for(int k=0; k<j; ++k){
+                aux+=L[j][k]*Zcol[k];
+            }
+            Zcol[j]=Icol[j]-aux;
+        }
+        //Solve U.Bcol=Zcol
+        for(int j=N-1; j>=0; --j){
+            double aux2=0;
+            for(int k=j+1; k<N; ++k){
+                aux2+=U[j][k]*Bcol[k];
+            }
+            Bcol[j]=(Zcol[j]-aux2)/U[j][j];
+        }
+        // Put Bcol in A
+        for(int j=0; j<N; ++j){
+            A[j][i]=Bcol[j];
+        }
+    }
 }
