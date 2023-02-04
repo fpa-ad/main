@@ -42,18 +42,18 @@ void particle::advance_velocity(double dt, double Ex, double Ey, double Ez, doub
 void particle::sanity_check(double X, double Y) {
     if (x > X) {
         x -= X;
-        sanity_check(X,Y);
+        sanity_check(X, Y);
     }
     else if (x < 0) {
         x += X;
-        sanity_check(X,Y);
+        sanity_check(X, Y);
     }
     if (y > Y) {
         y -= Y;
-        sanity_check(X,Y);
+        sanity_check(X, Y);
     }
     else if (y < 0) {
         y += Y;
-        sanity_check(X,Y);
+        sanity_check(X, Y);
     }
 };
