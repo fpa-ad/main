@@ -71,6 +71,7 @@ void sim::run(double runtime, double sc_dt) {
         if (t - snap >= sc_dt) {
             snap = t;
             snapshot();
+            cout<<"Simulation "<<t/runtime*100<<"\% Complete!"<<endl;
         }
         sim_plasma.move(dt);
         t += dt;
