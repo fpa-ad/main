@@ -20,3 +20,5 @@ J A N E L A S:
     Distribuições nas velocidades:
     - maxwellian -> controlar temperatura e v_0
     - bump-on-tail -> controlar separação e um dos coefs
+
+pngcrush -ow -rem allb -reduce file.png
