@@ -5,21 +5,21 @@
 void interface::create_simulation(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int in_n, py::list in_n_particles, py::list in_ctm, py::list in_f, int in_nFields, py::list in_const_fields) {
     n = in_n;
     
-    n_particles = (int*) malloc(n*sizeof(int));
+    n_particles = new int[n];
     for (int i = 0; i < n; i++) {
         n_particles[i] = in_n_particles[i].cast<double>();
     }
 
-    ctm = (double*) malloc(n*sizeof(double));
+    ctm = new double[n];
     for (int i = 0; i < n; i++) {
         ctm[i] = in_ctm[i].cast<double>();
     }
 
     nFields = in_nFields;
 
-    const_fields = (double**) malloc(in_nFields*sizeof(double*));
+    const_fields = new double*[nFields];
     for (int i = 0; i < in_nFields; i++) {
-        const_fields[i] = (double*) malloc(3*sizeof(double));
+        const_fields[i] = new double[3];
         for (int j = 0; j < 3; j++) {
             const_fields[i][j] = in_const_fields[i].cast<py::list>()[j].cast<double>();
         }
