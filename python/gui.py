@@ -25,7 +25,7 @@ class Window(QMainWindow):
         super().__init__(parent)
         self.setWindowIcon(QIcon('python/pic-logo.png'))
         self.setWindowTitle("PIC")
-        self.resize(800, 600)
+        self.resize(1000, 600)
         self.widget = QWidget()
         self.layout = QGridLayout()
         self.setCentralWidget(self.widget)
@@ -61,11 +61,41 @@ class Window(QMainWindow):
         dlg = ParticleDialog("new", self.particles, self.Lx, self.Ly)
         if dlg.exec():
             # new particle needs to be added to the list
-            print("add particle")
+            self.listwidget.addItem(self._printParticle(-1))
 
     def _particleClicked(self, qmodelindex):
         item = self.listwidget.currentItem()
-        print(item.text())
+        dlg = ParticleDialog("edit", self.particles, self.Lx, self.Ly, qmodelindex.row())
+        if dlg.exec():
+            # particle was changed and needs to be updated
+            item.setText(self._printParticle(qmodelindex.row()))
+
+    def _printParticle(self, i):
+        x_dist = self.particles[i][1][0]
+        if x_dist == 0:
+            x_dist_str = "random x dist."
+        elif x_dist == 1:
+            x_dist_str = f"step x dist. (s = {self.particles[i][1][1]})"
+        else:
+            x_dist_str = f"rectangular x dist. (s = {self.particles[i][1][1]}, e = {self.particles[i][1][2]})"
+        y_dist = self.particles[i][2][0]
+        if y_dist == 0:
+            y_dist_str = "random y dist."
+        elif y_dist == 1:
+            y_dist_str = f"step y dist. (s = {self.particles[i][2][1]})"
+        else:
+            y_dist_str = f"rectangular y dist. (s = {self.particles[i][2][1]}, e = {self.particles[i][2][2]})"
+        vx_dist = self.particles[i][3][0]
+        if vx_dist == 0:
+            vx_dist_str = f"maxwellian vx dist. (vp = {self.particles[i][3][1]})"
+        else:
+            vx_dist_str = f"bump-on-tail vx dist. (vp = {self.particles[i][3][1]}, v0 = {self.particles[i][3][2]}, s = {self.particles[i][3][3]})"
+        vy_dist = self.particles[i][4][0]
+        if vy_dist == 0:
+            vy_dist_str = f"maxwellian vy dist. (vp = {self.particles[i][4][1]})"
+        else:
+            vy_dist_str = f"bump-on-tail vy dist. (vp = {self.particles[i][4][1]}, v0 = {self.particles[i][4][2]}, s = {self.particles[i][4][3]})"
+        return f"ctm = {self.particles[i][0]}, {x_dist_str}, {y_dist_str},\n{vx_dist_str}, {vy_dist_str}"
 
     def _aboutClicked(self):
         dlg = CustomDialog("about")
@@ -128,20 +158,25 @@ Have you tried turning it off and on again?
         self.setLayout(self.layout)
 
 class ParticleDialog(QDialog):
-    def __init__(self, type, particles, Lx, Ly):
+    def __init__(self, type, particles, Lx, Ly, i=-1):
         super().__init__()
         self.setWindowIcon(QIcon('python/pic-logo.png'))
         self.setWindowTitle("Particle")
 
-        self.resize(600, 200)
+        self.resize(600, 800)
 
         if type == "new":
             QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
         elif type == "edit":
             QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Discard
+        
+        self.type = type
+        self.particles = particles
+        self.i = i
 
         self.buttonBox = QDialogButtonBox(QBtn)
         self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.accepted.connect(self._save)
         self.buttonBox.rejected.connect(self.reject)
 
         self.layout = QGridLayout()
@@ -153,22 +188,22 @@ class ParticleDialog(QDialog):
         ctm_label = QLabel("Charge to mass ratio")
         self.layout.addWidget(ctm_label, 1, 0, 1, 1, Qt.AlignLeft)
 
-        ctm = QDoubleSpinBox()
-        ctm.setMinimum(-10)
-        ctm.setMaximum(10)
-        ctm.setDecimals(4)
-        ctm.setValue(-1)
-        self.layout.addWidget(ctm, 1, 1, 1, 1, Qt.AlignHCenter)
+        self.ctm = QDoubleSpinBox()
+        self.ctm.setMinimum(-10)
+        self.ctm.setMaximum(10)
+        self.ctm.setDecimals(4)
+        self.ctm.setValue(-1)
+        self.layout.addWidget(self.ctm, 1, 1, 1, 1, Qt.AlignHCenter)
 
         self.layout.addWidget(QHLine(), 2, 0, 1, 2)
 
         x_label = QLabel("x distribution function")
         self.layout.addWidget(x_label, 3, 0, 1, 1, Qt.AlignLeft)
 
-        x = QComboBox()
-        x.addItems(["Random", "Step", "Rectangular"])
-        x.currentIndexChanged.connect(self._xChanged)
-        self.layout.addWidget(x, 3, 1, 1, 1, Qt.AlignHCenter)
+        self.x = QComboBox()
+        self.x.addItems(["Random", "Step", "Rectangular"])
+        self.x.currentIndexChanged.connect(self._xChanged)
+        self.layout.addWidget(self.x, 3, 1, 1, 1, Qt.AlignHCenter)
 
         self.x_grid_widget = QWidget()
         self.layout.addWidget(self.x_grid_widget, 4, 0, 1, 2)
@@ -198,10 +233,10 @@ class ParticleDialog(QDialog):
         y_label = QLabel("y distribution function")
         self.layout.addWidget(y_label, 6, 0, 1, 1, Qt.AlignLeft)
 
-        y = QComboBox()
-        y.addItems(["Random", "Step", "Rectangular"])
-        y.currentIndexChanged.connect(self._yChanged)
-        self.layout.addWidget(y, 6, 1, 1, 1, Qt.AlignHCenter)
+        self.y = QComboBox()
+        self.y.addItems(["Random", "Step", "Rectangular"])
+        self.y.currentIndexChanged.connect(self._yChanged)
+        self.layout.addWidget(self.y, 6, 1, 1, 1, Qt.AlignHCenter)
 
         self.y_grid_widget = QWidget()
         self.layout.addWidget(self.y_grid_widget, 7, 0, 1, 2)
@@ -231,10 +266,10 @@ class ParticleDialog(QDialog):
         vx_label = QLabel("vx distribution function")
         self.layout.addWidget(vx_label, 9, 0, 1, 1, Qt.AlignLeft)
 
-        vx = QComboBox()
-        vx.addItems(["Maxwellian", "Bump-on-tail"])
-        vx.currentIndexChanged.connect(self._vxChanged)
-        self.layout.addWidget(vx, 9, 1, 1, 1, Qt.AlignHCenter)
+        self.vx = QComboBox()
+        self.vx.addItems(["Maxwellian", "Bump-on-tail"])
+        self.vx.currentIndexChanged.connect(self._vxChanged)
+        self.layout.addWidget(self.vx, 9, 1, 1, 1, Qt.AlignHCenter)
 
         vx_grid_widget = QWidget()
         self.layout.addWidget(vx_grid_widget, 10, 0, 1, 2)
@@ -276,10 +311,10 @@ class ParticleDialog(QDialog):
         vy_label = QLabel("vy distribution function")
         self.layout.addWidget(vy_label, 12, 0, 1, 1, Qt.AlignLeft)
 
-        vy = QComboBox()
-        vy.addItems(["Maxwellian", "Bump-on-tail"])
-        vy.currentIndexChanged.connect(self._vyChanged)
-        self.layout.addWidget(vy, 12, 1, 1, 1, Qt.AlignHCenter)
+        self.vy = QComboBox()
+        self.vy.addItems(["Maxwellian", "Bump-on-tail"])
+        self.vy.currentIndexChanged.connect(self._vyChanged)
+        self.layout.addWidget(self.vy, 12, 1, 1, 1, Qt.AlignHCenter)
 
         vy_grid_widget = QWidget()
         self.layout.addWidget(vy_grid_widget, 13, 0, 1, 2)
@@ -319,10 +354,84 @@ class ParticleDialog(QDialog):
         self.layout.addWidget(self.buttonBox, 14, 0, 1, 1)
         self.setLayout(self.layout)
 
-        self._xChanged(0)
-        self._yChanged(0)
-        self._vxChanged(0)
-        self._vyChanged(0)
+        if type == "new":
+            self._xChanged(0)
+            self._yChanged(0)
+            self._vxChanged(0)
+            self._vyChanged(0)
+        elif type == "edit":
+            self.ctm.setValue(particles[i][0])
+
+            x_dist = particles[i][1][0]
+            self.x.setCurrentIndex(x_dist)
+            if x_dist >= 1:
+                self.x_s.setValue(particles[i][1][1])
+                if x_dist == 2:
+                    self.x_e.setValue(particles[i][1][2])
+
+            y_dist = particles[i][2][0]
+            self.y.setCurrentIndex(y_dist)
+            if y_dist >= 1:
+                self.y_s.setValue(particles[i][2][1])
+                if y_dist == 2:
+                    self.y_e.setValue(particles[i][2][2])
+
+            vx_dist = particles[i][3][0]
+            self.vx.setCurrentIndex(vx_dist)
+            self.vx_vp.setValue(particles[i][3][1])
+            if vx_dist == 1:
+                self.vx_v0.setValue(particles[i][3][2])
+                self.vx_s.setValue(particles[i][3][3])
+            
+            vy_dist = particles[i][4][0]
+            self.vy.setCurrentIndex(vy_dist)
+            self.vy_vp.setValue(particles[i][4][1])
+            if vy_dist == 1:
+                self.vy_v0.setValue(particles[i][4][2])
+                self.vy_s.setValue(particles[i][4][3])
+
+            self._xChanged(x_dist)
+            self._yChanged(y_dist)
+            self._vxChanged(vx_dist)
+            self._vyChanged(vy_dist)
+
+    def _save(self):
+        new_particle = [self.ctm.value()]
+
+        x_dist = self.x.currentIndex()
+        x = [x_dist]
+        if x_dist >= 1:
+            x.append(self.x_s.value())
+            if x_dist == 2:
+                x.append(self.x_e.value())
+        new_particle.append(x)
+
+        y_dist = self.y.currentIndex()
+        y = [y_dist]
+        if y_dist >= 1:
+            y.append(self.y_s.value())
+            if y_dist == 2:
+                y.append(self.y_e.value())
+        new_particle.append(y)
+
+        vx_dist = self.vx.currentIndex()
+        vx = [vx_dist, self.vx_vp.value()]
+        if vx_dist == 1:
+            vx.append(self.vx_v0.value())
+            vx.append(self.vx_s.value())
+        new_particle.append(vx)
+
+        vy_dist = self.vy.currentIndex()
+        vy = [vy_dist, self.vy_vp.value()]
+        if vy_dist == 1:
+            vy.append(self.vy_v0.value())
+            vy.append(self.vy_s.value())
+        new_particle.append(vy)
+
+        if self.type == "new":
+            self.particles.append(new_particle)
+        elif self.type == "edit":
+            self.particles[self.i] = new_particle
 
     def _xChanged(self, index):
         if index == 0:
