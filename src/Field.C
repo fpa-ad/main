@@ -26,6 +26,7 @@ Field::Field(){
 }
 
 Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, double fext_y, double fext_z){
+    
     Lx=fLx;
     Nx=(int)(fLx/fhx);
     hx=fLx/((double)(Nx));
@@ -382,7 +383,7 @@ void Field::InitializeMatFD(){
             UMat[i][j]=0;
         }
     }
-
+    cout<<"Finite Differences Setup Start"<<endl;
     LUdecomp(Mat,LMat,UMat,Nx*Ny);
     LUinverse(Mat,LMat,UMat,Nx*Ny);
 
@@ -446,7 +447,9 @@ void Field::LUdecomp(double** A, double** L, double** U, int N){
             }
             L[j][i]=L[j][i]/U[i][i];
         }
+        cout<<"LU Decomposition "<<(((double)(i))/N*100)<<"\% Complete!\r"<<flush;
     }
+    cout<<endl;
 }
 
 void Field::LUinverse(double** A, double** L, double** U, int N){
@@ -482,5 +485,7 @@ void Field::LUinverse(double** A, double** L, double** U, int N){
         for(int j=0; j<N; ++j){
             A[j][i]=Bcol[j];
         }
+        cout<<"Inverting "<<(((double)(i))/N*100)<<"\% Complete!\r"<<flush;
     }
+    cout<<endl;
 }

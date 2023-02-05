@@ -28,7 +28,9 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
             double raux4=(double)(gen())/((double)(gen.max()));
             particles[i][j] = particle(ctm[i], InverseCDF(f[i][0],raux1), InverseCDF(f[i][1],raux2), InverseCDF(f[i][2],raux3), InverseCDF(f[i][3],raux4));
             particles[i][j].sanity_check(Lx,Ly);
+            cout<<"Particle "<<i<<" Initialization "<<(((double)(j))/n_particles[i]*100)<<"\% Complete!\r"<<flush;
         }
+        cout<<endl;
     }
 
     //initialize fields

@@ -28,8 +28,18 @@ double random_speed() {
 }
 
 double Newton(funcdouble f, double a, double x0, int iterations, double h){
+    while(f(x0)<0.001){
+        x0+=1;
+    }
     for (int i=0; i<iterations; ++i){
-        x0=x0-((Integral(f,-100,x0,0.01)-a)*2*h)/(Integral(f,-100,x0+h,0.01)-Integral(f,-100,x0-h,0.01));
+        x0=x0-((f(x0)-a)*2*h)/(f(x0+h)-f(x0-h));
+    }
+    return x0;
+}
+
+double NewtonInt(funcdouble f, double a, double x0, int iterations, double h){
+    for (int i=0; i<iterations; ++i){
+        x0=x0-((Integral(f,-50,x0,0.01)-a)*2*h)/(Integral(f,-50,x0+h,0.01)-Integral(f,-50,x0-h,0.01));
     }
     return x0;
 }
@@ -45,5 +55,6 @@ double Integral(funcdouble f, double a, double b, double h){
 }
 
 double InverseCDF(funcdouble f, double rand){
-    return (Newton(f,rand,0.1,20,0.01));
+    double aux=f(-1001);
+    return (NewtonInt(f,rand,aux,10,0.01));
 }
