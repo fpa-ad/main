@@ -82,6 +82,7 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
         }
     }
     InitializeMatFD();
+
 }
 
 Field::Field(const Field& F1){
@@ -183,7 +184,28 @@ double Field::Y2deriv(int nx, int ny){
 }
 
 double Field::get_X(double x, double y){
-    int auxX = (int)(x/hx);
+    int auxX = floor(x/hx);
+    int auxY = floor(y/hy);
+    int auxX2 = auxX+1;
+    int auxY2 = auxY+1;
+    if(auxX2 == Nx) auxX2=0;
+    if(auxY2 == Ny) auxY2=0;
+    double res=0;
+
+    res+=hx*hy*Fx[auxX][auxY]*Spline1(x-auxX*hx,hy)*Spline1(y-auxY*hy,hy);
+    res+=hx*hy*Fx[auxX2][auxY]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY*hy,hy);
+    res+=hx*hy*Fx[auxX][auxY2]*Spline1(x-auxX*hx,hy)*Spline1(y-auxY2*hy,hy);
+    res+=hx*hy*Fx[auxX2][auxY2]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY2*hy,hy);
+
+    ///////////TEST////////////
+    /*cout<<res<<"  "<<Fx[auxX][auxY]<<"  "<<Fx[auxX2][auxY]<<"  "<<Fx[auxX][auxY2]<<"  "<<Fx[auxX2][auxY2]<<"  ";
+    auxX = (int)(x/hx);
+    auxY = (int)(y/hy);
+    cout<<Fx[auxX][auxY]<<endl;*/
+
+    return res+ext_x;
+
+    /*int auxX = (int)(x/hx);
     int auxY = (int)(y/hy);
     if(auxX==Nx) auxX=0;
     if(auxY==Ny) auxY=0;
@@ -192,11 +214,26 @@ double Field::get_X(double x, double y){
     if(auxX>=0 && auxX<Nx && auxY>=0 && auxY<Ny)
         return Fx[auxX][auxY]+ext_x;
     
-    return ext_x;
+    return ext_x;*/
 }
 
 double Field::get_Y(double x, double y){
-    int auxX = (int)(x/hx);
+    int auxX = floor(x/hx);
+    int auxY = floor(y/hy);
+    int auxX2 = auxX+1;
+    int auxY2 = auxY+1;
+    if(auxX2 == Nx) auxX2=0;
+    if(auxY2 == Ny) auxY2=0;
+    double res=0;
+
+    res+=hx*hy*Fy[auxX][auxY]*Spline1(x-auxX*hx,hy)*Spline1(y-auxY*hy,hy);
+    res+=hx*hy*Fy[auxX2][auxY]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY*hy,hy);
+    res+=hx*hy*Fy[auxX][auxY2]*Spline1(x-auxX*hx,hy)*Spline1(y-auxY2*hy,hy);
+    res+=hx*hy*Fy[auxX2][auxY2]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY2*hy,hy);
+
+    return res+ext_y;
+
+    /*int auxX = (int)(x/hx);
     int auxY = (int)(y/hy);
     if(auxX==Nx) auxX=0;
     if(auxY==Ny) auxY=0;
@@ -205,20 +242,24 @@ double Field::get_Y(double x, double y){
     if(auxX>=0 && auxX<Nx && auxY>=0 && auxY<Ny)
         return Fy[auxX][auxY]+ext_y;
     
-    return ext_y;
+    return ext_y;*/
 }
 
 double Field::get_Z(double x, double y){
-    int auxX = (int)(x/hx);
-    int auxY = (int)(y/hy);
-    if(auxX==Nx) auxX=0;
-    if(auxY==Ny) auxY=0;
+    int auxX = floor(x/hx);
+    int auxY = floor(y/hy);
+    int auxX2 = auxX+1;
+    int auxY2 = auxY+1;
+    if(auxX2 == Nx) auxX2=0;
+    if(auxY2 == Ny) auxY2=0;
+    double res=0;
 
+    res+=hx*hy*Fz[auxX][auxY]*Spline1(x-auxX*hx,hy)*Spline1(y-auxY*hy,hy);
+    res+=hx*hy*Fz[auxX2][auxY]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY*hy,hy);
+    res+=hx*hy*Fz[auxX][auxY2]*Spline1(x-auxX*hx,hy)*Spline1(y-auxY2*hy,hy);
+    res+=hx*hy*Fz[auxX2][auxY2]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY2*hy,hy);
 
-    if(auxX>=0 && auxX<Nx && auxY>=0 && auxY<Ny)
-        return Fz[auxX][auxY]+ext_z;
-    
-    return ext_z;
+    return res+ext_z;
 }
 
 void Field::Update(int n_types, int* n_particles, double* ctm, particle** particles){
@@ -243,6 +284,18 @@ void Field::Update(int n_types, int* n_particles, double* ctm, particle** partic
 
 void Field::Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho){
     int superparticle_N=10;
+    for(int i=0; i<Nx; ++i){
+        for (int j=0; j<Ny;++j){
+            for (int p_type=0;p_type<n_types;++p_type){
+                for(int p=0; p<n_particles[p_type]; ++p){
+                    rho[i][j]+=superparticle_N*ctm[p_type]*Spline1(i*hx-particles[p_type][p].get_x(),hx)*Spline1(j*hy-particles[p_type][p].get_y(),hy);
+                }
+            }
+            //cout<<rho[i][j]<<endl;
+        }
+    }
+    
+    /*int superparticle_N=10;
     for (int i=0;i<n_types;++i){
         for(int j=0; j<n_particles[i]; ++j){
             int auxX = (int)(particles[i][j].get_x()/hx);
@@ -252,7 +305,7 @@ void Field::Density(int n_types, int* n_particles, double* ctm, particle** parti
 
             rho[auxX][auxY]+=superparticle_N*ctm[i]/(hx*hy);
         }
-    }
+    }*/
     
 }
 

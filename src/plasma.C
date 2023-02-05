@@ -157,7 +157,6 @@ void plasma::move(double dt) {
         for (int j = 0; j < n_particles[i]; j++) {
             double x = particles[i][j].get_x();
             double y = particles[i][j].get_y();
-            get_Ex(x, y);
             particles[i][j].advance_velocity(dt, get_Ex(x, y), get_Ey(x, y), get_Ez(x, y), get_Bx(x, y), get_By(x, y), get_Bz(x, y));
             particles[i][j].sanity_check(Lx, Ly);
         }

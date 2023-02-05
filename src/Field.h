@@ -2,6 +2,8 @@
 #define __FIELD__
 
 #include "particle.h"
+#include <cmath>
+#include "myutils.h"
 #include <iostream>
 
 using namespace std;

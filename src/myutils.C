@@ -58,3 +58,8 @@ double InverseCDF(funcdouble f, double rand){
     double aux=f(-1001);
     return (NewtonInt(f,rand,aux,10,0.01));
 }
+
+double Spline1(double x, double L){
+    if(x<L && x>-L) return 1/L*(1-fabs(x)/L);
+    return 0;
+}
