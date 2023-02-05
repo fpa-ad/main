@@ -183,6 +183,10 @@ double Field::Y2deriv(int nx, int ny){
     return ((phi[nx][ny+1]-2*phi[nx][ny]+phi[nx][ny-1])/(hy*hy));
 }
 
+double Field::get_phi(int i, int j){
+    return phi[i][j];
+}
+
 double Field::get_X(double x, double y){
     int auxX = floor(x/hx);
     int auxY = floor(y/hy);

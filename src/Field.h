@@ -28,6 +28,7 @@ class Field{
     double get_X(double x, double y);
     double get_Y(double x, double y);
     double get_Z(double x, double y);
+    double get_phi(int i, int j);
 
     //Function to calculate the field, given the charge density
     void Update(int n_types, int* n_particles, double* ctm, particle** particles);

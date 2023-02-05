@@ -4,7 +4,7 @@
 using namespace std;
  
 double maxwellian(double x){
-    double temp=0.1;
+    double temp=1;
     double sigma=sqrt(temp);
     if (x<-1000) return 0.1;
     return exp(-x*x/(2*sigma*sigma))/(sigma*sqrt(2*M_PI));
@@ -68,17 +68,17 @@ int main(){
     funcdouble** f=new funcdouble*[2];
     f[0]=new funcdouble[4];
     f[1]=new funcdouble[4];
-    f[0][0]=&uniformE;
-    f[0][1]=&uniformE;
+    f[0][0]=&uniform;
+    f[0][1]=&uniform;
     f[0][2]=&maxwellian;
     f[0][3]=&maxwellian;
-    f[1][0]=&uniformE;
-    f[1][1]=&uniformE;
+    f[1][0]=&uniform;
+    f[1][1]=&uniform;
     f[1][2]=&maxwellian;
     f[1][3]=&maxwellian;
     cout << "starting simulation" << endl;
-    sim simulation(10, 10, 0.5, 0.5, 1e-3, 2, n_particles, ctm, f, 1, fields);
+    sim simulation(10, 10, 0.2, 0.2, 1e-3, 2, n_particles, ctm, f, 1, fields);
     cout << "running simulation" << endl;
-    simulation.run(3, 0.05);
+    simulation.run(10, 0.03);
     cout << "simulation complete" << endl;
 }
