@@ -25,7 +25,7 @@ class Window(QMainWindow):
         super().__init__(parent)
         self.setWindowIcon(QIcon('python/pic-logo.png'))
         self.setWindowTitle("PIC")
-        self.resize(1000, 600)
+        self.resize(800, 600)
         self.widget = QWidget()
         self.layout = QGridLayout()
         self.setCentralWidget(self.widget)
@@ -44,24 +44,111 @@ class Window(QMainWindow):
 
         title = QLabel("Configurations")
         title.setStyleSheet("font: bold 24px;")
-        self.layout.addWidget(title, 0, 0, 1, 1, Qt.AlignHCenter)
+        self.layout.addWidget(title, 0, 0, 1, 6, Qt.AlignHCenter)
 
         particles_title = QLabel("Particles")
-        self.layout.addWidget(particles_title, 1, 0, 1, 1, Qt.AlignHCenter)
+        particles_title.setStyleSheet("font: bold;")
+        self.layout.addWidget(particles_title, 1, 0, 1, 6, Qt.AlignHCenter)
 
         self.listwidget = QListWidget()
         self.listwidget.clicked.connect(self._particleClicked)
-        self.layout.addWidget(self.listwidget, 2, 0, 1, 1)
+        self.layout.addWidget(self.listwidget, 2, 0, 1, 6)
 
-        particles_button = QPushButton("New")
+        particles_button = QPushButton("Add")
         particles_button.clicked.connect(self._newParticle)
-        self.layout.addWidget(particles_button, 3, 0, 1, 1, Qt.AlignHCenter)
+        self.layout.addWidget(particles_button, 3, 0, 1, 3, Qt.AlignHCenter)
+
+        particles_undo = QPushButton("Undo")
+        particles_undo.clicked.connect(self._undoParticle)
+        self.layout.addWidget(particles_undo, 3, 3, 1, 3, Qt.AlignHCenter)
+
+        box_title = QLabel("Box parameters")
+        box_title.setStyleSheet("font: bold;")
+        self.layout.addWidget(box_title, 4, 0, 1, 6, Qt.AlignHCenter)
+
+        Lx_label = QLabel("Lx (x-direction box length)")
+        self.layout.addWidget(Lx_label, 5, 0, 1, 1, Qt.AlignLeft)
+
+        self.Lx_spin = QDoubleSpinBox()
+        self.Lx_spin.setMinimum(0.1)
+        self.Lx_spin.setMaximum(10)
+        self.Lx_spin.setDecimals(2)
+        self.layout.addWidget(self.Lx_spin, 5, 1, 1, 1, Qt.AlignHCenter)
+
+        Ly_label = QLabel("Ly (y-direction box length)")
+        self.layout.addWidget(Ly_label, 6, 0, 1, 1, Qt.AlignLeft)
+
+        self.Ly_spin = QDoubleSpinBox()
+        self.Ly_spin.setMinimum(0.1)
+        self.Ly_spin.setMaximum(10)
+        self.Ly_spin.setDecimals(2)
+        self.layout.addWidget(self.Ly_spin, 6, 1, 1, 1, Qt.AlignHCenter)
+
+        dx_label = QLabel("dx (x-direction grid size)")
+        self.layout.addWidget(dx_label, 5, 2, 1, 1, Qt.AlignLeft)
+
+        self.dx = QDoubleSpinBox()
+        self.dx.setMinimum(0.1)
+        self.dx.setMaximum(10)
+        self.dx.setDecimals(2)
+        self.layout.addWidget(self.dx, 5, 3, 1, 1, Qt.AlignHCenter)
+
+        dy_label = QLabel("dy (y-direction grid size)")
+        self.layout.addWidget(dy_label, 6, 2, 1, 1, Qt.AlignLeft)
+
+        self.dy = QDoubleSpinBox()
+        self.dy.setMinimum(0.1)
+        self.dy.setMaximum(10)
+        self.dy.setDecimals(2)
+        self.layout.addWidget(self.dy, 6, 3, 1, 1, Qt.AlignHCenter)
+
+        dt_label = QLabel("dt (time step)")
+        self.layout.addWidget(dt_label, 5, 4, 2, 1, Qt.AlignLeft)
+
+        self.dt = QDoubleSpinBox()
+        self.dt.setMinimum(0.1)
+        self.dt.setMaximum(1)
+        self.dt.setDecimals(3)
+        self.layout.addWidget(self.dt, 5, 5, 2, 1, Qt.AlignHCenter)
+
+        sim_title = QLabel("Simulation")
+        sim_title.setStyleSheet("font: bold;")
+        self.layout.addWidget(sim_title, 7, 0, 1, 6, Qt.AlignHCenter)
+
+        T_label = QLabel("Simulation time")
+        self.layout.addWidget(T_label, 8, 0, 1, 1, Qt.AlignLeft)
+
+        self.T = QDoubleSpinBox()
+        self.T.setMinimum(0.1)
+        self.T.setMaximum(600)
+        self.T.setValue(10)
+        self.T.setDecimals(3)
+        self.layout.addWidget(self.T, 8, 1, 1, 1, Qt.AlignHCenter)
+
+        sc_label = QLabel("Screenshot interval")
+        self.layout.addWidget(sc_label, 8, 2, 1, 1, Qt.AlignLeft)
+
+        self.T = QDoubleSpinBox()
+        self.T.setMinimum(0.1)
+        self.T.setMaximum(10)
+        self.T.setValue(0.2)
+        self.T.setDecimals(3)
+        self.layout.addWidget(self.T, 8, 3, 1, 1, Qt.AlignHCenter)
+
+        sim = QPushButton("Start")
+        sim.clicked.connect(self._simClicked)
+        self.layout.addWidget(sim, 8, 4, 1, 2, Qt.AlignHCenter)
 
     def _newParticle(self):
         dlg = ParticleDialog("new", self.particles, self.Lx, self.Ly)
         if dlg.exec():
             # new particle needs to be added to the list
             self.listwidget.addItem(self._printParticle(-1))
+
+    def _undoParticle(self):
+        if self.particles:
+            self.listwidget.takeItem(len(self.particles)-1)
+            self.particles.pop()
 
     def _particleClicked(self, qmodelindex):
         item = self.listwidget.currentItem()
@@ -96,6 +183,9 @@ class Window(QMainWindow):
         else:
             vy_dist_str = f"bump-on-tail vy dist. (vp = {self.particles[i][4][1]}, v0 = {self.particles[i][4][2]}, s = {self.particles[i][4][3]})"
         return f"ctm = {self.particles[i][0]}, {x_dist_str}, {y_dist_str},\n{vx_dist_str}, {vy_dist_str}"
+
+    def _simClicked(self):
+        print("start simulation")
 
     def _aboutClicked(self):
         dlg = CustomDialog("about")
