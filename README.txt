@@ -1,9 +1,7 @@
 -----------------------------------------------------------
 To do list:
 	Código C++ Simulação:
-		1. As partículas ainda não avançam em y
-		3. Simular a equação de Poisson para o campo elétrico
-		4. O campo magnético ainda não está nas contas para avançar posições e velocidades
+		1.Interpolação
 	Interface python:
 		5. Corrigir a pseudo-maxwelliana e implementar o resto
 		6. A lib continua a não compilar devidamente por vezes... Só fazendo rm lib/*
