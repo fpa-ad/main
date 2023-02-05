@@ -19,14 +19,14 @@ double uniform(double x){
 }
 
 double maxwellian2(double x){
-    double temp=0.3;
+    double temp=0.1;
     double sigma=sqrt(temp);
     if (x<-1000) return 2.1;
     return exp(-(x-2)*(x-2)/(2*sigma*sigma))/(sigma*sqrt(2*M_PI));
 }
 
 double maxwellian02(double x){
-    double temp=0.3;
+    double temp=0.1;
     double sigma=sqrt(temp);
     if (x<-1000) return -1.9;
     return exp(-(x+2)*(x+2)/(2*sigma*sigma))/(sigma*sqrt(2*M_PI));
@@ -51,8 +51,8 @@ double uniformP(double x){
 int main(){
 
     int n_particles[2];
-    n_particles[0] = 100;
-    n_particles[1] = 100;
+    n_particles[0] = 1;
+    n_particles[1] = 1;
     double ctm[2];
     ctm[0] = 1;
     ctm[1] = -1;
@@ -69,16 +69,16 @@ int main(){
     f[0]=new funcdouble[4];
     f[1]=new funcdouble[4];
     f[0][0]=&uniformE;
-    f[0][1]=&uniform;
-    f[0][2]=&maxwellian2;
+    f[0][1]=&uniformE;
+    f[0][2]=&maxwellian;
     f[0][3]=&maxwellian;
-    f[1][0]=&uniformP;
-    f[1][1]=&uniform;
-    f[1][2]=&maxwellian02;
+    f[1][0]=&uniformE;
+    f[1][1]=&uniformE;
+    f[1][2]=&maxwellian;
     f[1][3]=&maxwellian;
     cout << "starting simulation" << endl;
     sim simulation(10, 10, 0.2, 0.2, 1e-3, 2, n_particles, ctm, f, 1, fields);
     cout << "running simulation" << endl;
-    simulation.run(5, 0.05);
+    simulation.run(5, 0.02);
     cout << "simulation complete" << endl;
 }

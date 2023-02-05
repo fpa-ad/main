@@ -242,7 +242,7 @@ void Field::Update(int n_types, int* n_particles, double* ctm, particle** partic
 }
 
 void Field::Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho){
-
+    int superparticle_N=10;
     for (int i=0;i<n_types;++i){
         for(int j=0; j<n_particles[i]; ++j){
             int auxX = (int)(particles[i][j].get_x()/hx);
@@ -250,7 +250,7 @@ void Field::Density(int n_types, int* n_particles, double* ctm, particle** parti
             if(auxX==Nx) auxX=0;
             if(auxY==Ny) auxY=0;
 
-            rho[auxX][auxY]+=ctm[i]/(hx*hy);
+            rho[auxX][auxY]+=superparticle_N*ctm[i]/(hx*hy);
         }
     }
     
@@ -363,10 +363,13 @@ void Field::InitializeMatFD(){
     Kronecker(Ny,Ny,Nx,Nx,Ax,Ix,Matx);
     Kronecker(Ny,Ny,Nx,Nx,Iy,Ay,Maty);
 
-    for(int i=0; i<Nx*Ny; ++i){
+    for(int i=0; i<Nx*Ny-1; ++i){
         for(int j=0; j<Nx*Ny; ++j){
             Mat[i][j]=Matx[i][j]+Maty[i][j];
         }
+    }
+    for(int j=0; j<Nx*Ny; ++j){
+        Mat[Nx*Ny-1][j]=1;
     }
 
     double** LMat=new double*[Nx*Ny];
