@@ -47,13 +47,35 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
                     break;
                     }
                 case 1:
+                    {
                     // it's step
-                    cout << "step starting at " << specs[1].cast<double>() << endl;
+                    double L = (i == 0 ? in_X : in_Y);
+                    double s = specs[1].cast<double>();
+                    cout << "step starting at " << s << endl;
+                    f[p][i] = (std::function<double(double)>) [s, L] (double x) {
+                        if (x < s)
+                            return 0.0;
+                        else
+                            return 1/(L-s);
+                    };
                     break;
+                    }
                 case 2:
-                    // it's plateau
-                    cout << "plateau starting at " << specs[1].cast<double>() << " and ending at " << specs[2].cast<double>() << endl;
+                    {
+                    // it's rectangular
+                    double s = specs[1].cast<double>();
+                    double e = specs[2].cast<double>();
+                    cout << "rectangular starting at " << s << " and ending at " << e << endl;
+                    f[p][i] = (std::function<double(double)>) [s, e] (double x) {
+                        if (x < s)
+                            return 0.0;
+                        else if (x < e)
+                            return 1/(e-s);
+                        else
+                            return 0.0;
+                    };
                     break;
+                    }
             }
         }
 
@@ -66,12 +88,29 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
                     // it's maxwellian
                     double vp = specs[1].cast<double>();
                     cout << "maxwellian with vp " << vp << endl;
-                    f[p][i] = (std::function<double(double)>) [vp] (double v) {return 1/(vp*sqrt(M_PI)) * exp(-v*v/(vp*vp));};
+                    f[p][i] = (std::function<double(double)>) [vp] (double v) {
+                        if (abs(v) < 1000)
+                            return 1/(vp*sqrt(M_PI)) * exp(-v*v/(vp*vp));
+                        else
+                            return 0.1;
+                        };
                     break;
                     }
                 case 1:
+                    {
                     // it's a bump-on-tail
-                    cout << "bump-on-tail with vp " << specs[1].cast<double>() << " at " << specs[2].cast<double>() << " with a= " << specs[3].cast<double>() << endl;
+                    double vp = specs[1].cast<double>();
+                    double v0 = specs[2].cast<double>();
+                    double b = specs[3].cast<double>();
+                    cout << "bump-on-tail with vp " << vp << " at " << v0 << " with b= " << b << endl;
+                    f[p][i] = (std::function<double(double)>) [vp, v0, b] (double v) {
+                        if (abs(v) < 1000)
+                            return 1/(vp*sqrt(M_PI)) * ((1-b)*exp(-v*v/(vp*vp)) + b*exp(-(v-v0)*(v-v0)/(vp*vp))) ;
+                        else
+                            return 0.1;
+                        };
+                    break;
+                    }
             }
         }
     }
