@@ -7,7 +7,7 @@ Também já corrigi a grelha para hopefully não ficarem 1000 números sobrepost
 -----------------------------------------------------------
 To do list:
 	Código C++ Simulação:
-		1. Interpolação-Density for particles on edge of grid
+		1. Interpolação- Get_X() more general for higher order splines
 	Interface python:
 		6. A lib continua a não compilar devidamente por vezes... Só fazendo rm lib/*
     Data analysis:
