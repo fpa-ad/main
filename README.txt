@@ -1,7 +1,7 @@
 -----------------------------------------------------------
 To do list:
 	Código C++ Simulação:
-		1.Interpolação-Density for particles on edge of grid
+		1.Interpolação- Fields more general for higher order splines
         2. Exportar os campos para o txt: A cada snapshot, além das posições e velocidades das partículas, guardar num quadrado NxN os valores de phi em cada ponto da grelha
 	Interface python:
 		5. Corrigir a pseudo-maxwelliana e implementar o resto (ver imagem que o Diogo mandou)

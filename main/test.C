@@ -51,8 +51,8 @@ double uniformP(double x){
 int main(){
 
     int n_particles[2];
-    n_particles[0] = 1;
-    n_particles[1] = 1;
+    n_particles[0] = 1000;
+    n_particles[1] = 1000;
     double ctm[2];
     ctm[0] = 1;
     ctm[1] = -1;

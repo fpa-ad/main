@@ -201,24 +201,7 @@ double Field::get_X(double x, double y){
     res+=hx*hy*Fx[auxX][auxY2]*Spline1(x-auxX*hx,hy)*Spline1(y-auxY2*hy,hy);
     res+=hx*hy*Fx[auxX2][auxY2]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY2*hy,hy);
 
-    ///////////TEST////////////
-    /*cout<<res<<"  "<<Fx[auxX][auxY]<<"  "<<Fx[auxX2][auxY]<<"  "<<Fx[auxX][auxY2]<<"  "<<Fx[auxX2][auxY2]<<"  ";
-    auxX = (int)(x/hx);
-    auxY = (int)(y/hy);
-    cout<<Fx[auxX][auxY]<<endl;*/
-
     return res+ext_x;
-
-    /*int auxX = (int)(x/hx);
-    int auxY = (int)(y/hy);
-    if(auxX==Nx) auxX=0;
-    if(auxY==Ny) auxY=0;
-
-
-    if(auxX>=0 && auxX<Nx && auxY>=0 && auxY<Ny)
-        return Fx[auxX][auxY]+ext_x;
-    
-    return ext_x;*/
 }
 
 double Field::get_Y(double x, double y){
@@ -236,17 +219,6 @@ double Field::get_Y(double x, double y){
     res+=hx*hy*Fy[auxX2][auxY2]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY2*hy,hy);
 
     return res+ext_y;
-
-    /*int auxX = (int)(x/hx);
-    int auxY = (int)(y/hy);
-    if(auxX==Nx) auxX=0;
-    if(auxY==Ny) auxY=0;
-
-
-    if(auxX>=0 && auxX<Nx && auxY>=0 && auxY<Ny)
-        return Fy[auxX][auxY]+ext_y;
-    
-    return ext_y;*/
 }
 
 double Field::get_Z(double x, double y){
@@ -292,24 +264,11 @@ void Field::Density(int n_types, int* n_particles, double* ctm, particle** parti
         for (int j=0; j<Ny;++j){
             for (int p_type=0;p_type<n_types;++p_type){
                 for(int p=0; p<n_particles[p_type]; ++p){
-                    rho[i][j]+=superparticle_N*ctm[p_type]*Spline1(i*hx-particles[p_type][p].get_x(),hx)*Spline1(j*hy-particles[p_type][p].get_y(),hy);
+                    rho[i][j]+=superparticle_N*ctm[p_type]*(Spline1(i*hx-particles[p_type][p].get_x(),hx)+Spline1(i*hx+Lx-particles[p_type][p].get_x(),hx)+Spline1(i*hx-Lx-particles[p_type][p].get_x(),hx))*(Spline1(j*hy-particles[p_type][p].get_y(),hy)+Spline1(j*hy+Ly-particles[p_type][p].get_y(),hy)+Spline1(j*hy-Ly-particles[p_type][p].get_y(),hy));
                 }
             }
-            //cout<<rho[i][j]<<endl;
         }
     }
-    
-    /*int superparticle_N=10;
-    for (int i=0;i<n_types;++i){
-        for(int j=0; j<n_particles[i]; ++j){
-            int auxX = (int)(particles[i][j].get_x()/hx);
-            int auxY = (int)(particles[i][j].get_y()/hy);
-            if(auxX==Nx) auxX=0;
-            if(auxY==Ny) auxY=0;
-
-            rho[auxX][auxY]+=superparticle_N*ctm[i]/(hx*hy);
-        }
-    }*/
     
 }
 
