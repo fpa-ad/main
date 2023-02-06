@@ -2,6 +2,8 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QDialog, QDialogButtonBox, QGridLayout, QApplication, QWidget, QListWidget, QPushButton, QDoubleSpinBox, QComboBox, QFrame
+import pyqtgraph as pg
+import numpy as np
 
 class QHLine(QFrame):
     def __init__(self):
@@ -253,7 +255,7 @@ class ParticleDialog(QDialog):
         self.setWindowIcon(QIcon('python/pic-logo.png'))
         self.setWindowTitle("Particle")
 
-        self.resize(600, 800)
+        self.resize(1000, 800)
 
         if type == "new":
             QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
@@ -273,7 +275,7 @@ class ParticleDialog(QDialog):
 
         title = QLabel("Particle configuration")
         title.setStyleSheet("font: bold;")
-        self.layout.addWidget(title, 0, 0, 1, 2, Qt.AlignHCenter)
+        self.layout.addWidget(title, 0, 0, 1, 3, Qt.AlignHCenter)
 
         ctm_label = QLabel("Charge to mass ratio")
         self.layout.addWidget(ctm_label, 1, 0, 1, 1, Qt.AlignLeft)
@@ -374,16 +376,19 @@ class ParticleDialog(QDialog):
         self.vx_vp.setMaximum(10)
         self.vx_vp.setValue(1)
         self.vx_vp.setDecimals(3)
+        self.vx_vp.valueChanged.connect(self._updatePlot)
         vx_grid.addWidget(self.vx_vp, 0, 1, 1, 1, Qt.AlignHCenter)
 
         self.vx_v0_label = QLabel("Bump-on tail position")
         vx_grid.addWidget(self.vx_v0_label, 1, 0, 1, 1, Qt.AlignLeft)
 
         self.vx_v0 = QDoubleSpinBox()
-        self.vx_v0.setMinimum(0.001)
+        self.vx_v0.setMinimum(0.1)
+        self.vx_v0.setSingleStep(0.1)
         self.vx_v0.setMaximum(10)
         self.vx_v0.setValue(1)
         self.vx_v0.setDecimals(3)
+        self.vx_v0.valueChanged.connect(self._updatePlot)
         vx_grid.addWidget(self.vx_v0, 1, 1, 1, 1, Qt.AlignHCenter)
 
         self.vx_s_label = QLabel("Bump-on tail strength (b)")
@@ -394,6 +399,7 @@ class ParticleDialog(QDialog):
         self.vx_s.setMaximum(1)
         self.vx_s.setValue(0.1)
         self.vx_s.setDecimals(4)
+        self.vx_s.valueChanged.connect(self._updatePlot)
         vx_grid.addWidget(self.vx_s, 2, 1, 1, 1, Qt.AlignHCenter)
 
         self.layout.addWidget(QHLine(), 11, 0, 1, 2)
@@ -419,16 +425,19 @@ class ParticleDialog(QDialog):
         self.vy_vp.setMaximum(10)
         self.vy_vp.setValue(1)
         self.vy_vp.setDecimals(3)
+        self.vy_vp.valueChanged.connect(self._updatePlot)
         vy_grid.addWidget(self.vy_vp, 0, 1, 1, 1, Qt.AlignHCenter)
 
         self.vy_v0_label = QLabel("Bump-on tail position")
         vy_grid.addWidget(self.vy_v0_label, 1, 0, 1, 1, Qt.AlignLeft)
 
         self.vy_v0 = QDoubleSpinBox()
-        self.vy_v0.setMinimum(0.001)
+        self.vy_v0.setMinimum(0.1)
+        self.vy_v0.setSingleStep(0.1)
         self.vy_v0.setMaximum(10)
         self.vy_v0.setValue(1)
         self.vy_v0.setDecimals(3)
+        self.vy_v0.valueChanged.connect(self._updatePlot)
         vy_grid.addWidget(self.vy_v0, 1, 1, 1, 1, Qt.AlignHCenter)
 
         self.vy_s_label = QLabel("Bump-on tail strength (b)")
@@ -439,9 +448,14 @@ class ParticleDialog(QDialog):
         self.vy_s.setMaximum(1)
         self.vy_s.setValue(0.1)
         self.vy_s.setDecimals(4)
+        self.vy_s.valueChanged.connect(self._updatePlot)
         vy_grid.addWidget(self.vy_s, 2, 1, 1, 1, Qt.AlignHCenter)
 
-        self.layout.addWidget(self.buttonBox, 14, 0, 1, 1)
+        self.graphWidget = pg.PlotWidget()
+        self.layout.addWidget(self.graphWidget, 1, 2, 13, 1)
+        self.graphWidget.setBackground('w')
+
+        self.layout.addWidget(self.buttonBox, 14, 0, 1, 3)
         self.setLayout(self.layout)
 
         if type == "new":
@@ -484,6 +498,7 @@ class ParticleDialog(QDialog):
             self._yChanged(y_dist)
             self._vxChanged(vx_dist)
             self._vyChanged(vy_dist)
+        self._updatePlot()
 
     def _save(self):
         new_particle = [self.ctm.value()]
@@ -560,6 +575,7 @@ class ParticleDialog(QDialog):
 
             self.vx_s_label.show()
             self.vx_s.show()
+        self._updatePlot()
 
     def _vyChanged(self, index):
         if index == 0:
@@ -574,6 +590,33 @@ class ParticleDialog(QDialog):
 
             self.vy_s_label.show()
             self.vy_s.show()
+        self._updatePlot()
+
+    def _updatePlot(self):
+        self.graphWidget.clear()
+
+        points = np.arange(-5, 20, 0.1)
+
+        vx_dist = self.vx.currentIndex()
+        vp = self.vx_vp.value()
+        if vx_dist == 0:
+            fx = lambda v, vp=vp: 1/(vp*np.pi) * np.exp(-v*v/(vp*vp))
+        else:
+            fx = lambda v, vp=vp, v0=self.vx_v0.value(), b=self.vx_s.value(): 1/(vp*np.pi) * ((1-b)*np.exp(-v*v/(vp*vp)) + b*np.exp(-(v-v0)*(v-v0)/(vp*vp)))
+
+        vy_dist = self.vy.currentIndex()
+        vp = self.vy_vp.value()
+        if vy_dist == 0:
+            fy = lambda v, vp=vp: 1/(vp*np.pi) * np.exp(-v*v/(vp*vp))
+        else:
+            fy = lambda v, vp=vp, v0=self.vy_v0.value(), b=self.vy_s.value(): 1/(vp*np.pi) * ((1-b)*np.exp(-v*v/(vp*vp)) + b*np.exp(-(v-v0)*(v-v0)/(vp*vp)))
+
+        self.graphWidget.setTitle("Velocity distributions")
+        pen1 = pg.mkPen(color=(255, 0, 0), width=4)
+        self.graphWidget.plot(points, fx(points), name="vx", pen=pen1)
+        pen2 = pg.mkPen(color=(0, 0, 255), width=4)
+        self.graphWidget.plot(points, fy(points), name="vy", pen=pen2)
+        self.graphWidget.addLegend()
 
 app = QApplication(sys.argv)
 app.setWindowIcon(QIcon('python/pic-logo.png'))

@@ -1,7 +1,11 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-import imageio
+import imageio.v2 as imageio
+from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+
+minv = 1200
+binw = 50
 
 if os.path.exists("output") and os.path.isdir("output"):
     sims = os.listdir("output")
@@ -25,7 +29,7 @@ if os.path.exists("output") and os.path.isdir("output"):
             if (file == "README.txt"):
                 continue
             print(file)
-            fig = plt.figure()
+            fig, ax = plt.subplots()
             with open("output/"+sim+"/"+file) as f:
                 # read time and number of particle types
                 header = f.readline().split()
@@ -50,20 +54,34 @@ if os.path.exists("output") and os.path.isdir("output"):
                     plt.scatter(x, y, label="q/m="+header[0],s=5)
             plt.xlim(0, Lx)
             plt.ylim(0, Ly)
-            plt.xticks(np.arange(0, Ly+dy, dy))
-            plt.yticks(np.arange(0, Ly+dy, dy))
-            plt.grid(True)
+            ax.xaxis.set_minor_locator(MultipleLocator(dx))
+            ax.yaxis.set_minor_locator(MultipleLocator(dy))
+            plt.grid(True, which='both')
             plt.title(f"t={t}s")
             plt.legend()
-            name = "output/"+sim+"/"+file.replace("txt","png")
-            plt.savefig(name)
+            plt.savefig("output/"+sim+"/"+file.replace("txt","png"))
             frames.append(int(file.replace(".txt","")))
+            #plt.show()
+            plt.close(fig)
+            fig, axs = plt.subplots(1, 2, sharey=True, tight_layout=True, figsize=(8,4))
+            axs[0].hist(vx, bins=np.arange(-minv, minv, binw))
+            axs[0].set(title=f"$v_x$ for t={t}s")
+            axs[0].yaxis.set_major_locator(MultipleLocator(1))
+            axs[1].hist(vy, bins=np.arange(-minv, minv, binw))
+            axs[1].set(title=f"$v_y$ for t={t}s")
+            plt.savefig("output/"+sim+"/"+file.replace(".txt","")+"_hist.png")
             #plt.show()
             plt.close(fig)
         frames.sort()
         with imageio.get_writer("output/"+sim+"/"+'sim.gif', mode='I', fps=10) as writer:
             for filename in frames:
                 name = "output/"+sim+"/"+str(filename)+".png"
+                print(name)
+                image = imageio.imread(name)
+                writer.append_data(image)
+        with imageio.get_writer("output/"+sim+"/"+'sim_hist.gif', mode='I', fps=10) as writer:
+            for filename in frames:
+                name = "output/"+sim+"/"+str(filename)+"_hist.png"
                 print(name)
                 image = imageio.imread(name)
                 writer.append_data(image)

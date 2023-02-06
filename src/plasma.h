@@ -44,6 +44,7 @@ class plasma{
         int get_n_particle(int i);
         particle** get_particles();
         double* get_background_fields();
+        Field* get_fields();
 
         double get_Ex(double x, double y);
         double get_Ey(double x, double y);

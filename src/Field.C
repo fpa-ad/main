@@ -1,20 +1,6 @@
 #include "Field.h"
 
-Field::Field(){
-    Lx=0;
-    Ly=0;
-    Nx=0;
-    Ny=0;
-    hx=0;
-    hy=0;
-    ext_x=0;
-    ext_y=0;
-    ext_z=0;
-    phi=nullptr;
-    Fx=nullptr;
-    Fy=nullptr;
-    Fz=nullptr;
-
+Field::Field() : Lx(0), Ly(0), Nx(0), Ny(0), hx(0), hy(0), ext_x(0), ext_y(0), ext_z(0), phi(nullptr), Fx(nullptr), Fy(nullptr), Fz(nullptr) {
     Mat=new double*[Nx*Ny];
     for(int i=0; i<Nx*Ny; ++i){
         Mat[i]=new double[Nx*Ny];
@@ -25,12 +11,9 @@ Field::Field(){
     InitializeMatFD();
 }
 
-Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, double fext_y, double fext_z){
-    
-    Lx=fLx;
+Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, double fext_y, double fext_z) : Lx(fLx), Ly(fLy), ext_x(fext_x), ext_y(fext_y), ext_z(fext_z) {
     Nx=(int)(fLx/fhx);
     hx=fLx/((double)(Nx));
-    Ly=fLy;
     Ny=(int)(fLy/fhy);
     hy=fLy/((double)(Ny));
     
@@ -69,10 +52,6 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
             Fz[i][j]=0;
         }
     }
-
-    ext_x=fext_x;
-    ext_y=fext_y;
-    ext_z=fext_z;
 
     Mat=new double*[Nx*Ny];
     for(int i=0; i<Nx*Ny; ++i){
