@@ -1,7 +1,11 @@
+O plots.py agora também produz histogramas das velocidades (should be nifty).
+Para facilitar a leitura é simpático pré-definir logo os limites e largura de bin (está no início do ficheiro)
+Alterar para simulações diferentes
+
 -----------------------------------------------------------
 To do list:
 	Código C++ Simulação:
-		1.Interpolação-Density for particles on edge of grid
+		1. Interpolação-Density for particles on edge of grid
         2. Exportar os campos para o txt: A cada snapshot, além das posições e velocidades das partículas, guardar num quadrado NxN os valores de phi em cada ponto da grelha
 	Interface python:
 		5. Corrigir a pseudo-maxwelliana e implementar o resto (ver imagem que o Diogo mandou)
