@@ -82,6 +82,10 @@ double* plasma::get_background_fields() {
     return f;
 }
 
+Field* plasma::get_fields() {
+    return fields;
+}
+
 double plasma::get_Ex(double x, double y) {
     if (nFields == 0) {
         return 0;
