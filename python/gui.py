@@ -199,6 +199,8 @@ class Window(QMainWindow):
             ctms.append(self.particles[i][1])
             f.append([self.particles[i][2], self.particles[i][3], self.particles[i][4], self.particles[i][5]])
 
+        print(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, 0, [])
+
         i = l.interface()
         i.create_simulation(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, 0, [])
         i.run_simulation(3, 0.1)
