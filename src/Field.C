@@ -131,35 +131,35 @@ Field::Field(const Field& F1){
 }*/
 
 double Field::Xderiv(int nx, int ny){
-    if(nx==0)
-        return ((phi[1][ny]-phi[Nx-1][ny])/(2*hx));
-    if(nx==Nx-1)
-        return ((phi[0][ny]-phi[Nx-2][ny])/(2*hx));
-    return ((phi[nx+1][ny]-phi[nx-1][ny])/(2*hx));
+    int nxplus=nx+1;
+    int nxminus=nx-1;
+    if(nxminus==-1) nxminus=Nx-1;
+    if(nxplus==Nx) nxplus=0;
+    return ((phi[nxplus][ny]-phi[nxminus][ny])/(2*hx));
 }
     
 double Field::Yderiv(int nx, int ny){
-    if(ny==0)
-        return ((phi[nx][1]-phi[nx][Ny-1])/(2*hy));
-    if(ny==Ny-1)
-        return ((phi[nx][0]-phi[nx][Ny-2])/(2*hy));
-    return ((phi[nx][ny+1]-phi[nx][ny-1])/(2*hy));
+    int nyplus=ny+1;
+    int nyminus=ny-1;
+    if(nyminus==-1) nyminus=Ny-1;
+    if(nyplus==Ny) nyplus=0;
+    return ((phi[nx][nyplus]-phi[nx][nyminus])/(2*hy));
 }
     
 double Field::X2deriv(int nx, int ny){
-    if(nx==0)
-        return ((phi[1][ny]-2*phi[0][ny]+phi[Nx-1][ny])/(hx*hx));
-    if(nx==Nx-1)
-        return ((phi[0][ny]-2*phi[Nx-1][ny]+phi[Nx-2][ny])/(hx*hx));
-    return ((phi[nx+1][ny]-2*phi[nx][ny]+phi[nx-1][ny])/(hx*hx));
+    int nxplus=nx+1;
+    int nxminus=nx-1;
+    if(nxminus==-1) nxminus=Nx-1;
+    if(nxplus==Nx) nxplus=0;
+    return ((phi[nxplus][ny]-2*phi[nx][ny]+phi[nxminus][ny])/(hx*hx));
 }
 
 double Field::Y2deriv(int nx, int ny){
-    if(ny==0)
-        return ((phi[nx][1]-2*phi[nx][0]+phi[nx][Ny-1])/(hy*hy));
-    if(ny==Ny-1)
-        return ((phi[nx][0]-2*phi[nx][Ny-1]+phi[nx][Ny-2])/(hy*hy));
-    return ((phi[nx][ny+1]-2*phi[nx][ny]+phi[nx][ny-1])/(hy*hy));
+    int nyplus=ny+1;
+    int nyminus=ny-1;
+    if(nyminus==-1) nyminus=Ny-1;
+    if(nyplus==Ny) nyplus=0;
+    return ((phi[nx][nyplus]-2*phi[nx][ny]+phi[nx][nyminus])/(hy*hy));
 }
 
 double Field::get_phi(int i, int j){
@@ -167,53 +167,38 @@ double Field::get_phi(int i, int j){
 }
 
 double Field::get_X(double x, double y){
-    int auxX = floor(x/hx);
-    int auxY = floor(y/hy);
-    int auxX2 = auxX+1;
-    int auxY2 = auxY+1;
-    if(auxX2 == Nx) auxX2=0;
-    if(auxY2 == Ny) auxY2=0;
     double res=0;
 
-    res+=hx*hy*Fx[auxX][auxY]*Spline1(x-auxX*hx,hy)*Spline1(y-auxY*hy,hy);
-    res+=hx*hy*Fx[auxX2][auxY]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY*hy,hy);
-    res+=hx*hy*Fx[auxX][auxY2]*Spline1(x-auxX*hx,hy)*Spline1(y-auxY2*hy,hy);
-    res+=hx*hy*Fx[auxX2][auxY2]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY2*hy,hy);
-
+    for(int i=0; i<Nx; ++i){
+        for(int j=0; j<Ny; ++j){
+            res+=hx*hy*Fx[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
+        }
+    }
+    
     return res+ext_x;
 }
 
 double Field::get_Y(double x, double y){
-    int auxX = floor(x/hx);
-    int auxY = floor(y/hy);
-    int auxX2 = auxX+1;
-    int auxY2 = auxY+1;
-    if(auxX2 == Nx) auxX2=0;
-    if(auxY2 == Ny) auxY2=0;
     double res=0;
 
-    res+=hx*hy*Fy[auxX][auxY]*Spline1(x-auxX*hx,hy)*Spline1(y-auxY*hy,hy);
-    res+=hx*hy*Fy[auxX2][auxY]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY*hy,hy);
-    res+=hx*hy*Fy[auxX][auxY2]*Spline1(x-auxX*hx,hy)*Spline1(y-auxY2*hy,hy);
-    res+=hx*hy*Fy[auxX2][auxY2]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY2*hy,hy);
-
+    for(int i=0; i<Nx; ++i){
+        for(int j=0; j<Ny; ++j){
+            res+=hx*hy*Fy[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
+        }
+    }
+    
     return res+ext_y;
 }
 
 double Field::get_Z(double x, double y){
-    int auxX = floor(x/hx);
-    int auxY = floor(y/hy);
-    int auxX2 = auxX+1;
-    int auxY2 = auxY+1;
-    if(auxX2 == Nx) auxX2=0;
-    if(auxY2 == Ny) auxY2=0;
     double res=0;
 
-    res+=hx*hy*Fz[auxX][auxY]*Spline1(x-auxX*hx,hy)*Spline1(y-auxY*hy,hy);
-    res+=hx*hy*Fz[auxX2][auxY]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY*hy,hy);
-    res+=hx*hy*Fz[auxX][auxY2]*Spline1(x-auxX*hx,hy)*Spline1(y-auxY2*hy,hy);
-    res+=hx*hy*Fz[auxX2][auxY2]*Spline1(x-auxX2*hx,hy)*Spline1(y-auxY2*hy,hy);
-
+    for(int i=0; i<Nx; ++i){
+        for(int j=0; j<Ny; ++j){
+            res+=hx*hy*Fz[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
+        }
+    }
+    
     return res+ext_z;
 }
 
@@ -259,6 +244,7 @@ void Field::Poisson(double** rho){
             R[i*Ny+j]=-rho[i][j];
         }
     }
+    R[Nx*Ny-1]=0;
 
     double* vecphi = new double[Nx*Ny];
     for(int i = 0; i<Nx; ++i){
@@ -307,8 +293,10 @@ void Field::InitializeMatFD(){
         Ax[i]=new double[Ny];
         for(int j=0; j<Ny; ++j){
             Ax[i][j]=0;
-            if(j==i) Ax[i][j]=-2;
-            if(j==i+1||j==i-1||(j==0&&i==Ny-1)||(j==Ny-1&&i==0)) Ax[i][j]=1;
+            if(j==i) Ax[i][j]+=-2;
+            if(j==i+1||j==i-1) Ax[i][j]+=1;
+            if(j==0&&i==Nx-1)Ax[i][j]+=1;
+            if(j==Nx-1&&i==0) Ax[i][j]+=1;
         }
     }
 
@@ -317,8 +305,10 @@ void Field::InitializeMatFD(){
         Ay[i]=new double[Nx];
         for(int j=0; j<Nx; ++j){
             Ay[i][j]=0;
-            if(j==i) Ay[i][j]=-2;
-            if(j==i+1||j==i-1||(j==0&&i==Nx-1)||(j==Nx-1&&i==0)) Ay[i][j]=1;
+            if(j==i) Ay[i][j]+=-2;
+            if(j==i+1||j==i-1) Ay[i][j]+=1;
+            if(j==0&&i==Nx-1)Ay[i][j]+=1;
+            if(j==Nx-1&&i==0) Ay[i][j]+=1;
         }
     }
 

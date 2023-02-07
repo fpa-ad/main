@@ -37,12 +37,21 @@ double Newton(funcdouble f, double a, double x0, int iterations, double h){
     return x0;
 }
 
-double NewtonInt(funcdouble f, double a, double x0, int iterations, double h){
+double NewtonInt_X(funcdouble f, double a, double x0, int iterations, double h){
     for (int i=0; i<iterations; ++i){
-        x0=x0-((Integral(f,-50,x0,0.01)-a)*2*h)/(Integral(f,-50,x0+h,0.01)-Integral(f,-50,x0-h,0.01));
+        x0=x0-((Integral(f,0,x0,0.01)-a)*2*h)/(Integral(f, 0,x0+h,0.01)-Integral(f, 0,x0-h,0.01));
     }
     return x0;
 }
+
+
+double NewtonInt_V(funcdouble f, double a, double x0, int iterations, double h){
+    for (int i=0; i<iterations; ++i){
+        x0=x0-((Integral(f,-1,x0,0.0002)-a)*2*h)/(Integral(f,-1,x0+h,0.0002)-Integral(f,-1,x0-h,0.0002));
+    }
+    return x0;
+}
+
 
 double Integral(funcdouble f, double a, double b, double h){
     double res=0;
@@ -54,9 +63,14 @@ double Integral(funcdouble f, double a, double b, double h){
     return res;
 }
 
-double InverseCDF(funcdouble f, double rand){
+double InverseCDF_X(funcdouble f, double rand){
     double aux=f(-1001);
-    return (NewtonInt(f,rand,aux,10,0.01));
+    return (NewtonInt_X(f,rand,aux,10,0.01));
+}
+
+double InverseCDF_V(funcdouble f, double rand){
+    double aux=f(-1001);
+    return (NewtonInt_V(f,rand,aux,10,0.0002));
 }
 
 double Spline1(double x, double L){

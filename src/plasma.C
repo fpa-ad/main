@@ -26,7 +26,7 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
             double raux2=(double)(gen())/((double)(gen.max()));
             double raux3=(double)(gen())/((double)(gen.max()));
             double raux4=(double)(gen())/((double)(gen.max()));
-            particles[i][j] = particle(ctm[i], InverseCDF(f[i][0],raux1), InverseCDF(f[i][1],raux2), InverseCDF(f[i][2],raux3), InverseCDF(f[i][3],raux4));
+            particles[i][j] = particle(ctm[i], InverseCDF_X(f[i][0],raux1), InverseCDF_X(f[i][1],raux2), InverseCDF_V(f[i][2],raux3), InverseCDF_V(f[i][3],raux4));
             particles[i][j].sanity_check(Lx,Ly);
             cout<<"Particle "<<i<<" Initialization "<<(((double)(j))/n_particles[i]*100)<<"\% Complete!\r"<<flush;
         }
@@ -36,8 +36,8 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
     //initialize fields
     fields = (Field*) malloc(nFields*sizeof(fields[0]));
     //loop through fields
-    if(nFields>0) fields[0] = (Lx, Ly, hx, hy, const_fields[0][0], const_fields[0][1], const_fields[0][2]);
-    if(nFields>1) fields[1] = (Lx, Ly, hx, hy, const_fields[1][0], const_fields[1][1], const_fields[1][2]);
+    if(nFields>0) fields[0] = Field(Lx, Ly, hx, hy, const_fields[0][0], const_fields[0][1], const_fields[0][2]);
+    if(nFields>1) fields[1] = Field(Lx, Ly, hx, hy, const_fields[1][0], const_fields[1][1], const_fields[1][2]);
 }
 
 // destructor
