@@ -4,8 +4,9 @@ from PyQt5.QtGui import QIcon, QPixmap, QMovie
 from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QDialog, QDialogButtonBox, QGridLayout, QApplication, QWidget, QListWidget, QPushButton, QDoubleSpinBox, QComboBox, QFrame, QSpinBox
 import pyqtgraph as pg
 import numpy as np
+from plots import make_plots
 
-#import libFCpython as l
+import libFCpython as l
 
 class QHLine(QFrame):
     def __init__(self):
@@ -167,12 +168,12 @@ class Window(QMainWindow):
         sc_label = QLabel("Screenshot interval")
         self.layout.addWidget(sc_label, 10, 2, 1, 1, Qt.AlignLeft)
 
-        self.T = QDoubleSpinBox()
-        self.T.setMinimum(0.1)
-        self.T.setMaximum(10)
-        self.T.setValue(0.2)
-        self.T.setDecimals(3)
-        self.layout.addWidget(self.T, 10, 3, 1, 1, Qt.AlignHCenter)
+        self.sc = QDoubleSpinBox()
+        self.sc.setMinimum(0.1)
+        self.sc.setMaximum(10)
+        self.sc.setValue(0.2)
+        self.sc.setDecimals(3)
+        self.layout.addWidget(self.sc, 10, 3, 1, 1, Qt.AlignHCenter)
 
         sim = QPushButton("Start")
         sim.clicked.connect(self._simClicked)
@@ -237,7 +238,7 @@ class Window(QMainWindow):
             nFields = 2
             fields.append([0, 0, self.Bz.value()])
 
-        self.loading_screen = LoadingScreen(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields)
+        self.loading_screen = LoadingScreen(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields, self.T.value(), self.sc.value())
         self.show()
 
     def _aboutClicked(self):
@@ -682,7 +683,7 @@ class ParticleDialog(QDialog):
         self.graphWidget.addLegend()
 
 class LoadingScreen(QWidget):
-    def __init__(self, Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields):
+    def __init__(self, Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields, Tmax, sc):
         super().__init__()
         self.setFixedSize(100, 100)
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
@@ -695,10 +696,12 @@ class LoadingScreen(QWidget):
 
         self._startAnimation()
 
-        #i = l.interface()
-        #name = i.create_simulation(Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields)
-        #i.run_simulation(3, 0.1)
+        i = l.interface()
+        name = i.create_simulation(Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields)
+        i.run_simulation(Tmax, sc)
         # the destructor should be called automatically, if not, call i.end_simulation()
+
+        make_plots(name)
 
         self._stopAnimation()
 
