@@ -43,7 +43,10 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
                     // it's uniform
                     cout << "uniform" << endl;
                     double L = (i == 0 ? in_X : in_Y);
-                    f[p][i] = (std::function<double(double)>) [L] (double x) {return 1/L;};
+                    f[p][i] = (std::function<double(double)>) [L] (double x) {
+                        if(x<-1000) return 1.;
+                        return 1/L;
+                    };
                     break;
                     }
                 case 1:
@@ -53,6 +56,7 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
                     double s = specs[1].cast<double>();
                     cout << "step starting at " << s << endl;
                     f[p][i] = (std::function<double(double)>) [s, L] (double x) {
+                        if(x<-1000) return s+1; 
                         if (x < s)
                             return 0.0;
                         else
@@ -67,6 +71,7 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
                     double e = specs[2].cast<double>();
                     cout << "rectangular starting at " << s << " and ending at " << e << endl;
                     f[p][i] = (std::function<double(double)>) [s, e] (double x) {
+                        if(x<-1000) return ((s+e)/2); 
                         if (x < s)
                             return 0.0;
                         else if (x < e)

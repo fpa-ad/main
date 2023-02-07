@@ -1,11 +1,11 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-import imageio.v2 as imageio
+import imageio as imageio
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 
-minv = 1200
-binw = 50
+minv = 60
+binw = 1
 
 if os.path.exists("output") and os.path.isdir("output"):
     sims = os.listdir("output")
@@ -37,7 +37,7 @@ if os.path.exists("output") and os.path.isdir("output"):
                 n = int(header[2])
                 ctm = []
                 # for each particle type
-                for i in range(n):
+                for i in range(1):
                     header = f.readline().split()
                     ctm.append(float(header[0]))
                     n_particles = int(header[2])

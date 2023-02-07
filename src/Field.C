@@ -238,7 +238,7 @@ void Field::Update(int n_types, int* n_particles, double* ctm, particle** partic
 }
 
 void Field::Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho){
-    int superparticle_N=10;
+    int superparticle_N=1;
     for(int i=0; i<Nx; ++i){
         for (int j=0; j<Ny;++j){
             for (int p_type=0;p_type<n_types;++p_type){
