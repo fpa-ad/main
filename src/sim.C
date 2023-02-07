@@ -17,7 +17,7 @@ string sim::get_name() {
 }
 
 string sim::get_fullname() {
-    return string("output/") + timestamp + string("__") + name
+    return string("output/") + timestamp + string("__") + name;
 }
 
 void sim::snapshot() {

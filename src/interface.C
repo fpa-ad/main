@@ -124,7 +124,7 @@ py::str interface::create_simulation(double in_X, double in_Y, double in_dx, dou
 
     my_sim = new sim(in_X, in_Y, in_dx, in_dy, in_dt, n, n_particles, ctm, f, in_nFields, const_fields);
     
-    return my_sim.get_fullname().cast<py::str>();
+    return (py::str) my_sim->get_fullname();
 
 }
 
