@@ -19,11 +19,15 @@ double random_speed();
 
 double Newton(funcdouble f, double a, double x0, int iterations, double h);
 
-double NewtonInt(funcdouble f, double a, double x0, int iterations, double h);
+double NewtonInt_X(funcdouble f, double a, double x0, int iterations, double h);
+
+double NewtonInt_V(funcdouble f, double a, double x0, int iterations, double h);
 
 double Integral(funcdouble f, double a, double b, double h);
 
-double InverseCDF(funcdouble f, double rand);
+double InverseCDF_X(funcdouble f, double rand);
+
+double InverseCDF_V(funcdouble f, double rand);
 
 double Spline1(double x, double L);
 

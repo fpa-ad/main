@@ -99,7 +99,7 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
                         if (abs(v) < 1000)
                             return 1/(vp*sqrt(M_PI)) * exp(-v*v/(vp*vp));
                         else
-                            return 0.1;
+                            return vp/10;
                         };
                     break;
                     }
@@ -114,7 +114,7 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
                         if (abs(v) < 1000)
                             return 1/(vp*sqrt(M_PI)) * ((1-b)*exp(-v*v/(vp*vp)) + b*exp(-(v-v0)*(v-v0)/(vp*vp))) ;
                         else
-                            return 0.1;
+                            return vp/10;
                         };
                     break;
                     }

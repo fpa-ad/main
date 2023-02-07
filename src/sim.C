@@ -37,7 +37,7 @@ void sim::snapshot() {
     int Nx = (int)(X/dx);
     int Ny = (int)(Y/dy);
 
-    f << "phi vals for the grid (" << Nx << " by " << Ny << ")" << endl;
+    f << "phi vals for the grid " << Nx << " by " << Ny << endl;
 
     for (int i = 0; i < Nx; i++) {
         for (int j = 0; j < Ny; j++) {
