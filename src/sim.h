@@ -36,6 +36,9 @@ class sim{
         void set_name(string new_name);
         string get_name();
 
+        // simulation fullname (timestamp + name)
+        string get_fullname();
+
         // snapshot
         void snapshot();
 

@@ -1,11 +1,11 @@
 import sys
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QIcon, QPixmap, QMovie
 from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QDialog, QDialogButtonBox, QGridLayout, QApplication, QWidget, QListWidget, QPushButton, QDoubleSpinBox, QComboBox, QFrame, QSpinBox
 import pyqtgraph as pg
 import numpy as np
 
-import libFCpython as l
+#import libFCpython as l
 
 class QHLine(QFrame):
     def __init__(self):
@@ -65,84 +65,118 @@ class Window(QMainWindow):
         particles_undo.clicked.connect(self._undoParticle)
         self.layout.addWidget(particles_undo, 3, 3, 1, 3, Qt.AlignHCenter)
 
+        fields_title = QLabel("Background fields")
+        fields_title.setStyleSheet("font: bold;")
+        self.layout.addWidget(fields_title, 4, 0, 1, 6, Qt.AlignHCenter)
+
+        Ex_label = QLabel("Ex")
+        self.layout.addWidget(Ex_label, 5, 0, 1, 1, Qt.AlignLeft)
+
+        self.Ex = QDoubleSpinBox()
+        self.Ex.setMinimum(-10)
+        self.Ex.setMaximum(10)
+        self.Ex.setDecimals(3)
+        self.Ex.setValue(0)
+        self.layout.addWidget(self.Ex, 5, 1, 1, 1, Qt.AlignHCenter)
+
+        Ey_label = QLabel("Ey")
+        self.layout.addWidget(Ey_label, 5, 2, 1, 1, Qt.AlignLeft)
+
+        self.Ey = QDoubleSpinBox()
+        self.Ey.setMinimum(-10)
+        self.Ey.setMaximum(10)
+        self.Ey.setDecimals(3)
+        self.Ey.setValue(0)
+        self.layout.addWidget(self.Ey, 5, 3, 1, 1, Qt.AlignHCenter)
+
+        Bz_label = QLabel("Bz")
+        self.layout.addWidget(Bz_label, 5, 4, 1, 1, Qt.AlignLeft)
+
+        self.Bz = QDoubleSpinBox()
+        self.Bz.setMinimum(-10)
+        self.Bz.setMaximum(10)
+        self.Bz.setDecimals(3)
+        self.Bz.setValue(0)
+        self.layout.addWidget(self.Bz, 5, 5, 1, 1, Qt.AlignHCenter)
+
         box_title = QLabel("Box parameters")
         box_title.setStyleSheet("font: bold;")
-        self.layout.addWidget(box_title, 4, 0, 1, 6, Qt.AlignHCenter)
+        self.layout.addWidget(box_title, 6, 0, 1, 6, Qt.AlignHCenter)
 
         Lx_label = QLabel("Lx (x-direction box length)")
-        self.layout.addWidget(Lx_label, 5, 0, 1, 1, Qt.AlignLeft)
+        self.layout.addWidget(Lx_label, 7, 0, 1, 1, Qt.AlignLeft)
 
         self.Lx_spin = QDoubleSpinBox()
         self.Lx_spin.setMinimum(0.1)
         self.Lx_spin.setMaximum(10)
         self.Lx_spin.setDecimals(2)
         self.Lx_spin.setValue(1)
-        self.layout.addWidget(self.Lx_spin, 5, 1, 1, 1, Qt.AlignHCenter)
+        self.layout.addWidget(self.Lx_spin, 7, 1, 1, 1, Qt.AlignHCenter)
 
         Ly_label = QLabel("Ly (y-direction box length)")
-        self.layout.addWidget(Ly_label, 6, 0, 1, 1, Qt.AlignLeft)
+        self.layout.addWidget(Ly_label, 7, 2, 1, 1, Qt.AlignLeft)
 
         self.Ly_spin = QDoubleSpinBox()
         self.Ly_spin.setMinimum(0.1)
         self.Ly_spin.setMaximum(10)
         self.Ly_spin.setDecimals(2)
         self.Ly_spin.setValue(1)
-        self.layout.addWidget(self.Ly_spin, 6, 1, 1, 1, Qt.AlignHCenter)
+        self.layout.addWidget(self.Ly_spin, 7, 3, 1, 1, Qt.AlignHCenter)
 
         dx_label = QLabel("dx (x-direction grid size)")
-        self.layout.addWidget(dx_label, 5, 2, 1, 1, Qt.AlignLeft)
+        self.layout.addWidget(dx_label, 8, 0, 1, 1, Qt.AlignLeft)
 
         self.dx = QDoubleSpinBox()
         self.dx.setMinimum(0.1)
         self.dx.setMaximum(10)
         self.dx.setDecimals(2)
-        self.layout.addWidget(self.dx, 5, 3, 1, 1, Qt.AlignHCenter)
+        self.layout.addWidget(self.dx, 8, 1, 1, 1, Qt.AlignHCenter)
 
         dy_label = QLabel("dy (y-direction grid size)")
-        self.layout.addWidget(dy_label, 6, 2, 1, 1, Qt.AlignLeft)
+        self.layout.addWidget(dy_label, 8, 2, 1, 1, Qt.AlignLeft)
 
         self.dy = QDoubleSpinBox()
         self.dy.setMinimum(0.1)
         self.dy.setMaximum(10)
         self.dy.setDecimals(2)
-        self.layout.addWidget(self.dy, 6, 3, 1, 1, Qt.AlignHCenter)
+        self.layout.addWidget(self.dy, 8, 3, 1, 1, Qt.AlignHCenter)
 
         dt_label = QLabel("dt (time step)")
-        self.layout.addWidget(dt_label, 5, 4, 2, 1, Qt.AlignLeft)
+        self.layout.addWidget(dt_label, 7, 4, 2, 1, Qt.AlignLeft)
 
         self.dt = QDoubleSpinBox()
         self.dt.setMinimum(0.1)
         self.dt.setMaximum(1)
         self.dt.setDecimals(3)
-        self.layout.addWidget(self.dt, 5, 5, 2, 1, Qt.AlignHCenter)
+        self.layout.addWidget(self.dt, 7, 5, 2, 1, Qt.AlignHCenter)
 
         sim_title = QLabel("Simulation")
         sim_title.setStyleSheet("font: bold;")
-        self.layout.addWidget(sim_title, 7, 0, 1, 6, Qt.AlignHCenter)
+        self.layout.addWidget(sim_title, 9, 0, 1, 6, Qt.AlignHCenter)
 
         T_label = QLabel("Simulation time")
-        self.layout.addWidget(T_label, 8, 0, 1, 1, Qt.AlignLeft)
+        self.layout.addWidget(T_label, 10, 0, 1, 1, Qt.AlignLeft)
 
         self.T = QDoubleSpinBox()
         self.T.setMinimum(0.1)
         self.T.setMaximum(600)
         self.T.setValue(10)
         self.T.setDecimals(3)
-        self.layout.addWidget(self.T, 8, 1, 1, 1, Qt.AlignHCenter)
+        self.layout.addWidget(self.T, 10, 1, 1, 1, Qt.AlignHCenter)
 
         sc_label = QLabel("Screenshot interval")
-        self.layout.addWidget(sc_label, 8, 2, 1, 1, Qt.AlignLeft)
+        self.layout.addWidget(sc_label, 10, 2, 1, 1, Qt.AlignLeft)
 
         self.T = QDoubleSpinBox()
         self.T.setMinimum(0.1)
         self.T.setMaximum(10)
         self.T.setValue(0.2)
         self.T.setDecimals(3)
-        self.layout.addWidget(self.T, 8, 3, 1, 1, Qt.AlignHCenter)
+        self.layout.addWidget(self.T, 10, 3, 1, 1, Qt.AlignHCenter)
 
         sim = QPushButton("Start")
         sim.clicked.connect(self._simClicked)
-        self.layout.addWidget(sim, 8, 4, 1, 2, Qt.AlignHCenter)
+        self.layout.addWidget(sim, 10, 4, 1, 2, Qt.AlignHCenter)
 
     def _newParticle(self):
         dlg = ParticleDialog("new", self.particles, self.Lx, self.Ly)
@@ -190,7 +224,6 @@ class Window(QMainWindow):
         return f"{self.particles[i][0]} particle(s) with ctm = {self.particles[i][1]}, {x_dist_str}, {y_dist_str},\n{vx_dist_str}, {vy_dist_str}"
 
     def _simClicked(self):
-        print("starting simulation")
         n_particles = []
         ctms = []
         f = []
@@ -198,13 +231,14 @@ class Window(QMainWindow):
             n_particles.append(self.particles[i][0])
             ctms.append(self.particles[i][1])
             f.append([self.particles[i][2], self.particles[i][3], self.particles[i][4], self.particles[i][5]])
+        nFields = 1
+        fields = [[self.Ex.value(), self.Ey.value(), 0]]
+        if self.Bz.value() != 0:
+            nFields = 2
+            fields.append([0, 0, self.Bz.value()])
 
-        print(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, 0, [])
-
-        i = l.interface()
-        i.create_simulation(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, 1, [[0,0,0]])
-        i.run_simulation(3, 0.1)
-        # the destructor should be called automatically, if not, call i.end_simulation()
+        self.loading_screen = LoadingScreen(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields)
+        self.show()
 
     def _aboutClicked(self):
         dlg = CustomDialog("about")
@@ -646,6 +680,35 @@ class ParticleDialog(QDialog):
         pen2 = pg.mkPen(color=(0, 0, 255), width=4)
         self.graphWidget.plot(points, fy(points), name="vy", pen=pen2)
         self.graphWidget.addLegend()
+
+class LoadingScreen(QWidget):
+    def __init__(self, Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields):
+        super().__init__()
+        self.setFixedSize(100, 100)
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
+
+        self.label_animation = QLabel(self)
+
+        self.movie = QMovie('python/802.gif')
+        self.movie.setScaledSize(QSize(100, 100))
+        self.label_animation.setMovie(self.movie)
+
+        self._startAnimation()
+
+        #i = l.interface()
+        #name = i.create_simulation(Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields)
+        #i.run_simulation(3, 0.1)
+        # the destructor should be called automatically, if not, call i.end_simulation()
+
+        self._stopAnimation()
+
+    def _startAnimation(self):
+        self.movie.start()
+        self.show()
+
+    def _stopAnimation(self):
+        self.movie.stop()
+        self.close()
 
 app = QApplication(sys.argv)
 app.setWindowIcon(QIcon('python/pic-logo.png'))
