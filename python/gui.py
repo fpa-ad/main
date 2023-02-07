@@ -238,7 +238,8 @@ class Window(QMainWindow):
             nFields = 2
             fields.append([0, 0, self.Bz.value()])
 
-        self.loading_screen = LoadingScreen(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields, self.T.value(), self.sc.value())
+        self.loading_screen = LoadingScreen()
+        self.loading_screen.go(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields, self.T.value(), self.sc.value())
         self.show()
 
     def _aboutClicked(self):
@@ -683,7 +684,7 @@ class ParticleDialog(QDialog):
         self.graphWidget.addLegend()
 
 class LoadingScreen(QWidget):
-    def __init__(self, Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields, Tmax, sc):
+    def __init__(self):
         super().__init__()
         self.setFixedSize(100, 100)
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
@@ -694,8 +695,10 @@ class LoadingScreen(QWidget):
         self.movie.setScaledSize(QSize(100, 100))
         self.label_animation.setMovie(self.movie)
 
-        self._startAnimation()
+        self.movie.start()
+        self.show()
 
+    def go(self, Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields, Tmax, sc):
         i = l.interface()
         name = i.create_simulation(Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields)
         i.run_simulation(Tmax, sc)
@@ -703,13 +706,6 @@ class LoadingScreen(QWidget):
 
         make_plots(name)
 
-        self._stopAnimation()
-
-    def _startAnimation(self):
-        self.movie.start()
-        self.show()
-
-    def _stopAnimation(self):
         self.movie.stop()
         self.close()
 

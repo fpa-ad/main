@@ -47,8 +47,10 @@ $(BINDIR)/%.o: %.C | $(INC)
 	@echo compiling... $<
 	$(CC) -I src -I extern/pybind11/include -I /usr/include/python3.8 -I /usr/include/python3.10 -I PYBINDDIR -c $< -o $@
 
-test: lib
+libfc: lib
 	g++ -O3 -Wall -shared -std=c++20 -fPIC -I extern/pybind11/include -I /usr/include/python3.8 -I /usr/include/python3.10 -I PYBINDDIR -I src python/wrapper.cpp -o python/libFCpython$(P) -L lib -l FC -Wl,-rpath,.
+
+test: libfc
 	python3 python/main.py
 
 ######### clean
