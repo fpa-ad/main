@@ -202,7 +202,7 @@ class Window(QMainWindow):
         print(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, 0, [])
 
         i = l.interface()
-        i.create_simulation(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, 0, [])
+        i.create_simulation(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, 1, [[0,0,0]])
         i.run_simulation(3, 0.1)
         # the destructor should be called automatically, if not, call i.end_simulation()
 
