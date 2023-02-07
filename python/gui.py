@@ -76,6 +76,7 @@ class Window(QMainWindow):
         self.Lx_spin.setMinimum(0.1)
         self.Lx_spin.setMaximum(10)
         self.Lx_spin.setDecimals(2)
+        self.Lx_spin.setValue(1)
         self.layout.addWidget(self.Lx_spin, 5, 1, 1, 1, Qt.AlignHCenter)
 
         Ly_label = QLabel("Ly (y-direction box length)")
@@ -85,6 +86,7 @@ class Window(QMainWindow):
         self.Ly_spin.setMinimum(0.1)
         self.Ly_spin.setMaximum(10)
         self.Ly_spin.setDecimals(2)
+        self.Ly_spin.setValue(1)
         self.layout.addWidget(self.Ly_spin, 6, 1, 1, 1, Qt.AlignHCenter)
 
         dx_label = QLabel("dx (x-direction grid size)")
