@@ -17,11 +17,13 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
 
     nFields = in_nFields;
 
-    const_fields = new double*[nFields];
-    for (int i = 0; i < in_nFields; i++) {
-        const_fields[i] = new double[3];
-        for (int j = 0; j < 3; j++) {
-            const_fields[i][j] = in_const_fields[i].cast<py::list>()[j].cast<double>();
+    if (nFields > 0) {
+        const_fields = new double*[nFields];
+        for (int i = 0; i < in_nFields; i++) {
+            const_fields[i] = new double[3];
+            for (int j = 0; j < 3; j++) {
+                const_fields[i][j] = in_const_fields[i].cast<py::list>()[j].cast<double>();
+            }
         }
     }
 
