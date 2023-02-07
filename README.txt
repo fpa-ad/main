@@ -1,18 +1,14 @@
-O plots.py agora também produz histogramas das velocidades (should be nifty).
-Para facilitar a leitura é simpático pré-definir logo os limites e largura de bin (está no início do ficheiro)
-Alterar para simulações diferentes
-
-Também já corrigi a grelha para hopefully não ficarem 1000 números sobrepostos mas aparecer a grelha na mesma.
-
 -----------------------------------------------------------
 To do list:
 	Código C++ Simulação:
 		1. Interpolação- Get_X() more general for higher order splines
 	Interface python:
-		6. A lib continua a não compilar devidamente por vezes... Só fazendo rm lib/*
+		1. A lib continua a não compilar devidamente por vezes... Só fazendo rm lib/*
+		2. Adicionar Ex Ey e Bz ao GUI, implementar
+		3. Escrever coisas no latex
     Data analysis:
-        7. Make a study of what units we're using, adjust length scales, particle densities and number of particles in each superparticle
-        8. Do Fourier transform and find the langmuir dispersion relation
+        1. Make a study of what units we're using, adjust length scales, particle densities and number of particles in each superparticle
+        2. Do Fourier transform and find the langmuir dispersion relation
 ---------------------------------------------------------
 
 pngcrush -ow -rem allb -reduce file.png
