@@ -2,7 +2,7 @@
 #include <math.h>
 #include <functional>
 
-void interface::create_simulation(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int in_n, py::list in_n_particles, py::list in_ctm, py::list in_f, int in_nFields, py::list in_const_fields) {
+py::str interface::create_simulation(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int in_n, py::list in_n_particles, py::list in_ctm, py::list in_f, int in_nFields, py::list in_const_fields) {
     n = in_n;
     
     n_particles = new int[n];
@@ -123,6 +123,8 @@ void interface::create_simulation(double in_X, double in_Y, double in_dx, double
     }
 
     my_sim = new sim(in_X, in_Y, in_dx, in_dy, in_dt, n, n_particles, ctm, f, in_nFields, const_fields);
+    
+    return (py::str) my_sim->get_fullname();
 
 }
 

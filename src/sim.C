@@ -16,6 +16,10 @@ string sim::get_name() {
     return name;
 }
 
+string sim::get_fullname() {
+    return timestamp + string("__") + name;
+}
+
 void sim::snapshot() {
     ofstream f;
     stringstream ss;
