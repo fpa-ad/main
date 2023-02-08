@@ -1,11 +1,12 @@
 import os
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 import numpy as np
 import imageio as imageio
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 
-minv = 0.1
-binw = 0.001
+minv = 5
+binw = 0.1
 
 if os.path.exists("output") and os.path.isdir("output"):
     sims = os.listdir("output")
@@ -14,10 +15,14 @@ if os.path.exists("output") and os.path.isdir("output"):
             continue
         print("---- Simulation: ", sim, " ----")
         files = os.listdir("output/"+sim)
+        files.sort()
         # frames for the gif
         frames = []
+        PHI=[]
+        timebase=[]
+        xbase=[]
+        ybase=[]
         # read basic info
-        PHI=[[[]]]
         with open("output/"+sim+"/README.txt") as f:
             header = f.readline().split()
             Lx = float(header[1])
@@ -31,12 +36,13 @@ if os.path.exists("output") and os.path.isdir("output"):
                 continue
             print(file)
             fig, ax = plt.subplots()
-            phi_t=[[]]
+            phi_t=[]
             with open("output/"+sim+"/"+file) as f:
                 # read time and number of particle types
                 header = f.readline().split()
                 t = float(header[0])
                 n = int(header[2])
+                timebase.append(t)
                 ctm = []
                 # for each particle type
                 for i in range(n):
@@ -63,9 +69,10 @@ if os.path.exists("output") and os.path.isdir("output"):
                     phi_x=[]
                     for j in range(ny):
                         phi_y=line[j]
-                        phi_x.append(phi_y)
+                        phi_x.append(float(phi_y))
                     phi_t.append(phi_x)
                 PHI.append(phi_t)
+                #######################################
             plt.xlim(0, Lx)
             plt.ylim(0, Ly)
             ax.xaxis.set_minor_locator(MultipleLocator(dx))
@@ -80,7 +87,7 @@ if os.path.exists("output") and os.path.isdir("output"):
             fig, axs = plt.subplots(1, 2, sharey=True, tight_layout=True, figsize=(8,4))
             axs[0].hist(vx, bins=np.arange(-minv, minv, binw))
             axs[0].set(title=f"$v_x$ for t={t}s")
-            axs[0].yaxis.set_major_locator(MultipleLocator(1))
+            #axs[0].yaxis.set_major_locator(MultipleLocator(1))
             axs[1].hist(vy, bins=np.arange(-minv, minv, binw))
             axs[1].set(title=f"$v_y$ for t={t}s")
             plt.savefig("output/"+sim+"/"+file.replace(".txt","")+"_hist.png")
@@ -101,3 +108,16 @@ if os.path.exists("output") and os.path.isdir("output"):
                 print(name)
                 image = imageio.imread(name)
                 writer.append_data(image)
+
+        ################ FFT ##############
+        print(PHI)
+        for i in range(ny):
+            wave=PHI[:][:][i]
+
+            dt=timebase[1]-timebase[0]
+            k_max = np.pi / dx
+            omega_max = np.pi / dt
+
+            sp = np.abs(np.fft.fft2(wave))**2
+            sp = np.fft.fftshift(sp)
+            plt.imshow( sp, origin = 'lower', norm=colors.LogNorm(vmin = 500.0),extent = ( -k_max, k_max, -omega_max, omega_max ),aspect = 'auto', cmap = 'gray')
