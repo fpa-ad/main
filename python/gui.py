@@ -1,12 +1,10 @@
 import sys
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QIcon, QPixmap, QMovie
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QDialog, QDialogButtonBox, QGridLayout, QApplication, QWidget, QListWidget, QPushButton, QDoubleSpinBox, QComboBox, QFrame, QSpinBox
 import pyqtgraph as pg
 import numpy as np
 from plots import make_plots
-
-import time
 
 import libFCpython as l
 
@@ -177,9 +175,9 @@ class Window(QMainWindow):
         self.sc.setDecimals(3)
         self.layout.addWidget(self.sc, 10, 3, 1, 1, Qt.AlignHCenter)
 
-        self.sim = QPushButton("Start")
-        self.sim.clicked.connect(self._simClicked)
-        self.layout.addWidget(self.sim, 10, 4, 1, 2, Qt.AlignHCenter)
+        sim = QPushButton("Start")
+        sim.clicked.connect(self._simClicked)
+        self.layout.addWidget(sim, 10, 4, 1, 2, Qt.AlignHCenter)
 
     def _newParticle(self):
         dlg = ParticleDialog("new", self.particles, self.Lx, self.Ly)
@@ -240,27 +238,12 @@ class Window(QMainWindow):
             nFields = 2
             fields.append([0, 0, self.Bz.value()])
 
-        self.label_animation = QLabel(self)
-
-        self.movie = QMovie('python/802.gif')
-        self.movie.setScaledSize(QSize(100, 100))
-        self.label_animation.setMovie(self.movie)
-        self.layout.addWidget(self.label_animation, 10, 4, 1, 2, Qt.AlignCenter)
-        self.movie.start()
-        self.show()
-
-        # TODO remove
-        time.sleep(5)
-
-        #i = l.interface()
-        #name = i.create_simulation(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields)
-        #i.run_simulation(self.T.value(), self.sc.value())
+        i = l.interface()
+        name = i.create_simulation(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields)
+        i.run_simulation(self.T.value(), self.sc.value())
         # the destructor should be called automatically, if not, call i.end_simulation()
 
-        #make_plots(name)
-
-        del self.label_animation
-        del self.movie
+        make_plots(name)
 
     def _aboutClicked(self):
         dlg = CustomDialog("about")
@@ -688,26 +671,6 @@ class ParticleDialog(QDialog):
         pen2 = pg.mkPen(color=(0, 0, 255), width=4)
         self.graphWidget.plot(points, fy(points), name="vy", pen=pen2)
         self.graphWidget.addLegend()
-
-class LoadingScreen(QDialog):
-    def __init__(self):
-        QDialog.__init__(self)
-        self.setGeometry(0,0,100,100)
-
-        self.setWindowTitle("Loading")
-
-        self.label_animation = QLabel(self)
-
-        self.movie = QMovie('python/802.gif')
-        self.movie.setScaledSize(QSize(100, 100))
-        self.label_animation.setMovie(self.movie)
-
-        self.movie.start()
-        self.show()
-
-    def close(self):
-        self.movie.stop()
-        self.close()
 
 app = QApplication(sys.argv)
 app.setWindowIcon(QIcon('python/pic-logo.png'))
