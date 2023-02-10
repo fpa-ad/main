@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QObject, QThread, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QDialog, QDialogButtonBox, QGridLayout, QApplication, QWidget, QListWidget, QPushButton, QDoubleSpinBox, QComboBox, QFrame, QSpinBox
 import pyqtgraph as pg
@@ -7,6 +7,8 @@ import numpy as np
 from plots import make_plots
 
 import libFCpython as l
+
+import time
 
 class QHLine(QFrame):
     def __init__(self):
@@ -19,6 +21,35 @@ class QVLine(QFrame):
         super(QVLine, self).__init__()
         self.setFrameShape(QFrame.VLine)
         self.setFrameShadow(QFrame.Sunken)
+
+class Plots(QObject):
+    finished = pyqtSignal()
+
+    def __init__(self, Lx, Ly, dx, dy, dt, n, n_part, ctms, f, nFields, fields, T, sc):
+        super.__init__()
+        self.Lx = Lx
+        self.Ly = Ly
+        self.dx = dx
+        self.dy = dy
+        self.dt = dt
+        self.n = n
+        self.n_part = n_part
+        self.ctms = ctms
+        self.f = f
+        self.nFields = nFields
+        self.fields = fields
+        self.T = T
+        self.sc = sc
+
+    def run(self):
+        self.i = l.interface()
+        self.name = self.i.create_simulation(self.Lx, self.Ly, self.dx, self.dy, self.dt, self.n, self.n_part, self.ctms, self.f, self.nFields, self.fields)
+        self.i.run_simulation(self.T, self.sc)
+        # the destructor should be called automatically, if not, call i.end_simulation()
+
+        make_plots(self.name)
+
+        self.finished.emit()
 
 class Window(QMainWindow):
     def __init__(self, parent=None):
@@ -225,10 +256,6 @@ class Window(QMainWindow):
         return f"{self.particles[i][0]} particle(s) with ctm = {self.particles[i][1]}, {x_dist_str}, {y_dist_str},\n{vx_dist_str}, {vy_dist_str}"
 
     def _simClicked(self):
-        print("sim clicked")
-        self.sim.setEnabled(False)
-        self.sim.blockSignals(True)
-        
         n_particles = []
         ctms = []
         f = []
@@ -242,15 +269,23 @@ class Window(QMainWindow):
             nFields = 2
             fields.append([0, 0, self.Bz.value()])
 
-        i = l.interface()
-        name = i.create_simulation(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields)
-        i.run_simulation(self.T.value(), self.sc.value())
-        # the destructor should be called automatically, if not, call i.end_simulation()
+        self.thread = QThread()
+        self.worker = Plots(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields, self.T.value(), self.sc.value())
+        self.worker.moveToThread(self.thread)
+        self.thread.started.connect(self.worker.run)
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+        self.worker.progress.connect(self.reportProgress)
+        self.thread.start()
 
-        make_plots(name)
-
-        self.sim.setEnabled(True)
-        self.sim.blockSignals(False)
+        self.sim.setEnabled(False)
+        self.thread.finished.connect(
+            lambda: self.sim.setEnabled(True)
+        )
+        #self.thread.finished.connect(
+        #    lambda: self.stepLabel.setText("Long-Running Step: 0")
+        #)
 
     def _aboutClicked(self):
         dlg = CustomDialog("about")
