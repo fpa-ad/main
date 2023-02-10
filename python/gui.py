@@ -6,6 +6,8 @@ import pyqtgraph as pg
 import numpy as np
 from plots import make_plots
 
+import time
+
 import libFCpython as l
 
 class QHLine(QFrame):
@@ -239,8 +241,18 @@ class Window(QMainWindow):
             fields.append([0, 0, self.Bz.value()])
 
         self.loading_screen = LoadingScreen()
-        self.loading_screen.go(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields, self.T.value(), self.sc.value())
         self.show()
+
+        time.sleep(1)
+
+        i = l.interface()
+        name = i.create_simulation(Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields)
+        i.run_simulation(Tmax, sc)
+        # the destructor should be called automatically, if not, call i.end_simulation()
+
+        make_plots(name)
+
+        self.loading_screen.close()
 
     def _aboutClicked(self):
         dlg = CustomDialog("about")
@@ -697,15 +709,8 @@ class LoadingScreen(QWidget):
 
         self.movie.start()
         self.show()
-
-    def go(self, Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields, Tmax, sc):
-        i = l.interface()
-        name = i.create_simulation(Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields)
-        i.run_simulation(Tmax, sc)
-        # the destructor should be called automatically, if not, call i.end_simulation()
-
-        make_plots(name)
-
+    
+    def close(self):
         self.movie.stop()
         self.close()
 
