@@ -171,7 +171,7 @@ double Field::get_X(double x, double y){
 
     for(int i=0; i<Nx; ++i){
         for(int j=0; j<Ny; ++j){
-            res+=hx*hy*Fx[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
+            res+=Fx[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
         }
     }
     
@@ -183,7 +183,7 @@ double Field::get_Y(double x, double y){
 
     for(int i=0; i<Nx; ++i){
         for(int j=0; j<Ny; ++j){
-            res+=hx*hy*Fy[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
+            res+=Fy[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
         }
     }
     
@@ -195,7 +195,7 @@ double Field::get_Z(double x, double y){
 
     for(int i=0; i<Nx; ++i){
         for(int j=0; j<Ny; ++j){
-            res+=hx*hy*Fz[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
+            res+=Fz[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
         }
     }
     
@@ -223,14 +223,20 @@ void Field::Update(int n_types, int* n_particles, double* ctm, particle** partic
 }
 
 void Field::Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho){
-    int superparticle_N=1;
+    int quasi=0;
+    if(n_types<2) quasi=-ctm[0];
+    
+    int Npart=0;
+    Npart+=n_particles[0];
+
     for(int i=0; i<Nx; ++i){
         for (int j=0; j<Ny;++j){
             for (int p_type=0;p_type<n_types;++p_type){
                 for(int p=0; p<n_particles[p_type]; ++p){
-                    rho[i][j]+=superparticle_N*ctm[p_type]*(Spline1(i*hx-particles[p_type][p].get_x(),hx)+Spline1(i*hx+Lx-particles[p_type][p].get_x(),hx)+Spline1(i*hx-Lx-particles[p_type][p].get_x(),hx))*(Spline1(j*hy-particles[p_type][p].get_y(),hy)+Spline1(j*hy+Ly-particles[p_type][p].get_y(),hy)+Spline1(j*hy-Ly-particles[p_type][p].get_y(),hy));
+                    rho[i][j]+=Lx*Ly/Npart*ctm[p_type]*(Spline1(i*hx-particles[p_type][p].get_x(),hx)+Spline1(i*hx+Lx-particles[p_type][p].get_x(),hx)+Spline1(i*hx-Lx-particles[p_type][p].get_x(),hx))*(Spline1(j*hy-particles[p_type][p].get_y(),hy)+Spline1(j*hy+Ly-particles[p_type][p].get_y(),hy)+Spline1(j*hy-Ly-particles[p_type][p].get_y(),hy));
                 }
             }
+            rho[i][j]+=quasi;
         }
     }
     

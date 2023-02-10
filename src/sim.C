@@ -23,7 +23,7 @@ string sim::get_fullname() {
 void sim::snapshot() {
     ofstream f;
     stringstream ss;
-    ss << "output/" << timestamp << "__" << name << "/" << snapcount << ".txt";
+    ss << "output/" << timestamp << "__" << name << "/" << setw(4) << setfill('0') << snapcount << ".txt";
     f.open (ss.str());
 
     int n = sim_plasma.get_n();

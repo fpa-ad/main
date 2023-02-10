@@ -5,8 +5,8 @@ import numpy as np
 import imageio as imageio
 from matplotlib.ticker import (MultipleLocator)
 
-minv = 5
-binw = 0.1
+minv = 1
+binw = 0.01
 
 if os.path.exists("output") and os.path.isdir("output"):
     sims = os.listdir("output")
@@ -59,24 +59,13 @@ if os.path.exists("output") and os.path.isdir("output"):
                         y.append(float(line[1]))
                         vx.append(float(line[2]))
                         vy.append(float(line[3]))
-                    plt.scatter(x, y, label="q/m="+header[0],s=5)
-                ############## Field ################
-                header = f.readline().split()
-                nx = int(header[5])
-                ny = int(header[7])
-                for i in range(nx):
-                    line=f.readline().split()
-                    phi_x=[]
-                    for j in range(ny):
-                        phi_y=line[j]
-                        phi_x.append(float(phi_y))
-                    phi_t.append(phi_x)
-                PHI.append(phi_t)
-                #######################################
+                    #print(x)
+                    #print(y)
+                    plt.scatter(x, vx, label="q/m="+header[0],s=5)
             plt.xlim(0, Lx)
-            plt.ylim(0, Ly)
-            ax.xaxis.set_minor_locator(MultipleLocator(dx))
-            ax.yaxis.set_minor_locator(MultipleLocator(dy))
+            plt.ylim(-10, 10)
+            ax.xaxis.set_minor_locator(MultipleLocator(dx*10))
+            ax.yaxis.set_minor_locator(MultipleLocator(dy*10))
             plt.grid(True, which='both')
             plt.title(f"t={t}s")
             plt.legend()
@@ -98,21 +87,33 @@ if os.path.exists("output") and os.path.isdir("output"):
         frames.sort()
         with imageio.get_writer("output/"+sim+"/"+'sim.gif', mode='I', fps=10) as writer:
             for filename in frames:
-                name = "output/"+sim+"/"+str(filename)+".png"
+                name = "output/"+sim+"/"+str(filename).zfill(4)+".png"
                 print(name)
                 image = imageio.imread(name)
                 writer.append_data(image)
         with imageio.get_writer("output/"+sim+"/"+'sim_hist.gif', mode='I', fps=10) as writer:
             for filename in frames:
-                name = "output/"+sim+"/"+str(filename)+"_hist.png"
+                name = "output/"+sim+"/"+str(filename).zfill(4)+"_hist.png"
                 print(name)
                 image = imageio.imread(name)
                 writer.append_data(image)
 
-        ################ FFT ##############
-        print(PHI)
+        """################ FFT ##############
+        #print(PHI)
+        print(PHI[1][1][0])
+        nt=frames[-1]
         for i in range(ny):
-            wave=PHI[:][:][i]
+            wave=np.zeros([nt,nx])
+            for j in range(nt):
+                waveaux=np.zeros(nx)
+                for k in range(nx):
+                    waveaux[k]=(PHI[j][k][i])
+                wave[j,:]=waveaux[:]
+            
+            wind=np.hanning(nt)
+            print(wave[1,1])
+            for k in range(nx):
+                wave[:,k]*=wind
 
             dt=timebase[1]-timebase[0]
             k_max = np.pi / dx
@@ -120,4 +121,13 @@ if os.path.exists("output") and os.path.isdir("output"):
 
             sp = np.abs(np.fft.fft2(wave))**2
             sp = np.fft.fftshift(sp)
-            plt.imshow( sp, origin = 'lower', norm=colors.LogNorm(vmin = 500.0),extent = ( -k_max, k_max, -omega_max, omega_max ),aspect = 'auto', cmap = 'gray')
+            print(wave[1,1])
+            plt.imshow( sp, origin = 'lower', norm=colors.LogNorm(),extent = ( -k_max, k_max, -omega_max, omega_max ),aspect = 'auto', cmap = 'gray')
+
+            plt.ylim(0,omega_max)
+            plt.xlim(0,k_max)
+            plt.xlabel("$k$ [$\omega_n/c$]")
+            plt.ylabel("$\omega$ [$\omega_n$]")
+            plt.title("Wave dispersion relation")
+
+            plt.savefig("output/"+sim+"/fft_"+str(i)+".png")"""

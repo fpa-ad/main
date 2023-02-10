@@ -94,12 +94,13 @@ py::str interface::create_simulation(double in_X, double in_Y, double in_dx, dou
                     {
                     // it's maxwellian
                     double vp = specs[1].cast<double>();
+                    double v0 = specs[2].cast<double>();
                     cout << "maxwellian with vp " << vp << endl;
-                    f[p][i] = (std::function<double(double)>) [vp] (double v) {
+                    f[p][i] = (std::function<double(double)>) [vp, v0] (double v) {
                         if (abs(v) < 1000)
-                            return 1/(vp*sqrt(M_PI)) * exp(-v*v/(vp*vp));
+                            return 1/(vp*sqrt(M_PI)) * exp(-(v-v0)*(v-v0)/(vp*vp));
                         else
-                            return vp/10;
+                            return v0+vp/10;
                         };
                     break;
                     }

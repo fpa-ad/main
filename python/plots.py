@@ -73,13 +73,13 @@ def make_plots(sim):
     frames.sort()
     with imageio.get_writer("output/"+sim+"/"+'sim.gif', mode='I', fps=10) as writer:
         for filename in frames:
-            name = "output/"+sim+"/"+str(filename)+".png"
+            name = "output/"+sim+"/"+str(filename).zfill(4)+".png"
             print(name)
             image = imageio.imread(name)
             writer.append_data(image)
     with imageio.get_writer("output/"+sim+"/"+'sim_hist.gif', mode='I', fps=10) as writer:
         for filename in frames:
-            name = "output/"+sim+"/"+str(filename)+"_hist.png"
+            name = "output/"+sim+"/"+str(filename).zfill(4)+"_hist.png"
             print(name)
             image = imageio.imread(name)
             writer.append_data(image)
