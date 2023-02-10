@@ -280,11 +280,9 @@ class Window(QMainWindow):
 
         self.sim.setEnabled(False)
         self.thread.finished.connect(
-            lambda name : self.sim.setEnabled(True)
+            lambda : self.sim.setEnabled(True)
         )
-        self.thread.finished.connect(
-            lambda name : self._showResults(name)
-        )
+        self.worker.finished.connect(self._showResults)
 
     def _showResults(self, name):
         print("show results called ", name)
