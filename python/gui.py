@@ -175,9 +175,9 @@ class Window(QMainWindow):
         self.sc.setDecimals(3)
         self.layout.addWidget(self.sc, 10, 3, 1, 1, Qt.AlignHCenter)
 
-        sim = QPushButton("Start")
-        sim.clicked.connect(self._simClicked)
-        self.layout.addWidget(sim, 10, 4, 1, 2, Qt.AlignHCenter)
+        self.sim = QPushButton("Start")
+        self.sim.clicked.connect(self._simClicked)
+        self.layout.addWidget(self.sim, 10, 4, 1, 2, Qt.AlignHCenter)
 
     def _newParticle(self):
         dlg = ParticleDialog("new", self.particles, self.Lx, self.Ly)
@@ -225,6 +225,8 @@ class Window(QMainWindow):
         return f"{self.particles[i][0]} particle(s) with ctm = {self.particles[i][1]}, {x_dist_str}, {y_dist_str},\n{vx_dist_str}, {vy_dist_str}"
 
     def _simClicked(self):
+        self.sim.setEnabled(False)
+        
         n_particles = []
         ctms = []
         f = []
@@ -244,6 +246,8 @@ class Window(QMainWindow):
         # the destructor should be called automatically, if not, call i.end_simulation()
 
         make_plots(name)
+
+        self.sim.setEnabled(True)
 
     def _aboutClicked(self):
         dlg = CustomDialog("about")
