@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtCore import Qt, QObject, QThread, pyqtSignal
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon, QPixmap, QMovie
 from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QDialog, QDialogButtonBox, QGridLayout, QApplication, QWidget, QListWidget, QPushButton, QDoubleSpinBox, QComboBox, QFrame, QSpinBox
 import pyqtgraph as pg
 import numpy as np
@@ -713,6 +713,34 @@ class ParticleDialog(QDialog):
         pen2 = pg.mkPen(color=(0, 0, 255), width=4)
         self.graphWidget.plot(points, fy(points), name="vy", pen=pen2)
         self.graphWidget.addLegend()
+
+class CustomDialog(QDialog):
+    def __init__(self, name):
+        super().__init__()
+        self.setWindowIcon(QIcon('python/pic-logo.png'))
+
+        QBtn = QDialogButtonBox.Ok
+
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+
+        self.layout = QGridLayout()
+
+        self.plot_label = QLabel()
+        self.plot_movie = QMovie("output/"+name*"/sim.gif")
+        self.plot_label.setMovie(self.plot_movie)
+        self.layout.addWidget(self.plot_label, 0, 0, 1, 1)
+
+        self.hist_label = QLabel()
+        self.hist_movie = QMovie("output/"+name*"/sim_hist.gif")
+        self.hist_label.setMovie(self.hist_movie)
+        self.layout.addWidget(self.hist_label, 0, 1, 1, 1)
+
+        self.plot_movie.start()
+        self.hist_movie.start()
+
+        self.layout.addWidget(self.buttonBox, 1, 0, 1, 2)
+        self.setLayout(self.layout)
 
 app = QApplication(sys.argv)
 app.setWindowIcon(QIcon('python/pic-logo.png'))
