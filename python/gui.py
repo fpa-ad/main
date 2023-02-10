@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt, QObject, QThread, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QMovie
 from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QDialog, QDialogButtonBox, QGridLayout, QApplication, QWidget, QListWidget, QPushButton, QDoubleSpinBox, QComboBox, QFrame, QSpinBox
 import pyqtgraph as pg
@@ -7,6 +7,8 @@ import numpy as np
 from plots import make_plots
 
 import libFCpython as l
+
+import time
 
 class QHLine(QFrame):
     def __init__(self):
@@ -19,6 +21,35 @@ class QVLine(QFrame):
         super(QVLine, self).__init__()
         self.setFrameShape(QFrame.VLine)
         self.setFrameShadow(QFrame.Sunken)
+
+class Plots(QObject):
+    finished = pyqtSignal(str)
+
+    def __init__(self, Lx, Ly, dx, dy, dt, n, n_part, ctms, f, nFields, fields, T, sc):
+        super(QObject, self).__init__()
+        self.Lx = Lx
+        self.Ly = Ly
+        self.dx = dx
+        self.dy = dy
+        self.dt = dt
+        self.n = n
+        self.n_part = n_part
+        self.ctms = ctms
+        self.f = f
+        self.nFields = nFields
+        self.fields = fields
+        self.T = T
+        self.sc = sc
+
+    def run(self):
+        self.i = l.interface()
+        self.name = self.i.create_simulation(self.Lx, self.Ly, self.dx, self.dy, self.dt, self.n, self.n_part, self.ctms, self.f, self.nFields, self.fields)
+        self.i.run_simulation(self.T, self.sc)
+        # the destructor should be called automatically, if not, call i.end_simulation()
+
+        make_plots(self.name)
+
+        self.finished.emit(self.name)
 
 class Window(QMainWindow):
     def __init__(self, parent=None):
@@ -175,9 +206,9 @@ class Window(QMainWindow):
         self.sc.setDecimals(3)
         self.layout.addWidget(self.sc, 10, 3, 1, 1, Qt.AlignHCenter)
 
-        sim = QPushButton("Start")
-        sim.clicked.connect(self._simClicked)
-        self.layout.addWidget(sim, 10, 4, 1, 2, Qt.AlignHCenter)
+        self.sim = QPushButton("Start")
+        self.sim.clicked.connect(self._simClicked)
+        self.layout.addWidget(self.sim, 10, 4, 1, 2, Qt.AlignHCenter)
 
     def _newParticle(self):
         dlg = ParticleDialog("new", self.particles, self.Lx, self.Ly)
@@ -214,12 +245,12 @@ class Window(QMainWindow):
             y_dist_str = f"rectangular y dist. (s = {self.particles[i][3][1]}, e = {self.particles[i][3][2]})"
         vx_dist = self.particles[i][4][0]
         if vx_dist == 0:
-            vx_dist_str = f"maxwellian vx dist. (vp = {self.particles[i][4][1]})"
+            vx_dist_str = f"maxwellian vx dist. (vp = {self.particles[i][4][1]}, v0 = {self.particles[i][4][2]})"
         else:
             vx_dist_str = f"bump-on-tail vx dist. (vp = {self.particles[i][4][1]}, v0 = {self.particles[i][4][2]}, s = {self.particles[i][4][3]})"
         vy_dist = self.particles[i][5][0]
         if vy_dist == 0:
-            vy_dist_str = f"maxwellian vy dist. (vp = {self.particles[i][5][1]})"
+            vy_dist_str = f"maxwellian vy dist. (vp = {self.particles[i][5][1]}, v0 = {self.particles[i][5][2]})"
         else:
             vy_dist_str = f"bump-on-tail vy dist. (vp = {self.particles[i][5][1]}, v0 = {self.particles[i][5][2]}, s = {self.particles[i][5][3]})"
         return f"{self.particles[i][0]} particle(s) with ctm = {self.particles[i][1]}, {x_dist_str}, {y_dist_str},\n{vx_dist_str}, {vy_dist_str}"
@@ -238,9 +269,24 @@ class Window(QMainWindow):
             nFields = 2
             fields.append([0, 0, self.Bz.value()])
 
-        self.loading_screen = LoadingScreen()
-        self.loading_screen.go(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields, self.T.value(), self.sc.value())
-        self.show()
+        self.thread = QThread()
+        self.worker = Plots(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields, self.T.value(), self.sc.value())
+        self.worker.moveToThread(self.thread)
+        self.thread.started.connect(self.worker.run)
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+        self.thread.start()
+
+        self.sim.setEnabled(False)
+        self.thread.finished.connect(
+            lambda : self.sim.setEnabled(True)
+        )
+        self.worker.finished.connect(self._showResults)
+
+    def _showResults(self, name):
+        dlg = ResultsDialog(name)
+        dlg.exec()
 
     def _aboutClicked(self):
         dlg = CustomDialog("about")
@@ -442,14 +488,14 @@ class ParticleDialog(QDialog):
         self.vx_vp.valueChanged.connect(self._updatePlot)
         vx_grid.addWidget(self.vx_vp, 0, 1, 1, 1, Qt.AlignHCenter)
 
-        self.vx_v0_label = QLabel("Bump-on tail position")
+        self.vx_v0_label = QLabel("Position")
         vx_grid.addWidget(self.vx_v0_label, 1, 0, 1, 1, Qt.AlignLeft)
 
         self.vx_v0 = QDoubleSpinBox()
-        self.vx_v0.setMinimum(0.1)
+        self.vx_v0.setMinimum(-10)
         self.vx_v0.setSingleStep(0.1)
         self.vx_v0.setMaximum(10)
-        self.vx_v0.setValue(1)
+        self.vx_v0.setValue(0)
         self.vx_v0.setDecimals(3)
         self.vx_v0.valueChanged.connect(self._updatePlot)
         vx_grid.addWidget(self.vx_v0, 1, 1, 1, 1, Qt.AlignHCenter)
@@ -491,14 +537,14 @@ class ParticleDialog(QDialog):
         self.vy_vp.valueChanged.connect(self._updatePlot)
         vy_grid.addWidget(self.vy_vp, 0, 1, 1, 1, Qt.AlignHCenter)
 
-        self.vy_v0_label = QLabel("Bump-on tail position")
+        self.vy_v0_label = QLabel("Position")
         vy_grid.addWidget(self.vy_v0_label, 1, 0, 1, 1, Qt.AlignLeft)
 
         self.vy_v0 = QDoubleSpinBox()
-        self.vy_v0.setMinimum(0.1)
+        self.vy_v0.setMinimum(-10)
         self.vy_v0.setSingleStep(0.1)
         self.vy_v0.setMaximum(10)
-        self.vy_v0.setValue(1)
+        self.vy_v0.setValue(0)
         self.vy_v0.setDecimals(3)
         self.vy_v0.valueChanged.connect(self._updatePlot)
         vy_grid.addWidget(self.vy_v0, 1, 1, 1, 1, Qt.AlignHCenter)
@@ -548,15 +594,15 @@ class ParticleDialog(QDialog):
             vx_dist = particles[i][4][0]
             self.vx.setCurrentIndex(vx_dist)
             self.vx_vp.setValue(particles[i][3][1])
+            self.vx_v0.setValue(particles[i][3][2])
             if vx_dist == 1:
-                self.vx_v0.setValue(particles[i][3][2])
                 self.vx_s.setValue(particles[i][3][3])
             
             vy_dist = particles[i][5][0]
             self.vy.setCurrentIndex(vy_dist)
             self.vy_vp.setValue(particles[i][4][1])
+            self.vy_v0.setValue(particles[i][4][2])
             if vy_dist == 1:
-                self.vy_v0.setValue(particles[i][4][2])
                 self.vy_s.setValue(particles[i][4][3])
 
             self._xChanged(x_dist)
@@ -585,16 +631,14 @@ class ParticleDialog(QDialog):
         new_particle.append(y)
 
         vx_dist = self.vx.currentIndex()
-        vx = [vx_dist, self.vx_vp.value()]
+        vx = [vx_dist, self.vx_vp.value(), self.vx_v0.value()]
         if vx_dist == 1:
-            vx.append(self.vx_v0.value())
             vx.append(self.vx_s.value())
         new_particle.append(vx)
 
         vy_dist = self.vy.currentIndex()
-        vy = [vy_dist, self.vy_vp.value()]
+        vy = [vy_dist, self.vy_vp.value(), self.vy_v0.value()]
         if vy_dist == 1:
-            vy.append(self.vy_v0.value())
             vy.append(self.vy_s.value())
         new_particle.append(vy)
 
@@ -629,30 +673,18 @@ class ParticleDialog(QDialog):
 
     def _vxChanged(self, index):
         if index == 0:
-            self.vx_v0_label.hide()
-            self.vx_v0.hide()
-
             self.vx_s_label.hide()
             self.vx_s.hide()
         else:
-            self.vx_v0_label.show()
-            self.vx_v0.show()
-
             self.vx_s_label.show()
             self.vx_s.show()
         self._updatePlot()
 
     def _vyChanged(self, index):
         if index == 0:
-            self.vy_v0_label.hide()
-            self.vy_v0.hide()
-
             self.vy_s_label.hide()
             self.vy_s.hide()
         else:
-            self.vy_v0_label.show()
-            self.vy_v0.show()
-
             self.vy_s_label.show()
             self.vy_s.show()
         self._updatePlot()
@@ -665,14 +697,14 @@ class ParticleDialog(QDialog):
         vx_dist = self.vx.currentIndex()
         vp = self.vx_vp.value()
         if vx_dist == 0:
-            fx = lambda v, vp=vp: 1/(vp*np.pi) * np.exp(-v*v/(vp*vp))
+            fx = lambda v, vp=vp, v0=self.vx_v0.value(): 1/(vp*np.pi) * np.exp(-(v-v0)*(v-v0)/(vp*vp))
         else:
             fx = lambda v, vp=vp, v0=self.vx_v0.value(), b=self.vx_s.value(): 1/(vp*np.pi) * ((1-b)*np.exp(-v*v/(vp*vp)) + b*np.exp(-(v-v0)*(v-v0)/(vp*vp)))
 
         vy_dist = self.vy.currentIndex()
         vp = self.vy_vp.value()
         if vy_dist == 0:
-            fy = lambda v, vp=vp: 1/(vp*np.pi) * np.exp(-v*v/(vp*vp))
+            fy = lambda v, vp=vp, v0=self.vy_v0.value(): 1/(vp*np.pi) * np.exp(-(v-v0)*(v-v0)/(vp*vp))
         else:
             fy = lambda v, vp=vp, v0=self.vy_v0.value(), b=self.vy_s.value(): 1/(vp*np.pi) * ((1-b)*np.exp(-v*v/(vp*vp)) + b*np.exp(-(v-v0)*(v-v0)/(vp*vp)))
 
@@ -683,31 +715,33 @@ class ParticleDialog(QDialog):
         self.graphWidget.plot(points, fy(points), name="vy", pen=pen2)
         self.graphWidget.addLegend()
 
-class LoadingScreen(QWidget):
-    def __init__(self):
+class ResultsDialog(QDialog):
+    def __init__(self, name):
         super().__init__()
-        self.setFixedSize(100, 100)
-        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.CustomizeWindowHint)
+        self.setWindowIcon(QIcon('python/pic-logo.png'))
 
-        self.label_animation = QLabel(self)
+        QBtn = QDialogButtonBox.Ok
 
-        self.movie = QMovie('python/802.gif')
-        self.movie.setScaledSize(QSize(100, 100))
-        self.label_animation.setMovie(self.movie)
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
 
-        self.movie.start()
-        self.show()
+        self.layout = QGridLayout()
 
-    def go(self, Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields, Tmax, sc):
-        i = l.interface()
-        name = i.create_simulation(Lx, Ly, dx, dy, dt, n, n_particles, ctms, f, nFields, fields)
-        i.run_simulation(Tmax, sc)
-        # the destructor should be called automatically, if not, call i.end_simulation()
+        self.plot_label = QLabel()
+        self.plot_movie = QMovie("output/"+name+"/sim.gif")
+        self.plot_label.setMovie(self.plot_movie)
+        self.layout.addWidget(self.plot_label, 0, 0, 1, 1)
 
-        make_plots(name)
+        self.hist_label = QLabel()
+        self.hist_movie = QMovie("output/"+name+"/sim_hist.gif")
+        self.hist_label.setMovie(self.hist_movie)
+        self.layout.addWidget(self.hist_label, 0, 1, 1, 1)
 
-        self.movie.stop()
-        self.close()
+        self.plot_movie.start()
+        self.hist_movie.start()
+
+        self.layout.addWidget(self.buttonBox, 1, 0, 1, 2)
+        self.setLayout(self.layout)
 
 app = QApplication(sys.argv)
 app.setWindowIcon(QIcon('python/pic-logo.png'))
