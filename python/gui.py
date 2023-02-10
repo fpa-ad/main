@@ -26,7 +26,7 @@ class Plots(QObject):
     finished = pyqtSignal()
 
     def __init__(self, Lx, Ly, dx, dy, dt, n, n_part, ctms, f, nFields, fields, T, sc):
-        super.__init__()
+        super(QObject, self).__init__()
         self.Lx = Lx
         self.Ly = Ly
         self.dx = dx
@@ -276,7 +276,6 @@ class Window(QMainWindow):
         self.worker.finished.connect(self.thread.quit)
         self.worker.finished.connect(self.worker.deleteLater)
         self.thread.finished.connect(self.thread.deleteLater)
-        self.worker.progress.connect(self.reportProgress)
         self.thread.start()
 
         self.sim.setEnabled(False)
