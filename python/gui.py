@@ -23,7 +23,7 @@ class QVLine(QFrame):
         self.setFrameShadow(QFrame.Sunken)
 
 class Plots(QObject):
-    finished = pyqtSignal()
+    finished = pyqtSignal(str)
 
     def __init__(self, Lx, Ly, dx, dy, dt, n, n_part, ctms, f, nFields, fields, T, sc):
         super(QObject, self).__init__()
@@ -49,7 +49,7 @@ class Plots(QObject):
 
         make_plots(self.name)
 
-        self.finished.emit()
+        self.finished.emit(self.name)
 
 class Window(QMainWindow):
     def __init__(self, parent=None):
@@ -280,11 +280,14 @@ class Window(QMainWindow):
 
         self.sim.setEnabled(False)
         self.thread.finished.connect(
-            lambda: self.sim.setEnabled(True)
+            lambda name : self.sim.setEnabled(True)
         )
-        #self.thread.finished.connect(
-        #    lambda: self.stepLabel.setText("Long-Running Step: 0")
-        #)
+        self.thread.finished.connect(
+            lambda name : self._showResults(name)
+        )
+
+    def _showResults(self, name):
+        print("show results called ", name)
 
     def _aboutClicked(self):
         dlg = CustomDialog("about")
