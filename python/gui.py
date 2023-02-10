@@ -225,7 +225,9 @@ class Window(QMainWindow):
         return f"{self.particles[i][0]} particle(s) with ctm = {self.particles[i][1]}, {x_dist_str}, {y_dist_str},\n{vx_dist_str}, {vy_dist_str}"
 
     def _simClicked(self):
+        print("sim clicked")
         self.sim.setEnabled(False)
+        self.sim.blockSignals(True)
         
         n_particles = []
         ctms = []
@@ -248,6 +250,7 @@ class Window(QMainWindow):
         make_plots(name)
 
         self.sim.setEnabled(True)
+        self.sim.blockSignals(False)
 
     def _aboutClicked(self):
         dlg = CustomDialog("about")
