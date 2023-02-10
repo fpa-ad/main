@@ -244,7 +244,7 @@ class Window(QMainWindow):
         self.show()
 
         # TODO remove
-        time.sleep(1)
+        time.sleep(5)
 
         i = l.interface()
         name = i.create_simulation(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields)
@@ -459,10 +459,10 @@ class ParticleDialog(QDialog):
         vx_grid.addWidget(self.vx_v0_label, 1, 0, 1, 1, Qt.AlignLeft)
 
         self.vx_v0 = QDoubleSpinBox()
-        self.vx_v0.setMinimum(0.1)
+        self.vx_v0.setMinimum(-10)
         self.vx_v0.setSingleStep(0.1)
         self.vx_v0.setMaximum(10)
-        self.vx_v0.setValue(1)
+        self.vx_v0.setValue(0)
         self.vx_v0.setDecimals(3)
         self.vx_v0.valueChanged.connect(self._updatePlot)
         vx_grid.addWidget(self.vx_v0, 1, 1, 1, 1, Qt.AlignHCenter)
@@ -508,10 +508,10 @@ class ParticleDialog(QDialog):
         vy_grid.addWidget(self.vy_v0_label, 1, 0, 1, 1, Qt.AlignLeft)
 
         self.vy_v0 = QDoubleSpinBox()
-        self.vy_v0.setMinimum(0.1)
+        self.vy_v0.setMinimum(-10)
         self.vy_v0.setSingleStep(0.1)
         self.vy_v0.setMaximum(10)
-        self.vy_v0.setValue(1)
+        self.vy_v0.setValue(0)
         self.vy_v0.setDecimals(3)
         self.vy_v0.valueChanged.connect(self._updatePlot)
         vy_grid.addWidget(self.vy_v0, 1, 1, 1, 1, Qt.AlignHCenter)
