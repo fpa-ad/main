@@ -177,9 +177,9 @@ class Window(QMainWindow):
         self.sc.setDecimals(3)
         self.layout.addWidget(self.sc, 10, 3, 1, 1, Qt.AlignHCenter)
 
-        sim = QPushButton("Start")
-        sim.clicked.connect(self._simClicked)
-        self.layout.addWidget(sim, 10, 4, 1, 2, Qt.AlignHCenter)
+        self.sim = QPushButton("Start")
+        self.sim.clicked.connect(self._simClicked)
+        self.layout.addWidget(self.sim, 10, 4, 1, 2, Qt.AlignHCenter)
 
     def _newParticle(self):
         dlg = ParticleDialog("new", self.particles, self.Lx, self.Ly)
@@ -240,20 +240,27 @@ class Window(QMainWindow):
             nFields = 2
             fields.append([0, 0, self.Bz.value()])
 
-        self.loading_screen = LoadingScreen()
+        self.label_animation = QLabel(self)
+
+        self.movie = QMovie('python/802.gif')
+        self.movie.setScaledSize(QSize(100, 100))
+        self.label_animation.setMovie(self.movie)
+        self.layout.addWidget(self.label_animation, 10, 4, 1, 2, Qt.AlignCenter)
+        self.movie.start()
         self.show()
 
         # TODO remove
         time.sleep(5)
 
-        i = l.interface()
-        name = i.create_simulation(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields)
-        i.run_simulation(self.T.value(), self.sc.value())
+        #i = l.interface()
+        #name = i.create_simulation(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields)
+        #i.run_simulation(self.T.value(), self.sc.value())
         # the destructor should be called automatically, if not, call i.end_simulation()
 
-        make_plots(name)
+        #make_plots(name)
 
-        self.loading_screen.close()
+        del self.label_animation
+        del self.movie
 
     def _aboutClicked(self):
         dlg = CustomDialog("about")
