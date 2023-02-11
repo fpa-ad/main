@@ -227,7 +227,7 @@ class Window(QMainWindow):
         self.Bn.setValue(50)
         self.layout.addWidget(self.Bn, 12, 3, 1, 1, Qt.AlignHCenter)
 
-        self.sim = QPushButton("Start")
+        self.sim = QPushButton("START")
         self.sim.setFixedSize(80, 80)
         self.sim.setStyleSheet("border-radius: 40; border: 2px solid black; background-color:red; font: 16pt bold; color: black")
         self.sim.clicked.connect(self._simClicked)
