@@ -36,9 +36,9 @@ class interface {
         //@param in_dy y grid size
         //@param in_dt time step
         //@param n number of particle types
-        //@param n_particles array with number of particles of each type (size n)
-        //@param in_ctm array with charge to mass ratios for the particle types (size n)
-        //@param in_f array of functionals for the distribution functions (size n by 4, 2 for position and 2 for velocity)
+        //@param n_particles list with number of particles of each type (size n)
+        //@param in_ctm list with charge to mass ratios for the particle types (size n)
+        //@param in_f list of lists for the distribution functions (size n by 4, 2 for position and 2 for velocity); these lists should be, for the positions, [0] for uniform, [1, s] for step starting at s or [2, s, e] for rectangular starting at s and ending at e; for the velocities, [0, vp, v0] for maxwellian at v0 with velocity vp or [1, vp, v0, b] for bump-on-tail at v0 with "strength" b, with velocities vp
         //@param in_nFields number of fields (1 for electric, 2 for electromagnetic)
         //@param in_const_fields matrix with background fields (size in_nFields by 3)
         py::str create_simulation(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, py::list in_n_particles, py::list in_ctm, py::list in_f, int in_nFields, py::list in_const_fields);
