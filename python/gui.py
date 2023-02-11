@@ -285,7 +285,8 @@ class Window(QMainWindow):
         self.worker.finished.connect(self._showResults)
 
     def _showResults(self, name):
-        print("show results called ", name)
+        dlg = ResultsDialog(name)
+        dlg.exec()
 
     def _aboutClicked(self):
         dlg = CustomDialog("about")
@@ -714,7 +715,7 @@ class ParticleDialog(QDialog):
         self.graphWidget.plot(points, fy(points), name="vy", pen=pen2)
         self.graphWidget.addLegend()
 
-class CustomDialog(QDialog):
+class ResultsDialog(QDialog):
     def __init__(self, name):
         super().__init__()
         self.setWindowIcon(QIcon('python/pic-logo.png'))
@@ -727,12 +728,12 @@ class CustomDialog(QDialog):
         self.layout = QGridLayout()
 
         self.plot_label = QLabel()
-        self.plot_movie = QMovie("output/"+name*"/sim.gif")
+        self.plot_movie = QMovie("output/"+name+"/sim.gif")
         self.plot_label.setMovie(self.plot_movie)
         self.layout.addWidget(self.plot_label, 0, 0, 1, 1)
 
         self.hist_label = QLabel()
-        self.hist_movie = QMovie("output/"+name*"/sim_hist.gif")
+        self.hist_movie = QMovie("output/"+name+"/sim_hist.gif")
         self.hist_label.setMovie(self.hist_movie)
         self.layout.addWidget(self.hist_label, 0, 1, 1, 1)
 

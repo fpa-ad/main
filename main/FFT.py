@@ -69,7 +69,7 @@ if os.path.exists("output") and os.path.isdir("output"):
         print(PHI[1][1][0])
         nt=len(timebase)
         for i in range(ny):
-            wave=np.zeros([nt,nx])
+            wave=np.zeros([int(nt),nx])
             """for j in range(nt):
                 waveaux=np.zeros(nx)
                 for k in range(nx):
@@ -80,28 +80,36 @@ if os.path.exists("output") and os.path.isdir("output"):
                 waveaux=np.zeros(nx)
                 for k in range(nx):
                     waveaux[k]=(PHI[j][k][i])
-                wave[j,:]=waveaux[:]
+                if(1):
+                    wave[int(j),:]=waveaux[:]
             
-            wind=np.hanning(nt)
-            print(wave[1,1])
+            wind=np.hanning(int(nt))
+            #print(wave[1,1])
             for k in range(nx):
                 wave[:,k]*=wind
 
+            print(dx)
+            #wave=np.transpose(wave)
+            """for k in range(1,nx-1):
+                wave[:,k]=(wave[:,k+1]-wave[:,k-1])
+            wave[:,0]=(wave[:,1]-wave[:,nx-1])
+            wave[:,nx-1]=(wave[:,0]-wave[:,nx-2])"""
+
             dt=timebase[5]-timebase[4]
             k_max = np.pi / dx
-            omega_max = np.pi / dt
+            omega_max = np.pi / (dt)
 
             sp = np.abs(np.fft.fft2(wave))**2
             sp = np.fft.fftshift(sp)
-            print(wave[1,1])
-            plt.imshow( sp, origin = 'lower', norm=colors.LogNorm(vmin=500),extent = ( -k_max, k_max, -omega_max, omega_max ),aspect = 'auto', cmap = 'gray')
+            #print(wave[1,1])
+            plt.imshow( sp, origin = 'lower', norm=colors.LogNorm(vmin=50),extent = ( -k_max, k_max, -omega_max, omega_max ),aspect = 'auto', cmap = 'gray')
 
             k = np.linspace(-k_max, k_max, num = 512)
-            w=1+3*(0.4**2)*k**2
+            w=np.sqrt(1+2)+3*(1**2)*k**2
             plt.plot( k, w, label = "Electron Plasma Wave", color = 'r',ls = '-.' )
 
-            plt.ylim(0,2)
-            plt.xlim(0,k_max/10)
+            plt.ylim(0,40)
+            plt.xlim(0,k_max)
             plt.xlabel("$k$ [$\omega_n/c$]")
             plt.ylabel("$\omega$ [$\omega_n$]")
             plt.title("Wave dispersion relation")

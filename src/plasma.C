@@ -151,7 +151,7 @@ void plasma::move(double dt) {
         }
     }
     // update the fields
-    for (int i = 0; i < nFields; i ++) {
+    for (int i = 0; i < 1/*nFields*/; i ++) {
         fields[i].Update(n, n_particles, ctm, particles);
     }
     // loop through the particles
