@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtCore import Qt, QObject, QThread, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QMovie
-from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QDialog, QDialogButtonBox, QGridLayout, QApplication, QWidget, QListWidget, QPushButton, QDoubleSpinBox, QComboBox, QFrame, QSpinBox
+from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QDialog, QDialogButtonBox, QGridLayout, QApplication, QWidget, QListWidget, QPushButton, QDoubleSpinBox, QComboBox, QFrame, QSpinBox, QTextEdit
 import pyqtgraph as pg
 import numpy as np
 from plots import make_plots
@@ -347,7 +347,9 @@ class CustomDialog(QDialog):
         elif type == "help":
             self.setWindowTitle("Help")
 
-            message = QTextEdit('''
+            message = QTextEdit()
+
+            message.setPlainText('''---- FAQ
 1. The program crashed! Where are my results? Did I lose everything?
 No. As the simulation progresses, its results are saved in a timestamped folder on the "output" folder in your main directory. You should be able to recover most of your results.
 
@@ -360,6 +362,9 @@ The plots program is fully optimised, so if the simulation runs smoothly, and qu
 
 4. The program will not let me select the parameters I want for the positions distribution functions!
 Have you checked if they are in compliance with the Lx and Ly you have selected? Try increasing these first.
+
+5. The boxes will not let me input the parameters I want!
+Assume the limitations are there for a reason OR try using the library directly instead.
             ''')
             message.setReadOnly(True)
 
