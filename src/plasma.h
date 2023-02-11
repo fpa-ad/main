@@ -21,12 +21,10 @@ class plasma{
         
         // number of fields
         int nFields = 0;
-        // vector of field objects
-        Field* fields = nullptr;
         // background fields;
         double** bkg_fields = nullptr;
-
-        // properties of grid
+        // vector of field objects
+        Field* fields = nullptr;
 
         // size of box - x direction
         double Lx;
