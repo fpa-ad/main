@@ -8,7 +8,7 @@ from matplotlib.ticker import (MultipleLocator)
 minv = 100
 binw = 0.01
 
-matplotlib.use("AGG")
+matplotlib.use("Agg")
 
 def make_plots(sim):
     files = os.listdir("output/"+sim)
@@ -28,8 +28,8 @@ def make_plots(sim):
     plt.grid(True, which='both')
     points = None
     fig2, axs2 = plt.subplots(1, 2, sharey=True, tight_layout=True, figsize=(8,4))
-    bars1 = None
-    bars2 = None
+    hist1 = None
+    hist2 = None
     for file in files:
         if not ".txt" in file:
             continue
@@ -37,6 +37,21 @@ def make_plots(sim):
             continue
         print(file)
         with open("output/"+sim+"/"+file) as f:
+            # clear the plots
+            if points != None:
+                for p in points:
+                    p.remove()
+            points = []
+            if hist1 != None:
+                for bar in hist1:
+                    for b in bar:
+                        b.remove()
+            hist1 = []
+            if hist2 != None:
+                for bar in hist2:
+                    for b in bar:
+                        b.remove()
+            hist2 = []
             # read time and number of particle types
             header = f.readline().split()
             t = float(header[0])
@@ -58,9 +73,13 @@ def make_plots(sim):
                     vx.append(float(line[2]))
                     vy.append(float(line[3]))
                 plt.figure(1)
-                if points != None:
-                    points.remove()
-                points = plt.scatter(x, y, label="q/m="+header[0] , s=5)
+                points.append(plt.scatter(x, y, label="q/m="+header[0] , s=5))
+                plt.figure(2)
+                counts, bins, bars1 = axs2[0].hist(vx, bins = np.arange(-minv, minv, binw), label="q/m="+header[0], alpha=0.5)
+                hist1.append(bars1)
+                counts, bins, bars2 = axs2[1].hist(vy, bins = np.arange(-minv, minv, binw), label="q/m="+header[0], alpha=0.5)
+                hist2.append(bars2)
+        plt.figure(1)
         plt.legend()
         plt.title(f"t={t}s")
         plt.savefig("output/"+sim+"/"+file.replace("txt","png"))
@@ -68,14 +87,7 @@ def make_plots(sim):
         plt.figure(2)
         axs2[0].set(title=f"$v_x$ for t={t}s")
         axs2[1].set(title=f"$v_y$ for t={t}s")
-        if bars1 != None:
-            for b in bars1:
-                b.remove()
-        if bars2 != None:
-            for b in bars2:
-                b.remove()
-        counts, bins, bars1 = axs2[0].hist(vx, bins = np.arange(-minv, minv, binw))
-        counts, bins, bars2 = axs2[1].hist(vy, bins = np.arange(-minv, minv, binw))
+        plt.legend()
         plt.savefig("output/"+sim+"/"+file.replace(".txt","")+"_hist.png")
 
     frames.sort()
