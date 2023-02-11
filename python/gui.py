@@ -19,7 +19,7 @@ class Plots(QObject):
     """Thread to run the simulation and handle the outputs"""
     finished = pyqtSignal(str)
 
-    def __init__(self, Lx, Ly, dx, dy, dt, n, n_part, ctms, f, nFields, fields, T, sc):
+    def __init__(self, Lx, Ly, dx, dy, dt, n, n_part, ctms, f, nFields, fields, T, sc, B, Bn):
         super(QObject, self).__init__()
         self.Lx = Lx
         self.Ly = Ly
@@ -34,6 +34,8 @@ class Plots(QObject):
         self.fields = fields
         self.T = T
         self.sc = sc
+        self.B = B
+        self.Bn = Bn
 
     def run(self):
         """Run the simulation, export the plots"""
@@ -42,7 +44,7 @@ class Plots(QObject):
         self.i.run_simulation(self.T, self.sc)
         # the destructor should be called automatically, if not, call i.end_simulation()
 
-        make_plots(self.name)
+        make_plots(self.name, self.B, self.Bn)
 
         self.finished.emit(self.name)
 
@@ -180,7 +182,7 @@ class Window(QMainWindow):
 
         sim_title = QLabel("Simulation")
         sim_title.setStyleSheet("font: bold;")
-        self.layout.addWidget(sim_title, 9, 0, 1, 6, Qt.AlignHCenter)
+        self.layout.addWidget(sim_title, 9, 0, 1, 4, Qt.AlignHCenter)
 
         T_label = QLabel("Simulation time")
         self.layout.addWidget(T_label, 10, 0, 1, 1, Qt.AlignLeft)
@@ -202,9 +204,33 @@ class Window(QMainWindow):
         self.sc.setDecimals(3)
         self.layout.addWidget(self.sc, 10, 3, 1, 1, Qt.AlignHCenter)
 
+        plots_title = QLabel("Plots")
+        plots_title.setStyleSheet("font: bold;")
+        self.layout.addWidget(plots_title, 11, 0, 1, 4, Qt.AlignHCenter)
+
+        B_label = QLabel("Bin start/end")
+        self.layout.addWidget(B_label, 12, 0, 1, 1, Qt.AlignLeft)
+
+        self.B = QDoubleSpinBox()
+        self.B.setMinimum(0.1)
+        self.B.setMaximum(1000)
+        self.B.setValue(100)
+        self.B.setDecimals(1)
+        self.layout.addWidget(self.B, 12, 1, 1, 1, Qt.AlignHCenter)
+
+        Bn_label = QLabel("Bin number")
+        self.layout.addWidget(Bn_label, 12, 2, 1, 1, Qt.AlignLeft)
+
+        self.Bn = QSpinBox()
+        self.Bn.setMinimum(10)
+        self.Bn.setMaximum(200)
+        self.Bn.setValue(50)
+        self.layout.addWidget(self.Bn, 12, 3, 1, 1, Qt.AlignHCenter)
+
         self.sim = QPushButton("Start")
+        self.sim.setStyleSheet("font: 20pt bold; background-color: red; color: white")
         self.sim.clicked.connect(self._simClicked)
-        self.layout.addWidget(self.sim, 10, 4, 1, 2, Qt.AlignHCenter)
+        self.layout.addWidget(self.sim, 10, 4, 4, 2, Qt.AlignHCenter)
 
     def _newParticle(self):
         """Handler for the new particle button"""
@@ -273,7 +299,7 @@ class Window(QMainWindow):
             fields.append([0, 0, self.Bz.value()])
 
         self.thread = QThread()
-        self.worker = Plots(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields, self.T.value(), self.sc.value())
+        self.worker = Plots(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields, self.T.value(), self.sc.value(), self.B.value(), self.Bn.value())
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.run)
         self.worker.finished.connect(self.thread.quit)
@@ -365,6 +391,9 @@ Have you checked if they are in compliance with the Lx and Ly you have selected?
 
 5. The boxes will not let me input the parameters I want!
 Assume the limitations are there for a reason OR try using the library directly instead.
+
+6. I am getting really funky results.
+Check the Physics. The GUI only does very light validation of the parameters, there may be something weird with them.
             ''')
             message.setReadOnly(True)
 

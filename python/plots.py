@@ -5,12 +5,9 @@ import numpy as np
 import imageio as imageio
 from matplotlib.ticker import (MultipleLocator)
 
-minv = 100
-binw = 1
-
 matplotlib.use("Agg")
 
-def make_plots(sim):
+def make_plots(sim, binr, binn):
     files = os.listdir("output/"+sim)
     # frames for the gif
     frames = []
@@ -82,9 +79,9 @@ def make_plots(sim):
                 plt.figure(1)
                 points.append(plt.scatter(x, y, label="q/m="+header[0], s=10, color=c(col)))
                 plt.figure(2)
-                counts, bins, bars1 = axs2[0].hist(vx, bins = np.arange(-minv, minv, binw), label="q/m="+header[0], alpha=0.5, color=c(col))
+                counts, bins, bars1 = axs2[0].hist(vx, bins = binn, range = (-binr, binr), label="q/m="+header[0], alpha=0.5, color=c(col))
                 hist1.append(bars1)
-                counts, bins, bars2 = axs2[1].hist(vy, bins = np.arange(-minv, minv, binw), label="q/m="+header[0], alpha=0.5, color=c(col))
+                counts, bins, bars2 = axs2[1].hist(vy, bins = binn, range = (-binr, binr), label="q/m="+header[0], alpha=0.5, color=c(col))
                 hist2.append(bars2)
         plt.figure(1)
         plt.legend()
