@@ -4,22 +4,39 @@
 #include <fstream>
 #include <sstream>
 
+// constructor
+//@param in_X x length of the box
+//@param in_Y y length of the box
+//@param in_dx x grid size
+//@param in_dy y grid size
+//@param in_dt time step
+//@param n number of particle types
+//@param n_particles array with number of particles of each type (size n)
+//@param ctm array with charge to mass ratios for the particle types (size n)
+//@param f array of functionals for the distribution functions (size n by 4, 2 for position and 2 for velocity)
+//@param in_nFields number of fields (1 for electric, 2 for electromagnetic)
+//@param const_fields matrix with background fields (size in_nFields by 3)
 sim::sim(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int n, int* n_particles, double* ctm, funcdouble** f, int in_nFields, double** const_fields) :
         X(in_X), Y(in_Y), dx(in_dx), dy(in_dy), dt(in_dt), sim_plasma(in_X, in_Y, in_dx, in_dy, n, n_particles, ctm, f, in_nFields, const_fields) {
 }
 
+// set simulation name
+//@param new_name new name to give the simulation ("sim is default")
 void sim::set_name(string new_name) {
     name = new_name;
 }
 
+// return simulation name
 string sim::get_name() {
     return name;
 }
 
+// get simulation fullname (timestamp + name)
 string sim::get_fullname() {
     return timestamp + string("__") + name;
 }
 
+// get a snapshot
 void sim::snapshot() {
     ofstream f;
     stringstream ss;
@@ -55,6 +72,9 @@ void sim::snapshot() {
     snapcount++;
 }
 
+// run simulation
+//@param runtime total time to run
+//@param sc_dt time interval between snapshots
 void sim::run(double runtime, double sc_dt) {
     if (!filesystem::is_directory("output") || !filesystem::exists("output")) {
         filesystem::create_directory("output");
@@ -94,7 +114,3 @@ void sim::run(double runtime, double sc_dt) {
     }
     cout<<endl;
 }
-
-/*sim::~sim(){
-    free(&sim_plasma);
-}*/

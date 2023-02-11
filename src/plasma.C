@@ -3,6 +3,17 @@
 #include <random>
 
 // constructor
+//@param in_X x length of the box
+//@param in_Y y length of the box
+//@param in_dx x grid size
+//@param in_dy y grid size
+//@param in_dt time step
+//@param n number of particle types
+//@param n_particles array with number of particles of each type (size n)
+//@param ctm array with charge to mass ratios for the particle types (size n)
+//@param f array of functionals for the distribution functions (size n by 4, 2 for position and 2 for velocity)
+//@param in_nFields number of fields (1 for electric, 2 for electromagnetic)
+//@param const_fields matrix with background fields (size in_nFields by 3)
 plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n, int* in_n_particles, double* in_ctm, funcdouble** f, int in_nFields, double** const_fields) : Lx(in_Lx), Ly(in_Ly), hx(in_hx), hy(in_hy), n(in_n), n_particles(in_n_particles), ctm(in_ctm), nFields(in_nFields), bkg_fields(const_fields) {
 
     // initialize particles
@@ -57,6 +68,7 @@ int plasma::get_n() {
 }
 
 // return how many of the i-th particle type (no validation)
+//@param i index of the particle type
 int plasma::get_n_particle(int i) {
     return n_particles[i];
 }
@@ -91,6 +103,8 @@ Field* plasma::get_fields() {
 }
 
 // get the Ex field for a given position
+//@param x x position, from 0 to Lx
+//@param y y position, from 0 to Ly
 double plasma::get_Ex(double x, double y) {
     if (nFields == 0) {
         return 0;
@@ -101,6 +115,8 @@ double plasma::get_Ex(double x, double y) {
 }
 
 // get the Ey field for a given position
+//@param x x position, from 0 to Lx
+//@param y y position, from 0 to Ly
 double plasma::get_Ey(double x, double y) {
     if (nFields == 0) {
         return 0;
@@ -111,6 +127,8 @@ double plasma::get_Ey(double x, double y) {
 }
 
 // get the Ez field for a given position
+//@param x x position, from 0 to Lx
+//@param y y position, from 0 to Ly
 double plasma::get_Ez(double x, double y) {
     if (nFields == 0) {
         return 0;
@@ -121,6 +139,8 @@ double plasma::get_Ez(double x, double y) {
 }
 
 // get the Bx field for a given position
+//@param x x position, from 0 to Lx
+//@param y y position, from 0 to Ly
 double plasma::get_Bx(double x, double y) {
     if (nFields <= 1) {
         return 0;
@@ -131,6 +151,8 @@ double plasma::get_Bx(double x, double y) {
 }
 
 // get the By field for a given position
+//@param x x position, from 0 to Lx
+//@param y y position, from 0 to Ly
 double plasma::get_By(double x, double y) {
     if (nFields <= 1) {
         return 0;
@@ -141,6 +163,8 @@ double plasma::get_By(double x, double y) {
 }
 
 // get the Bz field for a given position
+//@param x x position, from 0 to Lx
+//@param y y position, from 0 to Ly
 double plasma::get_Bz(double x, double y) {
     if (nFields <= 1) {
         return 0;
@@ -151,6 +175,7 @@ double plasma::get_Bz(double x, double y) {
 }
 
 // move - calculate the next iteration
+//@param dt time step
 void plasma::move(double dt) {
     // loop through the particles
     for (int i = 0; i < n; i++) {
