@@ -8,21 +8,15 @@ from plots import make_plots
 
 import libFCpython as l
 
-import time
-
 class QHLine(QFrame):
+    """Simple horizontal line"""
     def __init__(self):
         super(QHLine, self).__init__()
         self.setFrameShape(QFrame.HLine)
         self.setFrameShadow(QFrame.Sunken)
 
-class QVLine(QFrame):
-    def __init__(self):
-        super(QVLine, self).__init__()
-        self.setFrameShape(QFrame.VLine)
-        self.setFrameShadow(QFrame.Sunken)
-
 class Plots(QObject):
+    """Thread to run the simulation and handle the outputs"""
     finished = pyqtSignal(str)
 
     def __init__(self, Lx, Ly, dx, dy, dt, n, n_part, ctms, f, nFields, fields, T, sc):
@@ -42,6 +36,7 @@ class Plots(QObject):
         self.sc = sc
 
     def run(self):
+        """Run the simulation, export the plots"""
         self.i = l.interface()
         self.name = self.i.create_simulation(self.Lx, self.Ly, self.dx, self.dy, self.dt, self.n, self.n_part, self.ctms, self.f, self.nFields, self.fields)
         self.i.run_simulation(self.T, self.sc)
@@ -52,6 +47,7 @@ class Plots(QObject):
         self.finished.emit(self.name)
 
 class Window(QMainWindow):
+    """Main program window"""
     def __init__(self, parent=None):
         self.particles = []
         self.Lx = 1
@@ -211,17 +207,21 @@ class Window(QMainWindow):
         self.layout.addWidget(self.sim, 10, 4, 1, 2, Qt.AlignHCenter)
 
     def _newParticle(self):
+        """Handler for the new particle button"""
         dlg = ParticleDialog("new", self.particles, self.Lx, self.Ly)
         if dlg.exec():
             # new particle needs to be added to the list
             self.listwidget.addItem(self._printParticle(-1))
 
     def _undoParticle(self):
+        """Handler for the undo button"""
         if self.particles:
             self.listwidget.takeItem(len(self.particles)-1)
             self.particles.pop()
 
     def _particleClicked(self, qmodelindex):
+        """Handler for the listwidget, when an item is clicked
+        @param qmodelindex QModelIndex clicked"""
         item = self.listwidget.currentItem()
         dlg = ParticleDialog("edit", self.particles, self.Lx, self.Ly, qmodelindex.row())
         if dlg.exec():
@@ -229,6 +229,8 @@ class Window(QMainWindow):
             item.setText(self._printParticle(qmodelindex.row()))
 
     def _printParticle(self, i):
+        """Print a given particle as a string
+        @param i particle's index"""
         x_dist = self.particles[i][2][0]
         if x_dist == 0:
             x_dist_str = "random x dist."
@@ -256,6 +258,7 @@ class Window(QMainWindow):
         return f"{self.particles[i][0]} particle(s) with ctm = {self.particles[i][1]}, {x_dist_str}, {y_dist_str},\n{vx_dist_str}, {vy_dist_str}"
 
     def _simClicked(self):
+        """Handler for the simulation button, runs the Plots thread"""
         n_particles = []
         ctms = []
         f = []
@@ -285,18 +288,24 @@ class Window(QMainWindow):
         self.worker.finished.connect(self._showResults)
 
     def _showResults(self, name):
+        """Show results handler, called when the Plots thread is done
+        @param name name of the simulation"""
         dlg = ResultsDialog(name)
         dlg.exec()
 
     def _aboutClicked(self):
+        """Handler for the about button"""
         dlg = CustomDialog("about")
         dlg.exec()
 
     def _helpClicked(self):
+        """Handler for the help button"""
         dlg = CustomDialog("help")
         dlg.exec()
 
 class CustomDialog(QDialog):
+    """Custom dialog, used for specific situations
+    @param type ("about" or "help")"""
     def __init__(self, type):
         super().__init__()
         self.setWindowIcon(QIcon('python/pic-logo.png'))
@@ -349,6 +358,12 @@ Have you tried turning it off and on again?
         self.setLayout(self.layout)
 
 class ParticleDialog(QDialog):
+    """Dialog to enter a new particle type
+    @param type whether this is a new particle or an edit
+    @param particles particle list
+    @param Lx x length of the box
+    @param Ly y length of the box
+    @param i index of the particle clicked, if editing (-1 otherwise)"""
     def __init__(self, type, particles, Lx, Ly, i=-1):
         super().__init__()
         self.setWindowIcon(QIcon('python/pic-logo.png'))
@@ -449,8 +464,8 @@ class ParticleDialog(QDialog):
 
         self.y_s = QDoubleSpinBox()
         self.y_s.setMinimum(0)
-        self.y_s.setMaximum(Lx)
-        self.y_s.setValue(Lx/4)
+        self.y_s.setMaximum(Ly)
+        self.y_s.setValue(Ly/4)
         self.y_grid.addWidget(self.y_s, 0, 1, 1, 1, Qt.AlignHCenter)
 
         self.y_e_label = QLabel("End")
@@ -458,8 +473,8 @@ class ParticleDialog(QDialog):
 
         self.y_e = QDoubleSpinBox()
         self.y_e.setMinimum(0)
-        self.y_e.setMaximum(Lx)
-        self.y_e.setValue(3*Lx/4)
+        self.y_e.setMaximum(Ly)
+        self.y_e.setValue(3*Ly/4)
         self.y_grid.addWidget(self.y_e, 1, 1, 1, 1, Qt.AlignHCenter)
 
         self.layout.addWidget(QHLine(), 10, 0, 1, 2)
@@ -612,6 +627,7 @@ class ParticleDialog(QDialog):
         self._updatePlot()
 
     def _save(self):
+        """Save the particle created/edited"""
         new_particle = [self.n.value(), self.ctm.value()]
 
         x_dist = self.x.currentIndex()
@@ -648,6 +664,8 @@ class ParticleDialog(QDialog):
             self.particles[self.i] = new_particle
 
     def _xChanged(self, index):
+        """Handler for the x distribution combo - changed
+        @param index index selected"""
         if index == 0:
             self.x_grid_widget.hide()
         else:
@@ -660,6 +678,8 @@ class ParticleDialog(QDialog):
                 self.x_e.show()
 
     def _yChanged(self, index):
+        """Handler for the y distribution combo - changed
+        @param index index selected"""
         if index == 0:
             self.y_grid_widget.hide()
         else:
@@ -672,6 +692,8 @@ class ParticleDialog(QDialog):
                 self.y_e.show()
 
     def _vxChanged(self, index):
+        """Handler for the vx distribution combo - changed
+        @param index index selected"""
         if index == 0:
             self.vx_s_label.hide()
             self.vx_s.hide()
@@ -681,6 +703,8 @@ class ParticleDialog(QDialog):
         self._updatePlot()
 
     def _vyChanged(self, index):
+        """Handler for the vy distribution combo - changed
+        @param index index selected"""
         if index == 0:
             self.vy_s_label.hide()
             self.vy_s.hide()
@@ -690,9 +714,10 @@ class ParticleDialog(QDialog):
         self._updatePlot()
 
     def _updatePlot(self):
+        """Update the plot of the distribution functions"""
         self.graphWidget.clear()
 
-        points = np.arange(-5, 20, 0.1)
+        points = np.arange(-10, 20, 0.1)
 
         vx_dist = self.vx.currentIndex()
         vp = self.vx_vp.value()
@@ -713,9 +738,11 @@ class ParticleDialog(QDialog):
         self.graphWidget.plot(points, fx(points), name="vx", pen=pen1)
         pen2 = pg.mkPen(color=(0, 0, 255), width=4)
         self.graphWidget.plot(points, fy(points), name="vy", pen=pen2)
+        self.graphWidget.setXRange(-5, 10, padding=0)
         self.graphWidget.addLegend()
 
 class ResultsDialog(QDialog):
+    """Dialog with the resulting gifs"""
     def __init__(self, name):
         super().__init__()
         self.setWindowIcon(QIcon('python/pic-logo.png'))
