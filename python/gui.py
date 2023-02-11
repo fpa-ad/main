@@ -288,6 +288,7 @@ class Window(QMainWindow):
 
         if not self.particles:
             QMessageBox.critical(self, "Error", "Unable to start simulation! Define some particles first...")
+            return
 
         n_particles = []
         ctms = []
