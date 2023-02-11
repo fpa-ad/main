@@ -6,7 +6,7 @@ import imageio as imageio
 from matplotlib.ticker import (MultipleLocator)
 
 minv = 100
-binw = 0.01
+binw = 1
 
 matplotlib.use("Agg")
 
@@ -14,12 +14,14 @@ def make_plots(sim):
     files = os.listdir("output/"+sim)
     # frames for the gif
     frames = []
+    n = 0
     with open("output/"+sim+"/README.txt") as f:
         header = f.readline().split()
         Lx = float(header[1])
         Ly = float(header[3])
         dx = float(header[5])
         dy = float(header[7])
+        n = int(f.readline().split()[0])
     fig, ax = plt.subplots()
     plt.xlim(0, Lx)
     plt.ylim(0, Ly)
@@ -30,6 +32,7 @@ def make_plots(sim):
     fig2, axs2 = plt.subplots(1, 2, sharey=True, tight_layout=True, figsize=(8,4))
     hist1 = None
     hist2 = None
+    c = matplotlib.cm.rainbow
     for file in files:
         if not ".txt" in file:
             continue
@@ -72,12 +75,16 @@ def make_plots(sim):
                     y.append(float(line[1]))
                     vx.append(float(line[2]))
                     vy.append(float(line[3]))
+                if (n == 1):
+                    col = 0
+                else:
+                    col = i / (n-1)
                 plt.figure(1)
-                points.append(plt.scatter(x, y, label="q/m="+header[0] , s=5))
+                points.append(plt.scatter(x, y, label="q/m="+header[0], s=10, color=c(col)))
                 plt.figure(2)
-                counts, bins, bars1 = axs2[0].hist(vx, bins = np.arange(-minv, minv, binw), label="q/m="+header[0], alpha=0.5)
+                counts, bins, bars1 = axs2[0].hist(vx, bins = np.arange(-minv, minv, binw), label="q/m="+header[0], alpha=0.5, color=c(col))
                 hist1.append(bars1)
-                counts, bins, bars2 = axs2[1].hist(vy, bins = np.arange(-minv, minv, binw), label="q/m="+header[0], alpha=0.5)
+                counts, bins, bars2 = axs2[1].hist(vy, bins = np.arange(-minv, minv, binw), label="q/m="+header[0], alpha=0.5, color=c(col))
                 hist2.append(bars2)
         plt.figure(1)
         plt.legend()
@@ -86,6 +93,7 @@ def make_plots(sim):
         frames.append(int(file.replace(".txt","")))
         plt.figure(2)
         axs2[0].set(title=f"$v_x$ for t={t}s")
+        plt.legend()
         axs2[1].set(title=f"$v_y$ for t={t}s")
         plt.legend()
         plt.savefig("output/"+sim+"/"+file.replace(".txt","")+"_hist.png")
