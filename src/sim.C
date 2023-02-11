@@ -76,7 +76,7 @@ void sim::run(double runtime, double sc_dt) {
         f << part[i][0].get_ctm() << " [q/m] " << n_part << " particles\n";
     }
     double* fields = sim_plasma.get_background_fields();
-    f << "Ex= " << fields[0] << " Ey= " << fields[1] << " Bx= " << fields[2] << " By= " << fields[3] << endl;
+    f << "Ex= " << fields[0] << " Ey= " << fields[1] << " Bz= " << fields[2] << endl;
     free(fields);
     f.close();
 
