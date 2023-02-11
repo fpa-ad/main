@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtCore import Qt, QObject, QThread, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QMovie
-from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QDialog, QDialogButtonBox, QGridLayout, QApplication, QWidget, QListWidget, QPushButton, QDoubleSpinBox, QComboBox, QFrame, QSpinBox, QTextEdit
+from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QDialog, QDialogButtonBox, QGridLayout, QApplication, QWidget, QListWidget, QPushButton, QDoubleSpinBox, QComboBox, QFrame, QSpinBox, QTextEdit, QMessageBox
 import pyqtgraph as pg
 import numpy as np
 from plots import make_plots
@@ -285,6 +285,10 @@ class Window(QMainWindow):
 
     def _simClicked(self):
         """Handler for the simulation button, runs the Plots thread"""
+
+        if not self.particles:
+            QMessageBox.critical(self, "Error", "Unable to start simulation! Define some particles first...")
+
         n_particles = []
         ctms = []
         f = []
