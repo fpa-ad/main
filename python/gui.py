@@ -347,10 +347,21 @@ class CustomDialog(QDialog):
         elif type == "help":
             self.setWindowTitle("Help")
 
-            message = QLabel('''
-You have reached the help section.
-Have you tried turning it off and on again?
+            message = QTextEdit('''
+1. The program crashed! Where are my results? Did I lose everything?
+No. As the simulation progresses, its results are saved in a timestamped folder on the "output" folder in your main directory. You should be able to recover most of your results.
+
+2. The program is having weird glitches...
+Have you tried recompiling the library from scratch?
+
+3. The program is taking a reaaaaaally long time to produce my gifs. Is this normal?
+If you have selected a very high frequency of snapshots or a very lengthy simulation, that can happen. Consider changing your parameters.
+The plots program is fully optimised, so if the simulation runs smoothly, and quickly, the problem is there are too many snapshots to handle. It's a waiting game...
+
+4. The program will not let me select the parameters I want for the positions distribution functions!
+Have you checked if they are in compliance with the Lx and Ly you have selected? Try increasing these first.
             ''')
+            message.setReadOnly(True)
 
             self.layout.addWidget(message, 0, 0, 1, 2, Qt.AlignTop)
 
