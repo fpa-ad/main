@@ -51,11 +51,11 @@ double uniformP(double x){
 int main(){
 
     int n_particles[2];
-    n_particles[0] = 10;
-    n_particles[1] = 10;
+    n_particles[0] = 1000;
+    n_particles[1] = 1000;
     double ctm[2];
-    ctm[0] = 1;
-    ctm[1] = -1;
+    ctm[0] = -1;
+    ctm[1] = 1;
     double** fields = new double*[2];
     fields[0] = new double[3];
     fields[1] = new double[3];
@@ -64,7 +64,7 @@ int main(){
     fields[0][2] = 0;
     fields[1][0] = 0;
     fields[1][1] = 0;
-    fields[1][2] = 10;
+    fields[1][2] = 5;
     funcdouble** f=new funcdouble*[2];
     f[0]=new funcdouble[4];
     f[1]=new funcdouble[4];
@@ -77,8 +77,8 @@ int main(){
     f[1][2]=&maxwellian;
     f[1][3]=&maxwellian;
     cout << "starting simulation" << endl;
-    sim simulation(10, 1, 0.1, 1, 1e-3, 2, n_particles, ctm, f, 1, fields);
+    sim simulation(10, 1, 0.1, 1, 0.05, 1, n_particles, ctm, f, 1, fields);
     cout << "running simulation" << endl;
-    simulation.run(1, 0.03);
+    simulation.run(10, 0.0);
     cout << "simulation complete" << endl;
 }

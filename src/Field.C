@@ -171,7 +171,7 @@ double Field::get_X(double x, double y){
 
     for(int i=0; i<Nx; ++i){
         for(int j=0; j<Ny; ++j){
-            res+=Fx[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
+            res+=hx*hy*Fx[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
         }
     }
     
@@ -183,7 +183,7 @@ double Field::get_Y(double x, double y){
 
     for(int i=0; i<Nx; ++i){
         for(int j=0; j<Ny; ++j){
-            res+=Fy[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
+            res+=hx*hy*Fy[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
         }
     }
     
@@ -195,7 +195,7 @@ double Field::get_Z(double x, double y){
 
     for(int i=0; i<Nx; ++i){
         for(int j=0; j<Ny; ++j){
-            res+=Fz[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
+            res+=hx*hy*Fz[i][j]*(Spline1(x-i*hx,hy)+Spline1(x-Lx-i*hx,hy)+Spline1(x+Lx-i*hx,hy))*(Spline1(y-j*hy,hy)+Spline1(y-Ly-j*hy,hy)+Spline1(y+Ly-j*hy,hy));
         }
     }
     
@@ -223,9 +223,14 @@ void Field::Update(int n_types, int* n_particles, double* ctm, particle** partic
 }
 
 void Field::Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho){
-    int quasi=0;
-    if(n_types<2) quasi=-ctm[0];
-    
+    double quasi=0;
+
+    for(int i=0; i<n_types; ++i){
+        quasi -= ctm[i];
+    }
+
+    //cout<<"quasi= "<<quasi<<endl;
+
     int Npart=0;
     Npart+=n_particles[0];
 
@@ -294,27 +299,29 @@ void Field::Poisson(double** rho){
 
 void Field::InitializeMatFD(){
 
-    double** Ax=new double*[Ny];
+    double** Ay=new double*[Ny];
     for(int i=0; i<Ny; ++i){
-        Ax[i]=new double[Ny];
+        Ay[i]=new double[Ny];
         for(int j=0; j<Ny; ++j){
+            Ay[i][j]=0;
+            if(j==i) Ay[i][j]+=-2;
+            if(j==i+1||j==i-1) Ay[i][j]+=1;
+            if(j==0&&i==Ny-1)Ay[i][j]+=1;
+            if(j==Ny-1&&i==0) Ay[i][j]+=1;
+            Ay[i][j]/=(hy*hy);
+        }
+    }
+
+    double** Ax=new double*[Nx];
+    for(int i=0; i<Nx; ++i){
+        Ax[i]=new double[Nx];
+        for(int j=0; j<Nx; ++j){
             Ax[i][j]=0;
             if(j==i) Ax[i][j]+=-2;
             if(j==i+1||j==i-1) Ax[i][j]+=1;
             if(j==0&&i==Nx-1)Ax[i][j]+=1;
             if(j==Nx-1&&i==0) Ax[i][j]+=1;
-        }
-    }
-
-    double** Ay=new double*[Nx];
-    for(int i=0; i<Nx; ++i){
-        Ay[i]=new double[Nx];
-        for(int j=0; j<Nx; ++j){
-            Ay[i][j]=0;
-            if(j==i) Ay[i][j]+=-2;
-            if(j==i+1||j==i-1) Ay[i][j]+=1;
-            if(j==0&&i==Nx-1)Ay[i][j]+=1;
-            if(j==Nx-1&&i==0) Ay[i][j]+=1;
+            Ax[i][j]/=(hx*hx);
         }
     }
 
@@ -351,14 +358,18 @@ void Field::InitializeMatFD(){
         }
     }
 
-    Kronecker(Ny,Ny,Nx,Nx,Ax,Ix,Matx);
-    Kronecker(Ny,Ny,Nx,Nx,Iy,Ay,Maty);
+    Kronecker(Ny,Ny,Nx,Nx,Ay,Ix,Matx);
+    Kronecker(Ny,Ny,Nx,Nx,Iy,Ax,Maty);
 
     for(int i=0; i<Nx*Ny-1; ++i){
         for(int j=0; j<Nx*Ny; ++j){
             Mat[i][j]=Matx[i][j]+Maty[i][j];
+            //cout<<Mat[i][j]<<" ";
         }
+        //cout<<endl;
     }
+    //cout<<endl<<endl;
+
     for(int j=0; j<Nx*Ny; ++j){
         Mat[Nx*Ny-1][j]=1;
     }
@@ -384,11 +395,11 @@ void Field::InitializeMatFD(){
     //Free all the memory
 
     for(int i = 0; i<Nx; ++i){
-        delete [] Ay[i];
+        delete [] Ax[i];
         delete [] Ix[i];
     }
     for(int i = 0; i<Ny; ++i){
-        delete [] Ax[i];
+        delete [] Ay[i];
         delete [] Iy[i];
     }
     for(int i = 0; i<Nx*Ny; ++i){

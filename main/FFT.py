@@ -105,11 +105,11 @@ if os.path.exists("output") and os.path.isdir("output"):
             plt.imshow( sp, origin = 'lower', norm=colors.LogNorm(vmin=50),extent = ( -k_max, k_max, -omega_max, omega_max ),aspect = 'auto', cmap = 'gray')
 
             k = np.linspace(-k_max, k_max, num = 512)
-            w=np.sqrt(1+2)+3*(1**2)*k**2
+            w=np.sqrt(1+1./5.)+3*(1**2)*(k)**2
             plt.plot( k, w, label = "Electron Plasma Wave", color = 'r',ls = '-.' )
 
-            plt.ylim(0,40)
-            plt.xlim(0,k_max)
+            plt.ylim(0,5)
+            plt.xlim(0,5)
             plt.xlabel("$k$ [$\omega_n/c$]")
             plt.ylabel("$\omega$ [$\omega_n$]")
             plt.title("Wave dispersion relation")
