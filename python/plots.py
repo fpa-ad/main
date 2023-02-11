@@ -11,21 +11,28 @@ def make_plots(sim):
     files = os.listdir("output/"+sim)
     # frames for the gif
     frames = []
-    # read basic info
-    PHI = [[[]]]
     with open("output/"+sim+"/README.txt") as f:
         header = f.readline().split()
         Lx = float(header[1])
         Ly = float(header[3])
         dx = float(header[5])
         dy = float(header[7])
+    fig, ax = plt.subplots()
+    plt.xlim(0, Lx)
+    plt.ylim(0, Ly)
+    ax.xaxis.set_minor_locator(MultipleLocator(dx))
+    ax.yaxis.set_minor_locator(MultipleLocator(dy))
+    plt.grid(True, which='both')
+    points = None
+    fig2, axs2 = plt.subplots(1, 2, sharey=True, tight_layout=True, figsize=(8,4))
+    bars1 = None
+    bars2 = None
     for file in files:
         if not ".txt" in file:
             continue
         if (file == "README.txt"):
             continue
         print(file)
-        fig, ax = plt.subplots()
         with open("output/"+sim+"/"+file) as f:
             # read time and number of particle types
             header = f.readline().split()
@@ -47,28 +54,26 @@ def make_plots(sim):
                     y.append(float(line[1]))
                     vx.append(float(line[2]))
                     vy.append(float(line[3]))
-                plt.scatter(x, y, label="q/m="+header[0] , s=5)
-        plt.xlim(0, Lx)
-        plt.ylim(0, Ly)
-        ax.xaxis.set_minor_locator(MultipleLocator(dx))
-        ax.yaxis.set_minor_locator(MultipleLocator(dy))
-        plt.grid(True, which='both')
-        plt.title(f"t={t}s")
+                plt.figure(1)
+                if points != None:
+                    points.remove()
+                points = plt.scatter(x, y, label="q/m="+header[0] , s=5)
         plt.legend()
+        plt.title(f"t={t}s")
         plt.savefig("output/"+sim+"/"+file.replace("txt","png"))
         frames.append(int(file.replace(".txt","")))
-        #plt.show()
-        plt.close(fig)
-        fig, axs = plt.subplots(1, 2, sharey=True, tight_layout=True, figsize=(8,4))
-        axs[0].hist(vx, bins=np.arange(-minv, minv, binw))
-        axs[0].set(title=f"$v_x$ for t={t}s")
-        axs[0].yaxis.set_major_locator(MultipleLocator(1))
-        axs[1].hist(vy, bins=np.arange(-minv, minv, binw))
-        axs[1].set(title=f"$v_y$ for t={t}s")
+        plt.figure(2)
+        axs2[0].set(title=f"$v_x$ for t={t}s")
+        axs2[1].set(title=f"$v_y$ for t={t}s")
+        if bars1 != None:
+            for b in bars1:
+                b.remove()
+        if bars2 != None:
+            for b in bars2:
+                b.remove()
+        counts, bins, bars1 = axs2[0].hist(vx, bins = np.arange(-minv, minv, binw))
+        counts, bins, bars2 = axs2[1].hist(vy, bins = np.arange(-minv, minv, binw))
         plt.savefig("output/"+sim+"/"+file.replace(".txt","")+"_hist.png")
-        #plt.show()
-        plt.close(fig)
-        
 
     frames.sort()
     with imageio.get_writer("output/"+sim+"/"+'sim.gif', mode='I', fps=10) as writer:
