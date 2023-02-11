@@ -2,6 +2,18 @@
 #include <math.h>
 #include <functional>
 
+// create the simulation
+//@param in_X x length of the box
+//@param in_Y y length of the box
+//@param in_dx x grid size
+//@param in_dy y grid size
+//@param in_dt time step
+//@param n number of particle types
+//@param n_particles array with number of particles of each type (size n)
+//@param in_ctm array with charge to mass ratios for the particle types (size n)
+//@param in_f array of functionals for the distribution functions (size n by 4, 2 for position and 2 for velocity)
+//@param in_nFields number of fields (1 for electric, 2 for electromagnetic)
+//@param in_const_fields matrix with background fields (size in_nFields by 3)
 py::str interface::create_simulation(double in_X, double in_Y, double in_dx, double in_dy, double in_dt, int in_n, py::list in_n_particles, py::list in_ctm, py::list in_f, int in_nFields, py::list in_const_fields) {
     n = in_n;
     
@@ -129,17 +141,24 @@ py::str interface::create_simulation(double in_X, double in_Y, double in_dx, dou
 
 }
 
+// run the simulation
+//@param runtime total time to run
+//@param sc_dt time interval between snapshots
+void interface::run_simulation(double runtime, double sc_dt) {
+    my_sim->run(runtime, sc_dt);
+}
+
+// end the simulation (basically a destructor)
 void interface::end_simulation() {
     delete n_particles;
+    n_particles = nullptr;
     delete ctm;
+    ctm = nullptr;
     for (int i = 0; i < nFields; i++) {
         delete const_fields[i];
     }
     delete const_fields;
-    // TODO deleting f does not work.
+    const_fields = nullptr;
+    // TODO deleting f does not work
 
-}
-
-void interface::run_simulation(double runtime, double sc_dt) {
-    my_sim->run(runtime, sc_dt);
 }

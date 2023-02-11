@@ -9,7 +9,6 @@ To do list:
 		1. Acabar comentários do Field.C (diogo, ver ??)
 		2. Copiar comentários para o Field.h (ana)
 		3. Comentários do myutils.C (diogo) + copiar (ana)
-		4. Comentários do interface.C + copiar (ana)
 ---------------------------------------------------------
 
 pngcrush -ow -rem allb -reduce file.png
