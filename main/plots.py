@@ -61,7 +61,7 @@ if os.path.exists("output") and os.path.isdir("output"):
                         vy.append(float(line[3]))
                     #print(x)
                     #print(y)
-                    plt.scatter(x, vx, label="q/m="+header[0],s=5)
+                    plt.scatter(x, vx, label="q/m="+header[0],s=2)
             plt.xlim(0, Lx)
             plt.ylim(-10, 10)
             ax.xaxis.set_minor_locator(MultipleLocator(dx*10))
