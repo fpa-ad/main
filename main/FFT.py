@@ -108,8 +108,8 @@ if os.path.exists("output") and os.path.isdir("output"):
             w=np.sqrt(1)+3/2*(1**2)*(k)**2
             plt.plot( k, w, label = "Electron Plasma Wave", color = 'r',ls = '-.' )
 
-            plt.ylim(0,2)
-            plt.xlim(0,2)
+            plt.ylim(0,10)
+            plt.xlim(0,5)
             plt.xlabel("$k$ [$\omega_n/c$]")
             plt.ylabel("$\omega$ [$\omega_n$]")
             plt.title("Wave dispersion relation")
