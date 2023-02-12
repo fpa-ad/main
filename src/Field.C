@@ -64,14 +64,7 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
 
 }
 
-Field::Field(const Field& F1){
-    Lx=F1.Lx;
-    Nx=F1.Nx;
-    hx=F1.hx;
-    Ly=F1.Ly;
-    Ny=F1.Ny;
-    hy=F1.hy;
-
+Field::Field(const Field& F1): Lx(F1.Lx), Nx(F1.Nx), hx(F1.hx), Ly(F1.Ly), Ny(F1.Ny), hy(F1.hy) {
     phi=new double*[Nx];
     for(int i=0; i<Nx; ++i){
         phi[i]=new double[Ny];
@@ -299,6 +292,83 @@ void Field::Poisson(double** rho){
 
 }
 
+void Field::Kronecker(int p, int q, int m, int n, double** A, double** B, double** R){
+    for(int i=0; i<p*m; ++i){
+        for(int j=0; j<q*n; ++j){
+            R[i][j]=A[i/m][j/n]*B[i%m][j%n];
+        }
+    }
+}
+
+void Field::LUdecomp(double** A, double** L, double** U, int N){
+
+    for (int i = 0; i<N; ++i){
+        for (int j=0; j<N; ++j){
+            L[i][j]=0;
+            U[i][j]=0;
+            if (i==j) L[i][j]=1;
+        }
+    }
+
+    //setup of L and U matrices ^^^^^^^
+
+    for (int i = 0; i<N;++i){
+        for(int j = i; j<N; ++j){
+            U[i][j]=A[i][j];
+            for(int k = 0; k<i; ++k){
+                U[i][j]=U[i][j]-L[i][k]*U[k][j];
+            }
+        }
+        for(int j = i+1; j<N; ++j){
+            L[j][i]=A[j][i];
+            for(int k = 0; k<i; ++k){
+                L[j][i]=L[j][i]-L[j][k]*U[k][i];
+            }
+            L[j][i]=L[j][i]/U[i][i];
+        }
+        cout<<"LU Decomposition "<<(((double)(i))/N*100)<<"\% Complete!\r"<<flush;
+    }
+    cout<<endl;
+}
+
+void Field::LUinverse(double** A, double** L, double** U, int N){
+    
+    for(int i=0; i<N; ++i){ //loop for each column of the inverse matrix (Bcol)
+        double* Bcol=new double[N];
+        double* Icol=new double[N];
+        double* Zcol=new double[N];
+        for(int j=0; j<N; ++j){ //loop to fill Icol
+            Icol[j]=0;
+            Bcol[j]=0;
+            Zcol[j]=0;
+            if(j==i) Icol[j]=1;
+        }
+        //Solve single Linear system
+        //Solve L.Zcol=Icol
+        for(int j=0; j<N; ++j){
+            double aux=0;
+            for(int k=0; k<j; ++k){
+                aux+=L[j][k]*Zcol[k];
+            }
+            Zcol[j]=Icol[j]-aux;
+        }
+        //Solve U.Bcol=Zcol
+        for(int j=N-1; j>=0; --j){
+            double aux2=0;
+            for(int k=j+1; k<N; ++k){
+                aux2+=U[j][k]*Bcol[k];
+            }
+            Bcol[j]=(Zcol[j]-aux2)/U[j][j];
+        }
+        // Put Bcol in A
+        for(int j=0; j<N; ++j){
+            A[j][i]=Bcol[j];
+        }
+        cout<<"Inverting "<<(((double)(i))/N*100)<<"\% Complete!\r"<<flush;
+    }
+    cout<<endl;
+}
+
 void Field::InitializeMatFD(){
 
     double** Ay=new double*[Ny];
@@ -418,81 +488,4 @@ void Field::InitializeMatFD(){
     delete [] Maty;
     delete [] LMat;
     delete [] UMat;
-}
-
-void Field::Kronecker(int p, int q, int m, int n, double** A, double** B, double** R){
-    for(int i=0; i<p*m; ++i){
-        for(int j=0; j<q*n; ++j){
-            R[i][j]=A[i/m][j/n]*B[i%m][j%n];
-        }
-    }
-}
-
-void Field::LUdecomp(double** A, double** L, double** U, int N){
-
-    for (int i = 0; i<N; ++i){
-        for (int j=0; j<N; ++j){
-            L[i][j]=0;
-            U[i][j]=0;
-            if (i==j) L[i][j]=1;
-        }
-    }
-
-    //setup of L and U matrices ^^^^^^^
-
-    for (int i = 0; i<N;++i){
-        for(int j = i; j<N; ++j){
-            U[i][j]=A[i][j];
-            for(int k = 0; k<i; ++k){
-                U[i][j]=U[i][j]-L[i][k]*U[k][j];
-            }
-        }
-        for(int j = i+1; j<N; ++j){
-            L[j][i]=A[j][i];
-            for(int k = 0; k<i; ++k){
-                L[j][i]=L[j][i]-L[j][k]*U[k][i];
-            }
-            L[j][i]=L[j][i]/U[i][i];
-        }
-        cout<<"LU Decomposition "<<(((double)(i))/N*100)<<"\% Complete!\r"<<flush;
-    }
-    cout<<endl;
-}
-
-void Field::LUinverse(double** A, double** L, double** U, int N){
-    
-    for(int i=0; i<N; ++i){ //loop for each collumn of the inverse matrix (Bcol)
-        double* Bcol=new double[N];
-        double* Icol=new double[N];
-        double* Zcol=new double[N];
-        for(int j=0; j<N; ++j){ //loop to fill Icol
-            Icol[j]=0;
-            Bcol[j]=0;
-            Zcol[j]=0;
-            if(j==i) Icol[j]=1;
-        }
-        //Solve single Linear system
-        //Solve L.Zcol=Icol
-        for(int j=0; j<N; ++j){
-            double aux=0;
-            for(int k=0; k<j; ++k){
-                aux+=L[j][k]*Zcol[k];
-            }
-            Zcol[j]=Icol[j]-aux;
-        }
-        //Solve U.Bcol=Zcol
-        for(int j=N-1; j>=0; --j){
-            double aux2=0;
-            for(int k=j+1; k<N; ++k){
-                aux2+=U[j][k]*Bcol[k];
-            }
-            Bcol[j]=(Zcol[j]-aux2)/U[j][j];
-        }
-        // Put Bcol in A
-        for(int j=0; j<N; ++j){
-            A[j][i]=Bcol[j];
-        }
-        cout<<"Inverting "<<(((double)(i))/N*100)<<"\% Complete!\r"<<flush;
-    }
-    cout<<endl;
 }

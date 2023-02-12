@@ -1,31 +1,25 @@
 import sys
 from PyQt5.QtCore import Qt, QObject, QThread, pyqtSignal
 from PyQt5.QtGui import QIcon, QPixmap, QMovie
-from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QDialog, QDialogButtonBox, QGridLayout, QApplication, QWidget, QListWidget, QPushButton, QDoubleSpinBox, QComboBox, QFrame, QSpinBox
+from PyQt5.QtWidgets import QMainWindow, QLabel, QToolBar, QAction, QDialog, QDialogButtonBox, QGridLayout, QApplication, QWidget, QListWidget, QPushButton, QDoubleSpinBox, QComboBox, QFrame, QSpinBox, QTextEdit, QMessageBox
 import pyqtgraph as pg
 import numpy as np
 from plots import make_plots
 
 import libFCpython as l
 
-import time
-
 class QHLine(QFrame):
+    """Simple horizontal line"""
     def __init__(self):
         super(QHLine, self).__init__()
         self.setFrameShape(QFrame.HLine)
         self.setFrameShadow(QFrame.Sunken)
 
-class QVLine(QFrame):
-    def __init__(self):
-        super(QVLine, self).__init__()
-        self.setFrameShape(QFrame.VLine)
-        self.setFrameShadow(QFrame.Sunken)
-
 class Plots(QObject):
+    """Thread to run the simulation and handle the outputs"""
     finished = pyqtSignal(str)
 
-    def __init__(self, Lx, Ly, dx, dy, dt, n, n_part, ctms, f, nFields, fields, T, sc):
+    def __init__(self, Lx, Ly, dx, dy, dt, n, n_part, ctms, f, nFields, fields, T, sc, B, Bn):
         super(QObject, self).__init__()
         self.Lx = Lx
         self.Ly = Ly
@@ -40,18 +34,22 @@ class Plots(QObject):
         self.fields = fields
         self.T = T
         self.sc = sc
+        self.B = B
+        self.Bn = Bn
 
     def run(self):
+        """Run the simulation, export the plots"""
         self.i = l.interface()
         self.name = self.i.create_simulation(self.Lx, self.Ly, self.dx, self.dy, self.dt, self.n, self.n_part, self.ctms, self.f, self.nFields, self.fields)
         self.i.run_simulation(self.T, self.sc)
         # the destructor should be called automatically, if not, call i.end_simulation()
 
-        make_plots(self.name)
+        make_plots(self.name, self.B, self.Bn)
 
         self.finished.emit(self.name)
 
 class Window(QMainWindow):
+    """Main program window"""
     def __init__(self, parent=None):
         self.particles = []
         self.Lx = 1
@@ -184,7 +182,7 @@ class Window(QMainWindow):
 
         sim_title = QLabel("Simulation")
         sim_title.setStyleSheet("font: bold;")
-        self.layout.addWidget(sim_title, 9, 0, 1, 6, Qt.AlignHCenter)
+        self.layout.addWidget(sim_title, 9, 0, 1, 4, Qt.AlignHCenter)
 
         T_label = QLabel("Simulation time")
         self.layout.addWidget(T_label, 10, 0, 1, 1, Qt.AlignLeft)
@@ -206,22 +204,51 @@ class Window(QMainWindow):
         self.sc.setDecimals(3)
         self.layout.addWidget(self.sc, 10, 3, 1, 1, Qt.AlignHCenter)
 
-        self.sim = QPushButton("Start")
+        plots_title = QLabel("Plots")
+        plots_title.setStyleSheet("font: bold;")
+        self.layout.addWidget(plots_title, 11, 0, 1, 4, Qt.AlignHCenter)
+
+        B_label = QLabel("Bin start/end")
+        self.layout.addWidget(B_label, 12, 0, 1, 1, Qt.AlignLeft)
+
+        self.B = QDoubleSpinBox()
+        self.B.setMinimum(0.1)
+        self.B.setMaximum(1000)
+        self.B.setValue(100)
+        self.B.setDecimals(1)
+        self.layout.addWidget(self.B, 12, 1, 1, 1, Qt.AlignHCenter)
+
+        Bn_label = QLabel("Bin number")
+        self.layout.addWidget(Bn_label, 12, 2, 1, 1, Qt.AlignLeft)
+
+        self.Bn = QSpinBox()
+        self.Bn.setMinimum(10)
+        self.Bn.setMaximum(200)
+        self.Bn.setValue(50)
+        self.layout.addWidget(self.Bn, 12, 3, 1, 1, Qt.AlignHCenter)
+
+        self.sim = QPushButton("START")
+        self.sim.setFixedSize(80, 80)
+        self.sim.setStyleSheet("border-radius: 40; border: 2px solid black; background-color:red; font: 16pt bold; color: black")
         self.sim.clicked.connect(self._simClicked)
-        self.layout.addWidget(self.sim, 10, 4, 1, 2, Qt.AlignHCenter)
+        self.layout.addWidget(self.sim, 10, 4, 4, 2, Qt.AlignHCenter)
 
     def _newParticle(self):
+        """Handler for the new particle button"""
         dlg = ParticleDialog("new", self.particles, self.Lx, self.Ly)
         if dlg.exec():
             # new particle needs to be added to the list
             self.listwidget.addItem(self._printParticle(-1))
 
     def _undoParticle(self):
+        """Handler for the undo button"""
         if self.particles:
             self.listwidget.takeItem(len(self.particles)-1)
             self.particles.pop()
 
     def _particleClicked(self, qmodelindex):
+        """Handler for the listwidget, when an item is clicked
+        @param qmodelindex QModelIndex clicked"""
         item = self.listwidget.currentItem()
         dlg = ParticleDialog("edit", self.particles, self.Lx, self.Ly, qmodelindex.row())
         if dlg.exec():
@@ -229,6 +256,8 @@ class Window(QMainWindow):
             item.setText(self._printParticle(qmodelindex.row()))
 
     def _printParticle(self, i):
+        """Print a given particle as a string
+        @param i particle's index"""
         x_dist = self.particles[i][2][0]
         if x_dist == 0:
             x_dist_str = "random x dist."
@@ -256,6 +285,12 @@ class Window(QMainWindow):
         return f"{self.particles[i][0]} particle(s) with ctm = {self.particles[i][1]}, {x_dist_str}, {y_dist_str},\n{vx_dist_str}, {vy_dist_str}"
 
     def _simClicked(self):
+        """Handler for the simulation button, runs the Plots thread"""
+
+        if not self.particles:
+            QMessageBox.critical(self, "Error", "Unable to start simulation! Define some particles first...")
+            return
+
         n_particles = []
         ctms = []
         f = []
@@ -270,7 +305,7 @@ class Window(QMainWindow):
             fields.append([0, 0, self.Bz.value()])
 
         self.thread = QThread()
-        self.worker = Plots(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields, self.T.value(), self.sc.value())
+        self.worker = Plots(self.Lx_spin.value(), self.Ly_spin.value(), self.dx.value(), self.dy.value(), self.dt.value(), len(self.particles), n_particles, ctms, f, nFields, fields, self.T.value(), self.sc.value(), self.B.value(), self.Bn.value())
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.run)
         self.worker.finished.connect(self.thread.quit)
@@ -285,18 +320,24 @@ class Window(QMainWindow):
         self.worker.finished.connect(self._showResults)
 
     def _showResults(self, name):
+        """Show results handler, called when the Plots thread is done
+        @param name name of the simulation"""
         dlg = ResultsDialog(name)
         dlg.exec()
 
     def _aboutClicked(self):
+        """Handler for the about button"""
         dlg = CustomDialog("about")
         dlg.exec()
 
     def _helpClicked(self):
+        """Handler for the help button"""
         dlg = CustomDialog("help")
         dlg.exec()
 
 class CustomDialog(QDialog):
+    """Custom dialog, used for specific situations
+    @param type ("about" or "help")"""
     def __init__(self, type):
         super().__init__()
         self.setWindowIcon(QIcon('python/pic-logo.png'))
@@ -338,10 +379,29 @@ class CustomDialog(QDialog):
         elif type == "help":
             self.setWindowTitle("Help")
 
-            message = QLabel('''
-You have reached the help section.
-Have you tried turning it off and on again?
+            message = QTextEdit()
+
+            message.setPlainText('''---- FAQ
+1. The program crashed! Where are my results? Did I lose everything?
+No. As the simulation progresses, its results are saved in a timestamped folder on the "output" folder in your main directory. You should be able to recover most of your results.
+
+2. The program is having weird glitches...
+Have you tried recompiling the library from scratch?
+
+3. The program is taking a reaaaaaally long time to produce my gifs. Is this normal?
+If you have selected a very high frequency of snapshots or a very lengthy simulation, that can happen. Consider changing your parameters.
+The plots program is fully optimised, so if the simulation runs smoothly, and quickly, the problem is there are too many snapshots to handle. It's a waiting game...
+
+4. The program will not let me select the parameters I want for the positions distribution functions!
+Have you checked if they are in compliance with the Lx and Ly you have selected? Try increasing these first.
+
+5. The boxes will not let me input the parameters I want!
+Assume the limitations are there for a reason OR try using the library directly instead.
+
+6. I am getting really funky results.
+Check the Physics. The GUI only does very light validation of the parameters, there may be something weird with them.
             ''')
+            message.setReadOnly(True)
 
             self.layout.addWidget(message, 0, 0, 1, 2, Qt.AlignTop)
 
@@ -349,6 +409,12 @@ Have you tried turning it off and on again?
         self.setLayout(self.layout)
 
 class ParticleDialog(QDialog):
+    """Dialog to enter a new particle type
+    @param type whether this is a new particle or an edit
+    @param particles particle list
+    @param Lx x length of the box
+    @param Ly y length of the box
+    @param i index of the particle clicked, if editing (-1 otherwise)"""
     def __init__(self, type, particles, Lx, Ly, i=-1):
         super().__init__()
         self.setWindowIcon(QIcon('python/pic-logo.png'))
@@ -449,8 +515,8 @@ class ParticleDialog(QDialog):
 
         self.y_s = QDoubleSpinBox()
         self.y_s.setMinimum(0)
-        self.y_s.setMaximum(Lx)
-        self.y_s.setValue(Lx/4)
+        self.y_s.setMaximum(Ly)
+        self.y_s.setValue(Ly/4)
         self.y_grid.addWidget(self.y_s, 0, 1, 1, 1, Qt.AlignHCenter)
 
         self.y_e_label = QLabel("End")
@@ -458,8 +524,8 @@ class ParticleDialog(QDialog):
 
         self.y_e = QDoubleSpinBox()
         self.y_e.setMinimum(0)
-        self.y_e.setMaximum(Lx)
-        self.y_e.setValue(3*Lx/4)
+        self.y_e.setMaximum(Ly)
+        self.y_e.setValue(3*Ly/4)
         self.y_grid.addWidget(self.y_e, 1, 1, 1, 1, Qt.AlignHCenter)
 
         self.layout.addWidget(QHLine(), 10, 0, 1, 2)
@@ -612,6 +678,7 @@ class ParticleDialog(QDialog):
         self._updatePlot()
 
     def _save(self):
+        """Save the particle created/edited"""
         new_particle = [self.n.value(), self.ctm.value()]
 
         x_dist = self.x.currentIndex()
@@ -648,6 +715,8 @@ class ParticleDialog(QDialog):
             self.particles[self.i] = new_particle
 
     def _xChanged(self, index):
+        """Handler for the x distribution combo - changed
+        @param index index selected"""
         if index == 0:
             self.x_grid_widget.hide()
         else:
@@ -660,6 +729,8 @@ class ParticleDialog(QDialog):
                 self.x_e.show()
 
     def _yChanged(self, index):
+        """Handler for the y distribution combo - changed
+        @param index index selected"""
         if index == 0:
             self.y_grid_widget.hide()
         else:
@@ -672,6 +743,8 @@ class ParticleDialog(QDialog):
                 self.y_e.show()
 
     def _vxChanged(self, index):
+        """Handler for the vx distribution combo - changed
+        @param index index selected"""
         if index == 0:
             self.vx_s_label.hide()
             self.vx_s.hide()
@@ -681,6 +754,8 @@ class ParticleDialog(QDialog):
         self._updatePlot()
 
     def _vyChanged(self, index):
+        """Handler for the vy distribution combo - changed
+        @param index index selected"""
         if index == 0:
             self.vy_s_label.hide()
             self.vy_s.hide()
@@ -690,9 +765,10 @@ class ParticleDialog(QDialog):
         self._updatePlot()
 
     def _updatePlot(self):
+        """Update the plot of the distribution functions"""
         self.graphWidget.clear()
 
-        points = np.arange(-5, 20, 0.1)
+        points = np.arange(-10, 20, 0.1)
 
         vx_dist = self.vx.currentIndex()
         vp = self.vx_vp.value()
@@ -713,9 +789,11 @@ class ParticleDialog(QDialog):
         self.graphWidget.plot(points, fx(points), name="vx", pen=pen1)
         pen2 = pg.mkPen(color=(0, 0, 255), width=4)
         self.graphWidget.plot(points, fy(points), name="vy", pen=pen2)
+        self.graphWidget.setXRange(-5, 10, padding=0)
         self.graphWidget.addLegend()
 
 class ResultsDialog(QDialog):
+    """Dialog with the resulting gifs"""
     def __init__(self, name):
         super().__init__()
         self.setWindowIcon(QIcon('python/pic-logo.png'))
