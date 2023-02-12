@@ -1,5 +1,6 @@
 #include "Field.h"
 
+// Constructor
 Field::Field() : Lx(0), Ly(0), Nx(0), Ny(0), hx(0), hy(0), ext_x(0), ext_y(0), ext_z(0), phi(nullptr), Fx(nullptr), Fy(nullptr), Fz(nullptr) {
     Mat=new double*[Nx*Ny];
     for(int i=0; i<Nx*Ny; ++i){
@@ -11,6 +12,14 @@ Field::Field() : Lx(0), Ly(0), Nx(0), Ny(0), hx(0), hy(0), ext_x(0), ext_y(0), e
     InitializeMatFD();
 }
 
+// Constructor
+//@param fLx x length of the box
+//@param fLy y length of the box
+//@param fhx x grid size
+//@param fhy y grid size
+//@param fext_x external field, x direction
+//@param fext_y external field, y direction
+//@param fext_z external field, z direction
 Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, double fext_y, double fext_z) : Lx(fLx), Ly(fLy), ext_x(fext_x), ext_y(fext_y), ext_z(fext_z) {
     Nx=(int)(fLx/fhx);
     hx=fLx/((double)(Nx));
@@ -64,6 +73,8 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
 
 }
 
+// Constructor
+//@param F1 field object
 Field::Field(const Field& F1): Lx(F1.Lx), Nx(F1.Nx), hx(F1.hx), Ly(F1.Ly), Ny(F1.Ny), hy(F1.hy) {
     phi=new double*[Nx];
     for(int i=0; i<Nx; ++i){
@@ -125,6 +136,9 @@ Field::Field(const Field& F1): Lx(F1.Lx), Nx(F1.Nx), hx(F1.hx), Ly(F1.Ly), Ny(F1
     delete [] Fz;
 }*/
 
+// X derivative
+//@param nx x grid coordinate
+//@param ny y grid coordinate
 double Field::Xderiv(int nx, int ny){
     int nxplus=nx+1;
     int nxminus=nx-1;
@@ -132,7 +146,10 @@ double Field::Xderiv(int nx, int ny){
     if(nxplus==Nx) nxplus=0;
     return ((phi[nxplus][ny]-phi[nxminus][ny])/(2*hx));
 }
-    
+
+// Y derivative
+//@param nx x grid coordinate
+//@param ny y grid coordinate
 double Field::Yderiv(int nx, int ny){
     int nyplus=ny+1;
     int nyminus=ny-1;
@@ -140,7 +157,10 @@ double Field::Yderiv(int nx, int ny){
     if(nyplus==Ny) nyplus=0;
     return ((phi[nx][nyplus]-phi[nx][nyminus])/(2*hy));
 }
-    
+
+// Second X derivative
+//@param nx x grid coordinate
+//@param ny y grid coordinate
 double Field::X2deriv(int nx, int ny){
     int nxplus=nx+1;
     int nxminus=nx-1;
@@ -149,6 +169,9 @@ double Field::X2deriv(int nx, int ny){
     return ((phi[nxplus][ny]-2*phi[nx][ny]+phi[nxminus][ny])/(hx*hx));
 }
 
+// Second Y derivative
+//@param nx x grid coordinate
+//@param ny y grid coordinate
 double Field::Y2deriv(int nx, int ny){
     int nyplus=ny+1;
     int nyminus=ny-1;
@@ -157,10 +180,9 @@ double Field::Y2deriv(int nx, int ny){
     return ((phi[nx][nyplus]-2*phi[nx][ny]+phi[nx][nyminus])/(hy*hy));
 }
 
-double Field::get_phi(int i, int j){
-    return phi[i][j];
-}
-
+// Return field in the X direction
+//@param x x position
+//@param y y position
 double Field::get_X(double x, double y){
     double res=0;
 
@@ -173,6 +195,9 @@ double Field::get_X(double x, double y){
     return res+ext_x;
 }
 
+// Return field in the Y direction
+//@param x x position
+//@param y y position
 double Field::get_Y(double x, double y){
     double res=0;
 
@@ -185,6 +210,9 @@ double Field::get_Y(double x, double y){
     return res+ext_y;
 }
 
+// Return field in the Z direction
+//@param x x position
+//@param y y position
 double Field::get_Z(double x, double y){
     double res=0;
 
@@ -197,6 +225,18 @@ double Field::get_Z(double x, double y){
     return res+ext_z;
 }
 
+// Return internal phi field
+//@param i x grid coordinate
+//@param j y grid coordinate
+double Field::get_phi(int i, int j){
+    return phi[i][j];
+}
+
+// Function to calculate the field, given the charge density
+//@param n_types number of particle types
+//@param n_particles array with number of particles of each type (size n)
+//@param ctm array with charge to mass ratios for the particle types (size n)
+//@param particles particle matrix
 void Field::Update(int n_types, int* n_particles, double* ctm, particle** particles){
     
     double** rho=new double*[Nx];
@@ -217,31 +257,8 @@ void Field::Update(int n_types, int* n_particles, double* ctm, particle** partic
     delete [] rho;
 }
 
-void Field::Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho){
-    double quasi=0;
-
-    for(int i=0; i<n_types; ++i){
-        quasi -= ctm[i];
-    }
-
-    //cout<<"quasi= "<<quasi<<endl;
-
-    int Npart=0;
-    Npart+=n_particles[0];
-
-    for(int i=0; i<Nx; ++i){
-        for (int j=0; j<Ny;++j){
-            for (int p_type=0;p_type<n_types;++p_type){
-                for(int p=0; p<n_particles[p_type]; ++p){
-                    rho[i][j]+=Lx*Ly/Npart*ctm[p_type]*(Spline1(i*hx-particles[p_type][p].get_x(),hx)+Spline1(i*hx+Lx-particles[p_type][p].get_x(),hx)+Spline1(i*hx-Lx-particles[p_type][p].get_x(),hx))*(Spline1(j*hy-particles[p_type][p].get_y(),hy)+Spline1(j*hy+Ly-particles[p_type][p].get_y(),hy)+Spline1(j*hy-Ly-particles[p_type][p].get_y(),hy));
-                }
-            }
-            rho[i][j]+=quasi;
-        }
-    }
-    
-}
-
+// Function to update the internal field
+//@param rho density matrix at gridpoints (from Density)
 void Field::Poisson(double** rho){
     
     double* R = new double[Nx*Ny];
@@ -292,6 +309,45 @@ void Field::Poisson(double** rho){
 
 }
 
+// Function to calculate density given the particle positions
+//@param n_types number of particle types
+//@param n_particles array with number of particles of each type (size n)
+//@param ctm array with charge to mass ratios for the particle types (size n)
+//@param particles particle matrix
+//@param rho density matrix at the grid points, onto which the result will be copied
+void Field::Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho){
+    double quasi=0;
+
+    for(int i=0; i<n_types; ++i){
+        quasi -= ctm[i];
+    }
+
+    //cout<<"quasi= "<<quasi<<endl;
+
+    int Npart=0;
+    Npart+=n_particles[0];
+
+    for(int i=0; i<Nx; ++i){
+        for (int j=0; j<Ny;++j){
+            for (int p_type=0;p_type<n_types;++p_type){
+                for(int p=0; p<n_particles[p_type]; ++p){
+                    rho[i][j]+=Lx*Ly/Npart*ctm[p_type]*(Spline1(i*hx-particles[p_type][p].get_x(),hx)+Spline1(i*hx+Lx-particles[p_type][p].get_x(),hx)+Spline1(i*hx-Lx-particles[p_type][p].get_x(),hx))*(Spline1(j*hy-particles[p_type][p].get_y(),hy)+Spline1(j*hy+Ly-particles[p_type][p].get_y(),hy)+Spline1(j*hy-Ly-particles[p_type][p].get_y(),hy));
+                }
+            }
+            rho[i][j]+=quasi;
+        }
+    }
+    
+}
+
+// Function to calculate the kronecker (tensor) product of two matrices
+//@param p number of lines of matrix A
+//@param q number of columns of matrix A
+//@param m number of lines of matrix B
+//@param n number of columns of matrix B
+//@param A First matrix to multiply
+//@param B Second matrix to multiply
+//@param R Matrix onto which the result will be copied (must be (p*m)x(q*n))
 void Field::Kronecker(int p, int q, int m, int n, double** A, double** B, double** R){
     for(int i=0; i<p*m; ++i){
         for(int j=0; j<q*n; ++j){
@@ -300,6 +356,11 @@ void Field::Kronecker(int p, int q, int m, int n, double** A, double** B, double
     }
 }
 
+// LU matrix decomposition
+//@param A matrix to decompose
+//@param L L matrix for the result
+//@param U U matrix for the result
+//@param N size of the matrix (NxN)
 void Field::LUdecomp(double** A, double** L, double** U, int N){
 
     for (int i = 0; i<N; ++i){
@@ -331,6 +392,11 @@ void Field::LUdecomp(double** A, double** L, double** U, int N){
     cout<<endl;
 }
 
+// LU matrix inversion
+//@param A original matrix, where the inverse is put
+//@param L lower triangular matrix
+//@param U upper triangular matrix
+//@param N size of the matrices (NxX)
 void Field::LUinverse(double** A, double** L, double** U, int N){
     
     for(int i=0; i<N; ++i){ //loop for each column of the inverse matrix (Bcol)
@@ -369,6 +435,7 @@ void Field::LUinverse(double** A, double** L, double** U, int N){
     cout<<endl;
 }
 
+// Initialization of the MatFD matrix
 void Field::InitializeMatFD(){
 
     double** Ay=new double*[Ny];

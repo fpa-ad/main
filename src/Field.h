@@ -69,6 +69,8 @@ class Field{
         //@param particles particle matrix
         void Update(int n_types, int* n_particles, double* ctm, particle** particles);
 
+        // Function to update the internal field
+        //@param rho density matrix at gridpoints (from Density)
         void Poisson(double** rho);
 
         // Function to calculate density given the particle positions
@@ -81,9 +83,9 @@ class Field{
 
         // Function to calculate the kronecker (tensor) product of two matrices
         //@param p number of lines of matrix A
-        //@param q number of collumns of matrix A
+        //@param q number of columns of matrix A
         //@param m number of lines of matrix B
-        //@param n number of collumns of matrix B
+        //@param n number of columns of matrix B
         //@param A First matrix to multiply
         //@param B Second matrix to multiply
         //@param R Matrix onto which the result will be copied (must be (p*m)x(q*n))
