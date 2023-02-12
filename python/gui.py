@@ -381,7 +381,7 @@ class ParticleDialog(QDialog):
 
         self.n = QSpinBox()
         self.n.setMinimum(1)
-        self.n.setMaximum(100)
+        self.n.setMaximum(100000)
         self.layout.addWidget(self.n, 1, 1, 1, 1, Qt.AlignCenter)
 
         self.layout.addWidget(QHLine(), 2, 0, 1, 2)

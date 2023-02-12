@@ -66,7 +66,7 @@ Field::Field(double fLx, double fLy, double fhx, double fhy, double fext_x, doub
 
 Field::Field(const Field& F1){
     Lx=F1.Lx;
-    Nx=F1.Lx;
+    Nx=F1.Nx;
     hx=F1.hx;
     Ly=F1.Ly;
     Ny=F1.Ny;
@@ -124,10 +124,12 @@ Field::Field(const Field& F1){
         delete [] phi[i];
         delete [] Fx[i];
         delete [] Fy[i];
+        delete [] Fz[i];
     }
     delete [] phi;
     delete [] Fx;
     delete [] Fy;
+    delete [] Fz;
 }*/
 
 double Field::Xderiv(int nx, int ny){

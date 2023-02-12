@@ -5,8 +5,8 @@ import numpy as np
 import imageio as imageio
 from matplotlib.ticker import (MultipleLocator)
 
-minv = 1
-binw = 0.01
+minv = 5
+binw = 0.05
 
 if os.path.exists("output") and os.path.isdir("output"):
     sims = os.listdir("output")
@@ -61,7 +61,7 @@ if os.path.exists("output") and os.path.isdir("output"):
                         vy.append(float(line[3]))
                     #print(x)
                     #print(y)
-                    plt.scatter(x, vx, label="q/m="+header[0],s=2)
+                    plt.scatter(x, vx, label="q/m="+header[0],s=1)
             plt.xlim(0, Lx)
             plt.ylim(-10, 10)
             ax.xaxis.set_minor_locator(MultipleLocator(dx*10))

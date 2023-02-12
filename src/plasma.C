@@ -40,7 +40,7 @@ plasma::plasma(double in_Lx, double in_Ly, double in_hx, double in_hy, int in_n,
     if(nFields>1) fields[1] = Field(Lx, Ly, hx, hy, const_fields[1][0], const_fields[1][1], const_fields[1][2]);
 
     //// TEST ///
-    cout<<ctm[0]<<endl;
+    //cout<<ctm[0]<<endl;
     /////////////
 }
 
