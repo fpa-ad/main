@@ -1,10 +1,9 @@
 -----------------------------------------------------------
 To do list:
 	Código C++ Simulação:
-		1. Interpolação- Get_X() more general for higher order splines
+		1. Recheck Splines (just in case) 
     Data analysis:
-        1. Make a study of what units we're using, adjust length scales, particle densities and number of particles in each superparticle
-        2. Do Fourier transform and find the langmuir dispersion relation
+        1. Quasi-linear theory
 	Comentar:
 		1. Acabar comentários do Field.C (diogo, ver ??)
 		2. Copiar comentários para o Field.h (ana)

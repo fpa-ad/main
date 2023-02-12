@@ -76,17 +76,17 @@ class Field{
         //@param n_particles array with number of particles of each type (size n)
         //@param ctm array with charge to mass ratios for the particle types (size n)
         //@param particles particle matrix
-        //@param rho ??
+        //@param rho density matrix at the grid points, onto which the result will be copied
         void Density(int n_types, int* n_particles, double* ctm, particle** particles, double** rho);
 
-        // ??
-        //@param p ??
-        //@param q ??
-        //@param m ??
-        //@param n ??
-        //@param A ??
-        //@param B ??
-        //@param R ??
+        // Function to calculate the kronecker (tensor) product of two matrices
+        //@param p number of lines of matrix A
+        //@param q number of collumns of matrix A
+        //@param m number of lines of matrix B
+        //@param n number of collumns of matrix B
+        //@param A First matrix to multiply
+        //@param B Second matrix to multiply
+        //@param R Matrix onto which the result will be copied (must be (p*m)x(q*n))
         void Kronecker(int p, int q, int m, int n, double** A, double** B, double** R);
 
         // LU matrix decomposition
@@ -119,13 +119,13 @@ class Field{
         double hy=0;
         // Number of grid points - y direction
         int Ny=0;
-        // Internal phi field
+        // Internal scalar field
         double** phi=nullptr;
-        // ??
+        // x-component of the vector field
         double** Fx=nullptr;
-        // ??
+        // y-component of the vector field
         double** Fy=nullptr;
-        // ??
+        // z-component of the vector field
         double** Fz=nullptr;
         // External field - x direction
         double ext_x=0;
