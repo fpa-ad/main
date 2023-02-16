@@ -29,15 +29,21 @@ if os.path.exists("output") and os.path.isdir("output"):
             n = int(f.readline().split()[0])
         fig, ax = plt.subplots()
         plt.xlim(0, Lx)
-        plt.ylim(0, Ly)
+        plt.ylim(-10, 10)
         #ax.xaxis.set_minor_locator(MultipleLocator(dx))
         #ax.yaxis.set_minor_locator(MultipleLocator(dy))
+        plt.xlabel("$x\;[\lambda_{De}]$")
+        plt.ylabel("$v_x\;[\lambda_{De} \omega_{pe}]$")
         plt.grid(True, which='both')
         points = None
         fig2, axs2 = plt.subplots(1, 2, sharey=True, tight_layout=True, figsize=(8,4))
         hist1 = None
         hist2 = None
-        c = matplotlib.cm.rainbow
+        axs2[0].set_xlabel("$v_x\;[\lambda_{De} \omega_{pe}]$")
+        axs2[1].set_xlabel("$v_y\;[\lambda_{De} \omega_{pe}]$")
+        axs2[0].set_ylabel("Count")
+        axs2[1].set_ylabel("Count")
+        c = matplotlib.cm.tab10
         for file in files:
             if not ".txt" in file:
                 continue
@@ -80,26 +86,22 @@ if os.path.exists("output") and os.path.isdir("output"):
                         y.append(float(line[1]))
                         vx.append(float(line[2]))
                         vy.append(float(line[3]))
-                    if (n == 1):
-                        col = 0
-                    else:
-                        col = i / (n-1)
                     plt.figure(1)
-                    points.append(plt.scatter(x, y, label="q/m="+header[0], s=10, color=c(col)))
+                    points.append(plt.scatter(x, vx, label="q/m="+header[0], s=5, color=c(i)))
                     plt.figure(2)
-                    counts, bins, bars1 = axs2[0].hist(vx, bins = binn, range = (-binr, binr), label="q/m="+header[0], alpha=0.5, color=c(col))
+                    counts, bins, bars1 = axs2[0].hist(vx, bins = binn, range = (-binr, binr), label="q/m="+header[0], alpha=0.5, color=c(i))
                     hist1.append(bars1)
-                    counts, bins, bars2 = axs2[1].hist(vy, bins = binn, range = (-binr, binr), label="q/m="+header[0], alpha=0.5, color=c(col))
+                    counts, bins, bars2 = axs2[1].hist(vy, bins = binn, range = (-binr, binr), label="q/m="+header[0], alpha=0.5, color=c(i))
                     hist2.append(bars2)
             plt.figure(1)
             plt.legend()
-            plt.title(f"t={t}s")
+            plt.title(f"$t={t}"+"\;\omega_{pe}^{-1}$")
             plt.savefig("output/"+sim+"/"+file.replace("txt","png"))
             frames.append(int(file.replace(".txt","")))
             plt.figure(2)
-            axs2[0].set(title=f"$v_x$ for t={t}s")
+            axs2[0].set(title=f"$v_x$ for $t={t}"+"\;\omega_{pe}^{-1}$")
             plt.legend()
-            axs2[1].set(title=f"$v_y$ for t={t}s")
+            axs2[1].set(title=f"$v_y$ for $t={t}s"+"\;\omega_{pe}^{-1}$")
             plt.legend()
             plt.savefig("output/"+sim+"/"+file.replace(".txt","")+"_hist.png")
             
