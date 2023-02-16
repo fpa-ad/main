@@ -2,7 +2,7 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib
 import imageio as imageio
-from matplotlib.ticker import (MultipleLocator)
+#from matplotlib.ticker import (MultipleLocator)
 
 matplotlib.use("Agg")
 
@@ -22,7 +22,6 @@ def make_plots(sim, binr, binn):
     plt.xlim(0, Lx)
     plt.ylim(0, Ly)
     #ax.xaxis.set_minor_locator(MultipleLocator(dx))
-    #ax.yaxis.set_minor_locator(MultipleLocator(dy))
     plt.xlabel("$x\;[\lambda_{De}]$")
     plt.ylabel("$v_x\;[\lambda_{De} \omega_{pe}]$")
     plt.grid(True, which='both')

@@ -1,7 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 import imageio as imageio
-from matplotlib.ticker import (MultipleLocator)
+#from matplotlib.ticker import (MultipleLocator)
 import matplotlib
 
 matplotlib.use("Agg")
@@ -31,7 +31,6 @@ if os.path.exists("output") and os.path.isdir("output"):
         plt.xlim(0, Lx)
         plt.ylim(-10, 10)
         #ax.xaxis.set_minor_locator(MultipleLocator(dx))
-        #ax.yaxis.set_minor_locator(MultipleLocator(dy))
         plt.xlabel("$x\;[\lambda_{De}]$")
         plt.ylabel("$v_x\;[\lambda_{De} \omega_{pe}]$")
         plt.grid(True, which='both')
