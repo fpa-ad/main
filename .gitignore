@@ -3,3 +3,4 @@ lib/*
 output/*
 bin/*
 python/libFCpython*
+output_backup/*

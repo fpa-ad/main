@@ -154,7 +154,7 @@ if os.path.exists("output") and os.path.isdir("output"):
             plt.close()
 
             spimag=np.zeros(Nk)
-            for i in range(4001):
+            for i in range(gammaMax):
                 #spimag[:]+=np.sqrt(spIMAG[i,:])
                 spimag[:]+=spIMAG[i,:]
 
