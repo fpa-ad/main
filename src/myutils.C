@@ -64,6 +64,7 @@ double NewtonInt_V(funcdouble f, double a, double x0, int iterations, double h){
 //@param h finite difference to calculate the derivative of the denominator of the method
 double NewtonInt_V2(funcdouble f, double a, double x0, int iterations, double h){
     for (int i=0; i<iterations; ++i){
+        
         x0=x0-((Integral(f,-10,x0,0.01)-a)*2*h)/(Integral(f,-10,x0+h,0.01)-Integral(f,-10,x0-h,0.01));
     }
     return x0;
@@ -79,7 +80,7 @@ double Integral(funcdouble f, double a, double b, double h){
     int iters=(int)((b-a)/h);
     h=(b-a)/iters;
     for (int i=0; i<iters; ++i){
-        res+=f(a+i*h)*h;
+        res+=f(a+i*h+h/2)*h;
     }
     return res;
 }

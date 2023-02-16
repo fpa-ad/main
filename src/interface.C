@@ -127,7 +127,7 @@ py::str interface::create_simulation(double in_X, double in_Y, double in_dx, dou
                         if (abs(v) < 1000)
                             return 1/(vp*sqrt(M_PI)) * ((1-b)*exp(-v*v/(vp*vp)) + b*exp(-(v-v0)*(v-v0)/(vp*vp))) ;
                         else
-                            return vp/10;
+                            return v0+vp/5;
                         };
                     break;
                     }

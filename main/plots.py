@@ -10,7 +10,7 @@ binw = 0.05
 
 if os.path.exists("output") and os.path.isdir("output"):
     sims = os.listdir("output")
-    for sim in sims:
+    for sim in sims[1:]:
         if not os.path.isdir("output/"+sim):
             continue
         print("---- Simulation: ", sim, " ----")
@@ -67,21 +67,32 @@ if os.path.exists("output") and os.path.isdir("output"):
             ax.xaxis.set_minor_locator(MultipleLocator(dx*10))
             ax.yaxis.set_minor_locator(MultipleLocator(dy*10))
             plt.grid(True, which='both')
-            plt.title(f"t={t}s")
-            plt.legend()
+            pe='pe'
+            plt.title(f"$t={t}\omega_{{pe}}^{{-1}}$")
+            plt.legend(loc='upper right')
+            plt.xlabel("$x$ [$\lambda_{De}$]")
+            plt.ylabel("$v_x$ [$\lambda_{De}\omega_{pe}$]")
             plt.savefig("output/"+sim+"/"+file.replace("txt","png"))
-            frames.append(int(file.replace(".txt","")))
+            #frames.append(int(file.replace(".txt","")))
             #plt.show()
             plt.close(fig)
             fig, axs = plt.subplots(1, 2, sharey=True, tight_layout=True, figsize=(8,4))
             axs[0].hist(vx, bins=np.arange(-minv, minv, binw))
-            axs[0].set(title=f"$v_x$ for t={t}s")
+            axs[0].set(title=f"$v_x$ for $t={t}\omega_{{pe}}^{{-1}}$")
             #axs[0].yaxis.set_major_locator(MultipleLocator(1))
             axs[1].hist(vy, bins=np.arange(-minv, minv, binw))
-            axs[1].set(title=f"$v_y$ for t={t}s")
+            axs[1].set(title=f"$v_y$ for $t={t}\omega_{{pe}}^{{-1}}$")
             plt.savefig("output/"+sim+"/"+file.replace(".txt","")+"_hist.png")
             #plt.show()
             plt.close(fig)
+
+        for file in files:
+            if not ".txt" in file:
+                continue
+            if (file == "README.txt"):
+                continue
+            frames.append(int(file.replace(".txt","")))
+
             
 
         frames.sort()
