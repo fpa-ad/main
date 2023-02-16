@@ -1,7 +1,6 @@
 import os
 import matplotlib.pyplot as plt
 import matplotlib
-import numpy as np
 import imageio as imageio
 from matplotlib.ticker import (MultipleLocator)
 

@@ -4,6 +4,8 @@ import imageio as imageio
 from matplotlib.ticker import (MultipleLocator)
 import matplotlib
 
+matplotlib.use("Agg")
+
 binn = 100
 binr = 5
 
