@@ -87,7 +87,7 @@ if os.path.exists("output") and os.path.isdir("output"):
                         vx.append(float(line[2]))
                         vy.append(float(line[3]))
                     plt.figure(1)
-                    points.append(plt.scatter(x, vx, label="q/m="+header[0], s=5, color=c(i)))
+                    points.append(plt.scatter(x, vx, label="q/m="+header[0], s=2, color=c(i)))
                     plt.figure(2)
                     counts, bins, bars1 = axs2[0].hist(vx, bins = binn, range = (-binr, binr), label="q/m="+header[0], alpha=0.5, color=c(i))
                     hist1.append(bars1)
