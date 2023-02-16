@@ -11,7 +11,7 @@ binr = 5
 
 if os.path.exists("output") and os.path.isdir("output"):
     sims = os.listdir("output")
-    for sim in sims:
+    for sim in sims[1:]:
         if not os.path.isdir("output/"+sim):
             continue
         print("---- Simulation: ", sim, " ----")

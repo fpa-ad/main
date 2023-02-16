@@ -103,7 +103,7 @@ if os.path.exists("output") and os.path.isdir("output"):
             #print(len(wave))
             print(wave2[100,100])
             gammaMax=4001
-            spIMAG=np.imag(np.fft.fft2(wave[:gammaMax,:]))
+            spIMAG=np.imag(np.fft.fft2(wave))
             sp = np.abs(np.fft.fft2(wave))**2
             sp = np.fft.fftshift(sp)
             spIMAG=np.fft.fftshift(spIMAG)
