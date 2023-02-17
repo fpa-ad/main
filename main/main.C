@@ -48,14 +48,14 @@ double uniformP(double x){
     return 0;
 }
 
+// this is an example for 2 streams of the same species
 int main(){
-
     int n_particles[2];
-    n_particles[0] = 1000;
-    n_particles[1] = 1000;
+    n_particles[0] = 100;
+    n_particles[1] = 100;
     double ctm[2];
     ctm[0] = -1;
-    ctm[1] = 1;
+    ctm[1] = -1;
     double** fields = new double*[2];
     fields[0] = new double[3];
     fields[1] = new double[3];
@@ -64,19 +64,20 @@ int main(){
     fields[0][2] = 0;
     fields[1][0] = 0;
     fields[1][1] = 0;
-    fields[1][2] = 5;
+    fields[1][2] = 0;
     funcdouble** f=new funcdouble*[2];
     f[0]=new funcdouble[4];
     f[1]=new funcdouble[4];
     f[0][0]=&uniform;
     f[0][1]=&uniform;
-    f[0][2]=&maxwellian;
+    f[0][2]=&maxwellian2;
     f[0][3]=&maxwellian;
     f[1][0]=&uniform;
     f[1][1]=&uniform;
-    f[1][2]=&maxwellian;
+    f[1][2]=&maxwellian02;
     f[1][3]=&maxwellian;
     cout << "starting simulation" << endl;
+    // a description of the arguments can be found in src/sim.h
     sim simulation(10, 1, 0.1, 1, 0.05, 1, n_particles, ctm, f, 1, fields);
     cout << "running simulation" << endl;
     simulation.run(10, 0.0);
